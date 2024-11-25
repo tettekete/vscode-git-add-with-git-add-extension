@@ -6,6 +6,15 @@
   "engines": {
     "vscode": "^1.95.0"
   },
+  "publisher": "tettekete",
+  "author": "tettekete",
+  "license": "MIT",
+  "icon": "docs/images/git-add-with-git-add.png",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tettekete/vscode-git-add-with-git-add-extension"
+  },
+  "homepage": "https://github.com/tettekete/vscode-git-add-with-git-add-extension",
   "categories": [
     "Other"
   ],
