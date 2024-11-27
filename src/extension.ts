@@ -3,32 +3,11 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as path from 'path';
 
+import { findWorkspaceFolder } from './lib/utils';
+import { git_add_selected_lines } from './add_selected_lines';
+
 const _message_time_out = 4000;
 const execAsync = promisify(exec);
-/**
- * Find the workspace folder that contains the given file path.
- * @param filePath The file path to check.
- * @returns The root path of the workspace folder, or `undefined` if not found.
- */
-function findWorkspaceFolder(filePath: string): string | undefined
-{
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-
-    if ( ! workspaceFolders )
-	{
-        return undefined;
-    }
-
-	for (const folder of workspaceFolders)
-	{
-		if (filePath.startsWith(folder.uri.fsPath))
-		{
-			return folder.uri.fsPath;
-		}
-	}
-
-    return undefined;
-}
 
 /**
  * Returns a list of directory paths from vscode. workspace.workspaceFolders to which
@@ -169,8 +148,10 @@ export function activate(context: vscode.ExtensionContext)
 {
 	const run_git_add	= vscode.commands.registerCommand('tettekete.git-add-with-git-add', git_add );
 	const run_git_ad_u	= vscode.commands.registerCommand('tettekete.git-add-with-git-add-u', git_add_u );
+	const run_git_ad_l	= vscode.commands.registerCommand('tettekete.git-add-with-git-add-selected-lines', git_add_selected_lines );
 
-	context.subscriptions.push( run_git_add ,run_git_ad_u );
+
+	context.subscriptions.push( run_git_add ,run_git_ad_u ,run_git_ad_l );
 }
 
 // This method is called when your extension is deactivated

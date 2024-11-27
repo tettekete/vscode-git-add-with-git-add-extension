@@ -29,6 +29,10 @@
       {
         "command": "tettekete.git-add-with-git-add-u",
         "title": "git add -u: Update Tracked Files"
+      },
+      {
+        "command": "tettekete.git-add-with-git-add-selected-lines",
+        "title": "git add: Selected Lines(or cursor line)"
       }
     ]
   },
