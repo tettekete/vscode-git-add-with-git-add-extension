@@ -8,7 +8,7 @@ import
 	} from './lib/utils';
 import { makePatchForLineRange } from './lib/make-patch-for-line-range';
 import { LineRange } from './lib/line-range';
-import { execSync, spawnSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { kMessageTimeOut } from './constants';
 import { makePatchForUntrackedFile } from './lib/make-patch-for-untracked-file';
 import path from 'node:path';
@@ -23,7 +23,6 @@ export async function git_add_selected_lines()
 		return;
 	}
 
-	const document = editor.document;
 	const selection = editor.selection;
 
 	const filePath = editor.document.uri.fsPath;
