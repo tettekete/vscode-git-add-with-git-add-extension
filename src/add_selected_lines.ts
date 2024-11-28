@@ -44,7 +44,7 @@ export async function git_add_selected_lines()
 	}
 	else
 	{
-		startLine	= selection.anchor.line;
+		startLine	= selection.start.line;
 		endLine		= selection.end.line;
 	}
 
