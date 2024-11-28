@@ -28,13 +28,12 @@ export function makePatchForLineRange({
 
 	const parsedDiff = parseGitDiff( diff );
 	let diff_patch: string | Error = Error("makePatchForLineRange() faild.");
+	let is_patch_created = false;
 
 	parsedDiff.files.forEach((file: AnyFileChange) =>
 	{
-		if( ! isChangedFile( file ) )
-		{
-			return;
-		}
+		if( is_patch_created )			{ return; }
+		if( ! isChangedFile( file ) )	{ return; }
 
 		file.chunks.forEach((chunk: AnyChunk) =>
 		{
@@ -101,9 +100,7 @@ export function makePatchForLineRange({
 				}
 
 				diff_patch = patchMaker.toString();
-				
-				console.debug(`## diff_patch\n${diff_patch}\n-----`);
-				
+				is_patch_created = true;
 			}
 		});
 	});
