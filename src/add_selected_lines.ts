@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { isGitTrackedDir , getGitDiff ,findWorkspaceFolder } from './lib/utils';
 import { makePatchForLineRange } from './lib/make-patch-for-line-range';
 import { LineRange } from './lib/line-range';
+import { execSync, spawnSync } from 'child_process';
+import { kMessageTimeOut } from './constants';
 
 export async function git_add_selected_lines()
 {
@@ -56,4 +58,33 @@ export async function git_add_selected_lines()
 	const diff = getGitDiff( workspaceFolder, filePath );
 
 	const patch = makePatchForLineRange({ diff, selectedRange: selectedLineRange } );
+
+	console.debug(`# patch\n${patch}\n-----`);
+
+	if( typeof patch === 'string' && patch.length )
+	{
+		const applyProcess = spawnSync('git', ['apply','--cached'],
+		{
+			cwd: workspaceFolder,
+			input: patch,
+			stdio: 'pipe',
+			encoding: 'utf-8',
+		});
+
+		if (applyProcess.error)
+		{
+			vscode.window.showErrorMessage(`git-add-with-git-add: when apply diff\n${applyProcess.error.message}`,{modal: true});
+			return;
+		}
+		else if (applyProcess.status !== 0)
+		{
+			vscode.window.showErrorMessage(`git-add-with-git-add: "git apply failed:\n${applyProcess.stderr}`,{modal: true});
+			return;
+		}
+		else
+		{
+			console.log("Filtered diff applied successfully!");
+			vscode.window.setStatusBarMessage( `The patch has been successfully applied.` ,kMessageTimeOut);
+		}
+	}
 }
