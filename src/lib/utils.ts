@@ -59,6 +59,25 @@ export async function isGitTrackedDir( directory: string ):Promise<boolean>
 	return is_tracked;
 }
 
+export async function isGitTrackedFile( repo_dir: string ,file_path: string )
+{
+	let is_tracked = true;
+
+	try
+	{
+		const { stdout , stderr } = await execAsync(
+			`git ls-files --error-unmatch ${file_path}`,
+			{ cwd: repo_dir },
+		);
+	}
+	catch( e )
+	{
+		is_tracked = false;
+	}
+
+	return is_tracked;
+}
+
 /**
  * Find the workspace folder that contains the given file path.
  * @param filePath The file path to check.
