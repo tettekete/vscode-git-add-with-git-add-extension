@@ -10,20 +10,23 @@ export class PatchMaker
 	public to_range: LineRange | undefined;
 	public chunk_context: string = '';
 	public changes: AnyLineChange[] = [];
+	public omit_a_prefix: boolean = false;
 
 	constructor({
 		from_file,
 		to_file,
 		from_range,
 		to_range,
-		chunk_context = ''		// Extended git diff specification
+		chunk_context,		// Extended git diff specification
+		omit_a_prefix
 	}:
 	{
 		from_file: string;
 		to_file: string;
 		from_range?: LineRange;
 		to_range?: LineRange;
-		chunk_context?: string
+		chunk_context?: string;
+		omit_a_prefix?: boolean;
 	})
 	{
 		this.from_file	= from_file;
@@ -31,6 +34,7 @@ export class PatchMaker
 		if( from_range )	{ this.from_range	= from_range;}
 		if( to_range )		{ this.to_range	= to_range;}
 		if( chunk_context )	{ this.chunk_context = chunk_context;}
+		if( omit_a_prefix !== undefined ) { this.omit_a_prefix = omit_a_prefix; }
 	}
 
 	pushChanges( change: AnyLineChange )
@@ -63,7 +67,13 @@ export class PatchMaker
 			}
 		}
 
-		header_lines.push(`--- a/${this.from_file}`);
+		{
+			let prefix = 'a/';
+			if( this.omit_a_prefix ) { prefix = ''; }
+			header_lines.push(`--- ${prefix}${this.from_file}`);
+		}
+		
+		
 		header_lines.push(`+++ b/${this.to_file}`);
 
 		let fromFileLineNumbers = '';

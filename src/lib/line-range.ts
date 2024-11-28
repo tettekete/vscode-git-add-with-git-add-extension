@@ -5,6 +5,7 @@ export class LineRange
 {
 	private _start: number;
 	private _end: number;
+	private _lines_adjustment: 0 | 1 = 1;
 
 	constructor(
 		start: number,
@@ -69,12 +70,17 @@ export class LineRange
 	*/
 	get lines()
 	{
-		return this.end - this.start + 1;
+		return this.end - this.start + this._lines_adjustment;
 	}
 
 	set lines( n )
 	{
 		this._end = this._start + n -1;
+	}
+
+	set linesAdjustment( n : 0 | 1 )
+	{
+		this._lines_adjustment = n;
 	}
 
 	getOverlapRange( bRange: LineRange ): LineRange | undefined
@@ -99,6 +105,12 @@ export class LineRange
 		}
 
 		return false;
+	}
+
+	offsetRange( n : number )
+	{
+		this._start += n;
+		this._end += n; 
 	}
 
 	toDiffStyleString()
