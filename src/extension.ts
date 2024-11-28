@@ -5,8 +5,8 @@ import * as path from 'path';
 
 import { findWorkspaceFolder } from './lib/utils';
 import { git_add_selected_lines } from './add_selected_lines';
+import { kMessageTimeOut } from './constants';
 
-const _message_time_out = 4000;
 const execAsync = promisify(exec);
 
 /**
@@ -102,7 +102,7 @@ function git_add()
 					else
 					{
 						// vscode.window.showInformationMessage(`Git Add Successful: ${rel_path}`);
-						vscode.window.setStatusBarMessage( `git add ${rel_path} succeeded.` ,_message_time_out);
+						vscode.window.setStatusBarMessage( `git add ${rel_path} succeeded.` ,kMessageTimeOut);
 					}
 				}
 			);
@@ -138,7 +138,7 @@ async function git_add_u()
 					return;
 				}
 				
-				vscode.window.setStatusBarMessage( `git add -u completed successfully.` ,_message_time_out);
+				vscode.window.setStatusBarMessage( `git add -u completed successfully.` ,kMessageTimeOut);
 			}
 		);
 	}
