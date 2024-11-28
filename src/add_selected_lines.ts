@@ -1,9 +1,17 @@
 import * as vscode from 'vscode';
-import { isGitTrackedDir , getGitDiff ,findWorkspaceFolder } from './lib/utils';
+import
+	{
+		isGitTrackedDir, 
+		getGitDiff,
+		findWorkspaceFolder,
+		isGitTrackedFile
+	} from './lib/utils';
 import { makePatchForLineRange } from './lib/make-patch-for-line-range';
 import { LineRange } from './lib/line-range';
 import { execSync, spawnSync } from 'child_process';
 import { kMessageTimeOut } from './constants';
+import { makePatchForUntrackedFile } from './lib/make-patch-for-untracked-file';
+import path from 'node:path';
 
 export async function git_add_selected_lines()
 {
@@ -54,15 +62,25 @@ export async function git_add_selected_lines()
 	console.debug(`selectedLineRange.start: ${selectedLineRange.start}`);
 	console.debug(`selectedLineRange.end  : ${selectedLineRange.end}`);
 	
-	// get diff
-	const diff = getGitDiff( workspaceFolder, filePath );
+	let patch: string | Error;
+	if( await isGitTrackedFile( workspaceFolder , filePath ) )
+	{
+		// git The file being tracked is
+		const diff = getGitDiff( workspaceFolder, filePath );
 
-	const patch = makePatchForLineRange({ diff, selectedRange: selectedLineRange } );
-
-	console.debug(`# patch\n${patch}\n-----`);
+		patch = makePatchForLineRange({ diff, selectedRange: selectedLineRange } );
+	}
+	else
+	{
+		// untracked file
+		const rel_path = path.relative( workspaceFolder , filePath );
+		patch = makePatchForUntrackedFile({editor,rel_file_path: rel_path});
+	}
 
 	if( typeof patch === 'string' && patch.length )
 	{
+		console.debug(`# patch\n${patch}\n-----`);
+
 		const applyProcess = spawnSync('git', ['apply','--cached'],
 		{
 			cwd: workspaceFolder,
@@ -85,6 +103,12 @@ export async function git_add_selected_lines()
 		{
 			console.log("Filtered diff applied successfully!");
 			vscode.window.setStatusBarMessage( `The patch has been successfully applied.` ,kMessageTimeOut);
+			return;
 		}
+	}
+	else
+	{
+		const error = patch as Error;
+		vscode.window.showErrorMessage(`git-add-with-git-add: patch make error\n${error.message}`,{modal: true});
 	}
 }
