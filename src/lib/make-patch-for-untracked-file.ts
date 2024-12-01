@@ -33,8 +33,7 @@ export function makePatchForUntrackedFile(
 
 	const selectionRange = new LineRange( startLine , endLine );
 	selectionRange.offsetRange( -startLine );
-	const zeroRange	= new LineRange( 0,0 );
-	zeroRange.linesAdjustment = 0;
+	const zeroRange	= new LineRange( 0,0 ,false);
 
 	const patchMaker = new PatchMaker({
 		from_file: '/dev/null',
