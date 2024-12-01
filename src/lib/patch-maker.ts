@@ -18,7 +18,8 @@ export class PatchMaker
 		from_range,
 		to_range,
 		chunk_context,		// Extended git diff specification
-		omit_a_prefix
+		omit_a_prefix,
+		changes
 	}:
 	{
 		from_file: string;
@@ -27,6 +28,7 @@ export class PatchMaker
 		to_range?: LineRange;
 		chunk_context?: string;
 		omit_a_prefix?: boolean;
+		changes?: AnyLineChange[]
 	})
 	{
 		this.from_file	= from_file;
@@ -35,6 +37,7 @@ export class PatchMaker
 		if( to_range )		{ this.to_range	= to_range;}
 		if( chunk_context )	{ this.chunk_context = chunk_context;}
 		if( omit_a_prefix !== undefined ) { this.omit_a_prefix = omit_a_prefix; }
+		if( changes !== undefined ) { this.changes = changes; }
 	}
 
 	pushChanges( change: AnyLineChange )
