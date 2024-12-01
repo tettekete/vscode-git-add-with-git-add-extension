@@ -6,13 +6,13 @@ suite('LineRange Basic Tests', () =>
 	test('Basic Test',() =>
 	{
 		[
-			{ args: [ 1, 2 ], start: 1, end: 2 },
-			{ args: [ 4, 3 ], start: 3, end: 4 },
-			{ args: [ 5, 5 ], start: 5, end: 5 },
+			{ args: [ 1, 2 ], start: 1, end: 2 ,lines: 2},
+			{ args: [ 4, 3 ], start: 3, end: 4 ,lines: 2},
+			{ args: [ 5, 5 ], start: 5, end: 5 ,lines: 1},
 
-			{ args: [ -1, -2 ], start: -2, end: -1 },
-			{ args: [ -4, -3 ], start: -4, end: -3 },
-			{ args: [ -5, -5 ], start: -5, end: -5 },
+			{ args: [ -1, -2 ], start: -2, end: -1 ,lines: 2},
+			{ args: [ -4, -3 ], start: -4, end: -3 ,lines: 2},
+			{ args: [ -5, -5 ], start: -5, end: -5 ,lines: 1},
 			
 		].forEach((t) =>
 		{
@@ -20,6 +20,7 @@ suite('LineRange Basic Tests', () =>
 
 			assert.equal( r.start , t.start );
 			assert.equal( r.end , t.end );
+			assert.equal( r.lines , t.lines );
 		});
 	});
 
@@ -70,4 +71,47 @@ suite('LineRange Basic Tests', () =>
 
 		});
 	});
+});
+
+type constructor_args = [
+	start: number,
+	end: number,
+	flag?: boolean
+]
+
+suite('LineRange diff Format-related test', () =>
+{
+	test('construct with start and end',() =>
+	{
+		[
+			{ args: [ 3, 3, false ]	, diffStyleRange: '3,0', lines: 0 },
+			{ args: [ 3, 3 ]		, diffStyleRange: '3,1', lines: 1 },
+			{ args: [ 3, 7 ]		, diffStyleRange: '3,5', lines: 5 },
+			
+		].forEach((t) =>
+		{
+			const _args = (t.args as constructor_args );
+			const r = new LineRange( ..._args );
+
+			assert.equal( r.toDiffStyleString() , t.diffStyleRange );
+			assert.equal( r.lines , t.lines);
+		});
+	});
+
+	test('construct with "parse-git-diff" chunk',() =>
+	{
+		[
+			{ chunk:{ start: 3,lines: 0}	, diffStyleRange: '3,0', lines: 0 },
+			{ chunk:{ start: 3,lines: 1}	, diffStyleRange: '3,1', lines: 1 },
+			{ chunk:{ start: 3,lines: 5}	, diffStyleRange: '3,5', lines: 5 },
+			
+		].forEach((t) =>
+		{
+			const r = LineRange.fromChunkRange( t.chunk );
+
+			assert.equal( r.toDiffStyleString() , t.diffStyleRange );
+			assert.equal( r.lines , t.lines);
+		});
+	});
+
 });

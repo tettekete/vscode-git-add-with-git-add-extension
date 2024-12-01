@@ -5,31 +5,45 @@ export class LineRange
 {
 	private _start: number;
 	private _end: number;
-	private _lines_adjustment: 0 | 1 = 1;
+	private _includes_start_line: boolean = true;
 
 	constructor(
 		start: number,
-		end: number
+		end: number,
+		includes_start_line?: boolean
 	)
 	{
 		// Measures against TS warnings
 		this._start = start;
 		this._end	= end;
 
+		if( includes_start_line !== undefined )
+		{
+			this._includes_start_line = includes_start_line;
+		}
+
 		// Actual initialization process.
 		this.update_start_end( start , end );
 	}
 
+	static fromStartWithLines(
+			start: number ,
+			lines: number)
+	{
+		let includes_start_line = true;
+		let end = start + lines -1;
+		if( lines === 0 )
+		{
+			includes_start_line = false;
+			end = start;
+		}
+
+		return new LineRange( start , end ,includes_start_line );
+	}
+
 	static fromChunkRange( chunk: ChunkRange )
 	{
-		return new LineRange( chunk.start , chunk.start + chunk.lines -1 );
-			/*
-			e.g.) When `@@ -59,9 +62,8 @@ `:
-				`-59,9` means 9 lines including the 59th line.
-                Thus 58 + 9 - 1 = 67 is the last line.
-
-                If `-62,8` means 62 + 8 -1 = 69
-			*/
+		return LineRange.fromStartWithLines( chunk.start , chunk.lines );
 	}
 
 	private update_start_end( start:number , end: number )
@@ -70,17 +84,32 @@ export class LineRange
 	*/
 	get lines()
 	{
-		return this.end - this.start + this._lines_adjustment;
+		if( this._includes_start_line )
+		{
+			return this.end - this.start + 1;
+		}
+		else
+		{
+			return this.end - this.start;
+		}
+		
 	}
 
 	set lines( n )
 	{
-		this._end = this._start + n -1;
+		if( n === 0 )
+		{
+			this._end = this._start 
+		}
+		else
+		{
+			this._end = this._start + n -1;
+		}
 	}
 
-	set linesAdjustment( n : 0 | 1 )
+	set includes_start_line( bool : boolean )
 	{
-		this._lines_adjustment = n;
+		this._includes_start_line = bool;
 	}
 
 	getOverlapRange( bRange: LineRange ): LineRange | undefined
@@ -113,9 +142,35 @@ export class LineRange
 		this._end += n; 
 	}
 
+	inflatedClone( n: number )
+	{
+		return new LineRange( this._start -n , this._end +n ,this._includes_start_line );
+	}
+
+	getIterator(): Iterator<[number, number]>
+	{
+		const start	= this._start;
+		const end 	= this._end;
+
+		function* generator(): Generator<[number, number], void, unknown>
+		{
+			for (let i = 0; start + i <= end; i++)
+			{
+				yield [i, start + i];
+			}
+		}
+
+		return generator();
+	}
+
 	toDiffStyleString()
 	{
 		return `${this._start},${this.lines}`;
+	}
+
+	description()
+	{
+		return `{ start: ${this._start} ,end: ${this._end} ,lines: ${this.lines}} `;
 	}
 
 	clone()
