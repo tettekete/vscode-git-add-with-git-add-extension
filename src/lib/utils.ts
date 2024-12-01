@@ -13,13 +13,23 @@ const execAsync = promisify(exec);
  * 
  * @param {string} repo_dir - The path to the Git repository directory.
  * @param {string} file_path - The path to the file to check for differences.
+ * @param {number | undefined} unified - Default is 'undefined'. When a number is received, it is executed with the '--unified' option.
  * @returns {string} The Git diff output as a string, or an empty string if there are no differences.
  */
-export function getGitDiff( repo_dir:string , file_path: string ):string
+export function getGitDiff(
+							repo_dir:string ,
+							file_path: string ,
+							unified: number | undefined = undefined
+						):string
 {
+	let unified_option = '';
+	if( typeof unified === 'number' )
+	{
+		unified_option = `--unified=${unified}`;
+	}
+
 	const stdout = execSync(
-								// `git diff --unified=0 "${file_path}"`,
-								`git diff "${file_path}"`,
+								`git diff ${unified_option} "${file_path}"`,
 								{cwd: repo_dir }
 							).toString();
 	if( stdout.length )
