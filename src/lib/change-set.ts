@@ -323,7 +323,11 @@ export class ChangeSet
 		}
 	}
 
-	getModifyChangesInRange( start:number , end:number ):ChangeSet
+	getModifyChangesInRange(
+		start:number,
+		end:number,
+		include_preceding_deleted_lines = true
+	):ChangeSet
 	{
 		const line_type = 'lineAfter';
 		let hasEnterdRange		= false;
@@ -332,8 +336,6 @@ export class ChangeSet
 		
 		let startIdx		= -1;
 		let endIdx			= -1;
-		// let startLineNo		= -1;
-		// let endLineNo		= -1;
 
 		const changes:AnyLineChange[] = [];
 
@@ -365,7 +367,6 @@ export class ChangeSet
 						// 最初の modify 系 change が見つかった
 						hasEnteredModified = true;
 						startIdx = i;
-						// startLineNo = change[line_type];
 					}
 				}
 			}
@@ -382,13 +383,31 @@ export class ChangeSet
 			
 		}
 
+		// Add the previous continuous DeletedLine to the change.
+		if( changes.length && include_preceding_deleted_lines )
+		{
+			for(let i=startIdx - 1;i>=0;i-- )
+			{
+				const change = this._changes[i];
+				if( isDeletedLine( change ) )
+				{
+					changes.unshift( change );
+					startIdx --;
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+
 		// 末尾の UnchangedLine を除外する
 		const trimNum = ChangeSet.trimTrailingUnchangedLines( changes );
 
 		return new ChangeSet({
 			changes: changes,
 			start_index: startIdx,
-			end_index: endIdx - trimNum
+			end_index: changes.length ? endIdx - trimNum : -1
 		});
 	}
 

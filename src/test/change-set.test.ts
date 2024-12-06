@@ -221,3 +221,92 @@ suite('ChnageSet.getModifyChangesInRange Tests', () =>
 			}
 	});
 });
+
+suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines Tests', () =>
+{
+	test('linesAfter 31 to 31 and true(default)',()=>
+	{
+		const changeSet = new ChangeSet({ changes: chunks[1].changes });
+		const modfiedSet = changeSet.getModifyChangesInRange( 31, 31 );
+		const lines_begin = [
+			'',
+			'ggggggg'
+		];
+
+		const changes = modfiedSet.getChanges();
+		assert.equal( changes.length , lines_begin.length ,'changes.length === ines_begin.length');
+
+		for(let i=0;i<lines_begin.length;i++ )
+			{
+				assert.equal(
+					changes[i].content,
+					lines_begin[i],
+					`line [${i}] is "${lines_begin[i]}"`
+				);
+			}
+	});
+
+	test('linesAfter 31 to 31 and false',()=>
+	{
+		const changeSet = new ChangeSet({ changes: chunks[1].changes });
+		const modfiedSet = changeSet.getModifyChangesInRange( 31, 31 ,false );
+		const lines_begin = [
+			'ggggggg'
+		];
+
+		const changes = modfiedSet.getChanges();
+		assert.equal( changes.length , lines_begin.length ,'changes.length === ines_begin.length');
+
+		for(let i=0;i<lines_begin.length;i++ )
+			{
+				assert.equal(
+					changes[i].content,
+					lines_begin[i],
+					`line [${i}] is "${lines_begin[i]}"`
+				);
+			}
+	});
+
+	test('linesAfter 36 to 36 and true(default)',()=>
+	{
+		const changeSet = new ChangeSet({ changes: chunks[1].changes });
+		const modfiedSet = changeSet.getModifyChangesInRange( 36, 36 );
+		const lines_begin = [
+			'',
+			'ggggg'
+		];
+
+		const changes = modfiedSet.getChanges();
+		assert.equal( changes.length , lines_begin.length ,'changes.length === ines_begin.length');
+
+		for(let i=0;i<lines_begin.length;i++ )
+			{
+				assert.equal(
+					changes[i].content,
+					lines_begin[i],
+					`line [${i}] is "${lines_begin[i]}"`
+				);
+			}
+	});
+
+	test('linesAfter 36 to 36 and false',()=>
+	{
+		const changeSet = new ChangeSet({ changes: chunks[1].changes });
+		const modfiedSet = changeSet.getModifyChangesInRange( 36, 36 ,false );
+		const lines_begin = [
+			'ggggg'
+		];
+
+		const changes = modfiedSet.getChanges();
+		assert.equal( changes.length , lines_begin.length ,'changes.length === ines_begin.length');
+
+		for(let i=0;i<lines_begin.length;i++ )
+			{
+				assert.equal(
+					changes[i].content,
+					lines_begin[i],
+					`line [${i}] is "${lines_begin[i]}"`
+				);
+			}
+	});
+});
