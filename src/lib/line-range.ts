@@ -1,6 +1,33 @@
 
 import { ChunkRange } from 'parse-git-diff';
 
+/**
+ * 
+ * 行数における「範囲」を扱うためのクラスです。
+ * 
+ * 主に diff における行番号と行数を取り扱うために作られています。
+ * 一般的な、所謂 Range クラスとの一番の違いは end に指定した行が「範囲に含まれる」という点です。
+ * つまり start が 3 で end が 5 ならばその行数は 3 になります。イテレータも 3行目、4行目、5行目を返します。
+ * 
+ * また例外的に start と end が同じである場合に「行を持たない」という「範囲」を作ることが出来ます。
+ * これはコンストラクタの第3因数に false を渡すことで実現できます。
+ * 
+ * ---
+ * 
+ * This is a class for handling “ranges” in terms of line numbers.
+ * 
+ * It is mainly designed to handle line numbers and line counts in diff.
+ * The main difference from the general so-called Range class is that the line
+ * specified as end is “included in the range”.
+ * In other words, if start is 3 and end is 5, the line count will be 3. The
+ * iterator will also return the 3rd, 4th and 5th lines.
+ *
+ * Also, exceptionally, it is possible to create a “range” that “does
+ * not have any lines” when start and end are the same.
+ * This can be achieved by passing false as the third argument to the constructor.
+ * 
+ * 
+ */
 export class LineRange
 {
 	private _start: number;
