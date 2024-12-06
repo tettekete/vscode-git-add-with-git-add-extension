@@ -89,6 +89,11 @@ export class ChangeSet
 		return this._changes[n];
 	}
 
+	length():number
+	{
+		return this._changes.length;
+	}
+
 	constructor(
 		{
 			changes,
