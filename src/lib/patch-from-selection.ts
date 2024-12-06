@@ -144,6 +144,11 @@ export class PatchFromSelection
 		// 1. Get modify-type changes that overlap with the selected range.
 		const modifiedChangeSet = sourceChangeSet.getModifyChangesInRange(selectedRange.start ,selectedRange.end );
 
+		if( ! modifiedChangeSet.length() )
+		{
+			return Error('There are no modified lines.');
+		}
+
 		// 2. Get the changes that will be used as header padding.
 		const headerChanges = sourceChangeSet.getChangesByIndexAndSize(
 			{
@@ -225,6 +230,14 @@ export class PatchFromSelection
 				{
 					patchList.push( patch );
 				}
+				else
+				{
+					return patch as Error;
+				}
+			}
+			else
+			{
+				return patchMaker as Error;
 			}
 		}
 
