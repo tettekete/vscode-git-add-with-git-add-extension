@@ -196,3 +196,28 @@ suite('ChnageSet Basic Tests', () =>
 		
 	});
 });
+
+suite('ChnageSet.getModifyChangesInRange Tests', () =>
+{
+	// Test for bug in commit 32d7090 where it was not getting it right.
+	test('linesAfter 21 to 22',()=>
+	{
+		const changeSet = new ChangeSet({ changes: chunks[0].changes });
+		const modfiedSet = changeSet.getModifyChangesInRange( 21, 22 );
+		const lines_begin = [
+			'- Bastet as a',
+			'- Black cats and'
+		];
+
+		const changes = modfiedSet.getChanges();
+		assert.equal( changes.length , lines_begin.length ,'changes.length === ines_begin.length');
+
+		for(let i=0;i<lines_begin.length;i++ )
+			{
+				assert.ok(
+					changes[i].content.startsWith( lines_begin[i] )
+					,`line [${i}] begin with ${lines_begin[i]}`
+				);
+			}
+	});
+});

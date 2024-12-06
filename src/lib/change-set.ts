@@ -332,8 +332,8 @@ export class ChangeSet
 		
 		let startIdx		= -1;
 		let endIdx			= -1;
-		let startLineNo		= -1;
-		let endLineNo		= -1;
+		// let startLineNo		= -1;
+		// let endLineNo		= -1;
 
 		const changes:AnyLineChange[] = [];
 
@@ -353,32 +353,33 @@ export class ChangeSet
 					isEndOfRange = true;
 					endIdx = i;
 				}
+			}
 
-				// start 以降ならば、最初の modify 系 change を探す
-				if( hasEnterdRange )
+			// start 以降ならば、最初の modify 系 change を探す
+			if( hasEnterdRange )
+			{
+				if( ! hasEnteredModified )
 				{
-					if( ! hasEnteredModified )
+					if( isModifiedLineChange( change ) )
 					{
-						if( isModifiedLineChange( change ) )
-						{
-							// 最初の modify 系 change が見つかった
-							hasEnteredModified = true;
-							startIdx = i;
-							startLineNo = change[line_type];
-						}
+						// 最初の modify 系 change が見つかった
+						hasEnteredModified = true;
+						startIdx = i;
+						// startLineNo = change[line_type];
 					}
 				}
-
-				if( hasEnteredModified )
-				{
-					changes.push( change );
-				}
-
-				if( isEndOfRange )
-				{
-					break;
-				}
 			}
+
+			if( hasEnteredModified )
+			{
+				changes.push( change );
+			}
+
+			if( isEndOfRange )
+			{
+				break;
+			}
+			
 		}
 
 		// 末尾の UnchangedLine を除外する
