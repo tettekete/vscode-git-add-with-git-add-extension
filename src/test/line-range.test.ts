@@ -81,12 +81,13 @@ type constructor_args = [
 
 suite('LineRange diff Format-related test', () =>
 {
+	let test_idx = 0;
 	test('construct with start and end',() =>
 	{
 		[
-			{ args: [ 3, 3, false ]	, diffStyleRange: '3,0', lines: 0 },
-			{ args: [ 3, 3 ]		, diffStyleRange: '3,1', lines: 1 },
-			{ args: [ 3, 7 ]		, diffStyleRange: '3,5', lines: 5 },
+			{ args: [ 3, 3, false ]	, diffStyleRange: '3,0', lines: 0 ,start: 3 ,end: 3 },
+			{ args: [ 3, 3 ]		, diffStyleRange: '3,1', lines: 1 ,start: 3 ,end: 3 },
+			{ args: [ 3, 7 ]		, diffStyleRange: '3,5', lines: 5 ,start: 3 ,end: 7},
 			
 		].forEach((t) =>
 		{
@@ -95,6 +96,11 @@ suite('LineRange diff Format-related test', () =>
 
 			assert.equal( r.toDiffStyleString() , t.diffStyleRange );
 			assert.equal( r.lines , t.lines);
+
+			assert.equal( r.start , t.start ,`[${test_idx}]: ${r.start} === ${t.start}`);
+			assert.equal( r.end , t.end ,`[${test_idx}]: ${r.end} === ${t.end}`);
+
+			test_idx ++;
 		});
 	});
 
@@ -114,4 +120,47 @@ suite('LineRange diff Format-related test', () =>
 		});
 	});
 
+});
+
+
+suite('Iterator test', () =>
+{
+	let test_idx = 0;
+	test('construct with start and end',() =>
+	{
+		[
+			{ args: [ 3, 3 ,false]	, indexes:[], values:[]},
+			{ args: [ 3, 3 ]		, indexes:[0], values:[3]},
+			{ args: [ 3, 4 ]		, indexes:[0,1], values: [3,4] },
+			{ args: [ 5, 9 ]		, indexes:[0,1,2,3,4], values: [5,6,7,8,9] },
+			// 本来の使い方ではないが第三引数の意味は「1行目を含まない」なので、整合性のためこのような結果になるものとする。
+			// 後々このような使い方が必要になった場合仕様変更するかもしれない
+			{ args: [ 5, 9 ,false]	, indexes:[1,2,3,4], values: [6,7,8,9] },
+			
+		].forEach((t) =>
+		{
+			const _args = (t.args as constructor_args );
+			const LR = new LineRange( ..._args );
+			const ite = LR.getIterator();
+
+			let i = 0;
+			const values = [];
+			for( const {index,value} of ite )
+			{
+				assert.ok( t.indexes.length > i ,`${test_idx} - ${i}`);
+				assert.ok( t.values.length > i  ,`${test_idx} - ${i}`);
+				assert.equal( index , t.indexes[i] ,`${test_idx} - ${i}`);
+				assert.equal( value , t.values[i] ),`${test_idx} - ${i}`;
+
+				values.push( value );
+				i++;
+			}
+
+			// The number of values that can be retrieved in an iteration is the same as
+			// the value of lines.
+			assert.equal( values.length , LR.lines );
+
+			test_idx ++;
+		});
+	});
 });

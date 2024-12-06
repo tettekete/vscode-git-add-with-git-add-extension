@@ -13,17 +13,16 @@ export class LineRange
 		includes_start_line?: boolean
 	)
 	{
+		const updated = this.update_start_end( start , end );
+
 		// Measures against TS warnings
-		this._start = start;
-		this._end	= end;
+		this._start = updated.start;
+		this._end	= updated.end;
 
 		if( includes_start_line !== undefined )
 		{
 			this._includes_start_line = includes_start_line;
 		}
-
-		// Actual initialization process.
-		this.update_start_end( start , end );
 	}
 
 	static fromStartWithLines(
@@ -41,12 +40,17 @@ export class LineRange
 		return new LineRange( start , end ,includes_start_line );
 	}
 
+	// TODO: It depends on 'parse-git-diff', but if you use fromStartWithLines(), you can remove the dependency.
 	static fromChunkRange( chunk: ChunkRange )
 	{
 		return LineRange.fromStartWithLines( chunk.start , chunk.lines );
 	}
 
-	private update_start_end( start:number , end: number )
+	private update_start_end( start:number , end: number ):
+	{
+		start: number;
+		end: number;
+	}
 	{
 		if( start > end )
 		{
@@ -55,6 +59,8 @@ export class LineRange
 
 		this._start	= start;
 		this._end	= end;
+
+		return { start , end };
 	}
 
 	set start( n )
@@ -99,7 +105,7 @@ export class LineRange
 	{
 		if( n === 0 )
 		{
-			this._end = this._start 
+			this._end = this._start;
 		}
 		else
 		{
@@ -147,16 +153,31 @@ export class LineRange
 		return new LineRange( this._start -n , this._end +n ,this._includes_start_line );
 	}
 
-	getIterator(): Iterator<[number, number]>
+	// It's not being used at the moment, but the test has been written and I passed
+	// it, so I'll keep it.
+	getIterator(): IterableIterator<{index:number, value:number}>
 	{
 		const start	= this._start;
 		const end 	= this._end;
-
-		function* generator(): Generator<[number, number], void, unknown>
+		const thereAreNoLines = this.lines === 0;
+		let startAdjustment = 0;
+		if( ! this._includes_start_line )
 		{
-			for (let i = 0; start + i <= end; i++)
+			startAdjustment = 1;
+		}
+
+		function* generator(): Generator<{index:number, value:number}, void, unknown>
+		{
+			if( thereAreNoLines )
 			{
-				yield [i, start + i];
+				return;
+			}
+
+			for (let i = 0; i <= end - start - startAdjustment; i++)
+			{
+				yield {
+					index: i + startAdjustment,
+					value: start + i + startAdjustment};
 			}
 		}
 
