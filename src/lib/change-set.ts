@@ -44,6 +44,8 @@ export class ChangeSet
 {
 	public readonly range_basis: RANGE_BASIS_T = 'none';
 	private _changes:AnyLineChange[] = [];
+	#lineBeforeIndex: Map<number,{index:number,lineAfter:number | undefined }> = new Map();
+	#lineAfterIndex: Map<number,{index:number,lineBefore:number | undefined }> = new Map();
 
 	/*
 		_start_line , _end_line は `range_basis` が 'lineAfter' なら
@@ -115,6 +117,8 @@ export class ChangeSet
 	{
 		this._changes = changes;
 		if( typeof range_basis !== 'undefined' )	{ this.range_basis = range_basis; }
+
+		this.buildFromToIndex();
 
 		const r = this.getFirstLastLineNumbers();
 		this.firstLineBefore	= r.firstLineBefore;
@@ -210,6 +214,37 @@ export class ChangeSet
 			afterLines,
 			beforeLines
 		};
+	}
+
+	private buildFromToIndex()
+	{
+		for(let i=0;i<this._changes.length;i++)
+		{
+			const change = this._changes[i];
+			
+			let lineBefore	= isValidKey(change , kLineBefore) ? change[kLineBefore] : undefined;
+			let lineAfter	= isValidKey(change , kLineAfter) ? change[kLineAfter] : undefined;
+			
+			const beforePair = {
+				index: i,
+				lineAfter: lineAfter
+			};
+
+			const afterPair = {
+				index: i,
+				lineBefore: lineBefore
+			};
+
+			if( lineBefore !== undefined )
+			{
+				this.#lineBeforeIndex.set( lineBefore , beforePair );
+			}
+
+			if( lineAfter !== undefined )
+			{
+				this.#lineAfterIndex.set( lineAfter , afterPair );
+			}
+		}
 	}
 
 	// lineAfter の行番号ベースで指定範囲の change を返す
@@ -530,7 +565,7 @@ export class ChangeSet
 		}
 	)
 	{
-		const startIndex = this.findIndexFromBeforeLineNo( beforeStartLine );
+		const startIndex = this.getIndexFromBeforeLineNo( beforeStartLine );
 
 		if( typeof startIndex === 'undefined' )
 		{
@@ -559,22 +594,78 @@ export class ChangeSet
 
 	// lineBefore の番号を指定して一致する chnage リスト上のインデックス値を返す
 	// 見つからなかった場合 undefined を返す
-	findIndexFromBeforeLineNo( beforeLineNo:number ):number | undefined
+	getIndexFromBeforeLineNo( beforeLineNo:number ):number | undefined
 	{
-		for(let i=0;i<this._changes.length;i++)
-		{
-			const chnage	= this._changes[i];
+		const indexInfo	= this.#lineBeforeIndex.get( beforeLineNo );
 
-			if( isBeforeLineChange( chnage ) )
+		return indexInfo	=== undefined
+							? indexInfo
+							: indexInfo.index;
+	}
+
+	
+	/**
+	 * afterLineNo に対応する beforeLineNo を探し、見つからない場合 undefined を返す。
+	 *
+	 * @param {number} afterLineNo
+	 * @returns {(number | undefined)}
+	 */
+	getBeforeLineNoFormAfterLineNo( afterLineNo: number ):number | undefined
+	{
+		const indexInfo	= this.#lineAfterIndex.get( afterLineNo );
+
+		return indexInfo	=== undefined
+							? indexInfo
+							: indexInfo.lineBefore;
+	}
+
+
+	/**
+	 * afterLineNo に対応する beforeLineNo を探し、見つからない場合若い方に遡って最初の
+	 afterLineNo を返す。
+
+	 それも見つからなかった場合 fallback の指定があればその値を返し、なければ undefined を返す。
+	 *
+	 * @param {number} afterLineNo - change.lineAfter ベースの行番号
+	 * @param {?number} [fallback]
+	 * @returns {(number | undefined)}
+	 */
+	findBeforeLineNoFormAfterLineNo( afterLineNo:number ,fallback?:number ):number | undefined
+	{
+		const indexInfo	= this.#lineAfterIndex.get( afterLineNo );
+		const return_fallback_or_undefined = () =>
+		{
+			if( typeof fallback === 'number' )
 			{
-				if( chnage.lineBefore === beforeLineNo )
+				return fallback;
+			}
+			else
+			{
+				return undefined;
+			}
+		};
+
+		if( indexInfo === undefined )
+		{
+			return return_fallback_or_undefined();
+		}
+		else if( indexInfo.lineBefore === undefined )
+		{
+			for(let i=indexInfo.index -1;i>=0;i--)
+			{
+				const chnage = this._changes[i];
+				if( isBeforeLineChange( chnage ) )
 				{
-					return i;
+					return chnage.lineBefore;
 				}
 			}
-		}
 
-		return undefined;
+			return return_fallback_or_undefined();
+		}
+		else
+		{
+			return indexInfo.lineBefore;
+		}
 	}
 
 	concat( ...args:ChangeSet[] )
