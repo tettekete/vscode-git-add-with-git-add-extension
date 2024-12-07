@@ -20,7 +20,7 @@ import
 import { LineRange } from "./line-range";
 import { PatchMaker } from './patch-maker';
 import { ChangeSet } from './change-set';
-import { start } from 'repl';
+import { kPatchPaddingSize } from '../constants';
 
 export class PatchFromSelection
 {
@@ -136,7 +136,7 @@ export class PatchFromSelection
 
 		if( typeof selectedRange === 'undefined' )
 		{
-			return Error('Theare are not over larp range.');
+			return Error('There are no over-laped range.');
 		}
 
 		const sourceChangeSet = new ChangeSet({ changes: chunk.changes });
@@ -154,7 +154,7 @@ export class PatchFromSelection
 			{
 				startIndex: modifiedChangeSet.startIndex -1,
 				searchDirection: -1,
-				size: 3,
+				size: kPatchPaddingSize,
 				push_ok_filter: ( change: AnyLineChange ) =>
 				{
 					return isBeforeLineChange( change );
@@ -170,7 +170,7 @@ export class PatchFromSelection
 			{
 				startIndex: modifiedChangeSet.endIndex +1,
 				searchDirection: 1,
-				size: 3,
+				size: kPatchPaddingSize,
 				push_ok_filter: ( change: AnyLineChange ) =>
 				{
 					return isBeforeLineChange( change );
