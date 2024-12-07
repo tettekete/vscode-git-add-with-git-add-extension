@@ -5,10 +5,12 @@ import { ChangeSet } from '../lib/change-set';
 
 
 const diff = `diff --git a/cat-and-aliens-report.md b/cat-and-aliens-report.md
-index a8826c7..8743307 100644
+index a8826c7..621a8f7 100644
 --- a/cat-and-aliens-report.md
 +++ b/cat-and-aliens-report.md
-@@ -3,25 +3,24 @@
+@@ -1,27 +1,25 @@
+-# The History of Cats and Aliens: A Cosmic Tale
+ 
  ## Introduction
  
  For centuries, humanity has been fascinated by the enigmatic nature of cats and the possibility of
@@ -40,7 +42,7 @@ index a8826c7..8743307 100644
  
  In the medieval period, European folklore included tales of black cats appearing during strange
  astronomical events. These cats were sometimes linked to sorcery, but others believed they were
-@@ -29,20 +28,22 @@ harbingers of visitors from beyond the skies. Such stories fed into an enduring
+@@ -29,20 +27,22 @@ harbingers of visitors from beyond the skies. Such stories fed into an enduring
  between cats and the unknown.
  
  ## The Modern Era: UFOs and Cats
@@ -91,20 +93,20 @@ suite('ChnageSet Basic Tests', () =>
 	{
 		const changeSet1 = new ChangeSet({ changes: chunks[0].changes });
 
-		assert.equal( changeSet1.firstLineBefore	,3	,`changeSet1.firstLineBefore is ${changeSet1.firstLineBefore}`);
-		assert.equal( changeSet1.firstLineAfter		,3	,`changeSet1.firstLineAfter is ${changeSet1.firstLineAfter}`);
+		assert.equal( changeSet1.firstLineBefore	,1	,`changeSet1.firstLineBefore is ${changeSet1.firstLineBefore}`);
+		assert.equal( changeSet1.firstLineAfter		,1	,`changeSet1.firstLineAfter is ${changeSet1.firstLineAfter}`);
 		assert.equal( changeSet1.lastLineBefore		,27	,`changeSet1.lastLineBefore is ${changeSet1.lastLineBefore}`);
-		assert.equal( changeSet1.lastLineAfter		,26	,`changeSet1.lastLineAfter is ${changeSet1.lastLineAfter}`);
+		assert.equal( changeSet1.lastLineAfter		,25	,`changeSet1.lastLineAfter is ${changeSet1.lastLineAfter}`);
 
-		assert.equal( changeSet1.beforeLines		,25	,`changeSet1.beforeLines is ${changeSet1.beforeLines}`);
-		assert.equal( changeSet1.afterLines			,24	,`changeSet1.afterLines is ${changeSet1.afterLines}`);
+		assert.equal( changeSet1.beforeLines		,27	,`changeSet1.beforeLines is ${changeSet1.beforeLines}`);
+		assert.equal( changeSet1.afterLines			,25	,`changeSet1.afterLines is ${changeSet1.afterLines}`);
 		
 		const changeSet2 = new ChangeSet({ changes: chunks[1].changes });
 
 		assert.equal( changeSet2.firstLineBefore	,29	,`changeSet2.firstLineBefore is ${changeSet2.firstLineBefore}`);
-		assert.equal( changeSet2.firstLineAfter		,28	,`changeSet2.firstLineAfter is ${changeSet2.firstLineAfter}`);
+		assert.equal( changeSet2.firstLineAfter		,27	,`changeSet2.firstLineAfter is ${changeSet2.firstLineAfter}`);
 		assert.equal( changeSet2.lastLineBefore		,48	,`changeSet2.lastLineBefore is ${changeSet2.lastLineBefore}`);
-		assert.equal( changeSet2.lastLineAfter		,49	,`changeSet2.lastLineAfter is ${changeSet2.lastLineAfter}`);
+		assert.equal( changeSet2.lastLineAfter		,48	,`changeSet2.lastLineAfter is ${changeSet2.lastLineAfter}`);
 
 		assert.equal( changeSet2.beforeLines		,20	,`changeSet2.beforeLines is ${changeSet2.beforeLines}`);
 		assert.equal( changeSet2.afterLines			,22	,`changeSet2.afterLines is ${changeSet2.afterLines}`);
@@ -116,8 +118,8 @@ suite('ChnageSet Basic Tests', () =>
 	{
 		[
 			{
-				start: 5,
-				end: 9,
+				start: 4,
+				end: 8,
 				lines_begin:
 				[
 					'For centuries,',
@@ -128,8 +130,8 @@ suite('ChnageSet Basic Tests', () =>
 				]
 			},
 			{
-				start: 21,
-				end: 22,
+				start: 20,
+				end: 21,
 				lines_begin:
 				[
 					'- Bastet as',
@@ -189,7 +191,7 @@ suite('ChnageSet Basic Tests', () =>
 			{
 				assert.ok(
 					extracted.changeAt(i).content.startsWith( t.lines_begin[i] )
-					,`line [${i}] begin with ${t.lines_begin[i]}`
+					,`(${t.start},${t.end}) line [${i}] begin with "${t.lines_begin[i]}" actualy: "${extracted.changeAt(i).content}"`
 				);
 			}
 		});
@@ -200,10 +202,10 @@ suite('ChnageSet Basic Tests', () =>
 suite('ChnageSet.getModifyChangesInRange Tests', () =>
 {
 	// Test for bug in commit 32d7090 where it was not getting it right.
-	test('linesAfter 21 to 22',()=>
+	test('linesAfter 20 to 21',()=>
 	{
 		const changeSet = new ChangeSet({ changes: chunks[0].changes });
-		const modfiedSet = changeSet.getModifyChangesInRange( 21, 22 );
+		const modfiedSet = changeSet.getModifyChangesInRange( 20, 21 );
 		const lines_begin = [
 			'- Bastet as a',
 			'- Black cats and'
@@ -224,10 +226,10 @@ suite('ChnageSet.getModifyChangesInRange Tests', () =>
 
 suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines Tests', () =>
 {
-	test('linesAfter 31 to 31 and true(default)',()=>
+	test('linesAfter 30 to 30 and true(default)',()=>
 	{
 		const changeSet = new ChangeSet({ changes: chunks[1].changes });
-		const modfiedSet = changeSet.getModifyChangesInRange( 31, 31 );
+		const modfiedSet = changeSet.getModifyChangesInRange( 30, 30 );
 		const lines_match = [
 			'',
 			'ggggggg'
@@ -246,10 +248,10 @@ suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines Tests',
 			}
 	});
 
-	test('linesAfter 31 to 31 and false',()=>
+	test('linesAfter 30 to 30 and false',()=>
 	{
 		const changeSet = new ChangeSet({ changes: chunks[1].changes });
-		const modfiedSet = changeSet.getModifyChangesInRange( 31, 31 ,false );
+		const modfiedSet = changeSet.getModifyChangesInRange( 30, 30 ,false );
 		const lines_match = [
 			'ggggggg'
 		];
@@ -267,10 +269,10 @@ suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines Tests',
 			}
 	});
 
-	test('linesAfter 36 to 36 and true(default)',()=>
+	test('linesAfter 35 to 35 and true(default)',()=>
 	{
 		const changeSet = new ChangeSet({ changes: chunks[1].changes });
-		const modfiedSet = changeSet.getModifyChangesInRange( 36, 36 );
+		const modfiedSet = changeSet.getModifyChangesInRange( 35, 35 );
 		const lines_match = [
 			'',
 			'ggggg'
@@ -289,10 +291,10 @@ suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines Tests',
 			}
 	});
 
-	test('linesAfter 36 to 36 and false',()=>
+	test('linesAfter 35 to 35 and false',()=>
 	{
 		const changeSet = new ChangeSet({ changes: chunks[1].changes });
-		const modfiedSet = changeSet.getModifyChangesInRange( 36, 36 ,false );
+		const modfiedSet = changeSet.getModifyChangesInRange( 35, 35 ,false );
 		const lines_match = [
 			'ggggg'
 		];
@@ -314,10 +316,10 @@ suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines Tests',
 
 suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines allows added_line to be included', () =>
 {
-	test('linesAfter 46 to 46 and true(default)',()=>
+	test('linesAfter 45 to 45 and true(default)',()=>
 	{
 		const changeSet = new ChangeSet({ changes: chunks[1].changes });
-		const modfiedSet = changeSet.getModifyChangesInRange( 46, 46 );
+		const modfiedSet = changeSet.getModifyChangesInRange( 45, 45 );
 		const lines_begin = [
 			'such While beings.',
 			'their and cats',
