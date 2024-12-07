@@ -696,6 +696,15 @@ export class ChangeSet
 		return LineRange.fromStartWithLines( this.firstLineAfter ,this.afterLines );
 	}
 
+	/**
+	 * 開始位置に lineBefore を使い、 lines は after のものを使う
+	 * 事でパッチの to-file-line-numbers 向けの LineRange を返す。
+	 */
+	afterLineRangeForPatch(): LineRange | undefined
+	{
+		return LineRange.fromStartWithLines( this.firstLineBefore, this.afterLines );
+	}
+
 	// for debug
 	description()
 	{

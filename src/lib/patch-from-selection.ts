@@ -195,11 +195,17 @@ export class PatchFromSelection
 
 		const file = this.changedFile.path;
 
+		const toLineRange = allChangeSet.afterLineRangeForPatch();
+		if( toLineRange === undefined )
+		{
+			return Error("afterLineRangeForPatch() returns undefined.");
+		}
+
 		return new PatchMaker({
 			from_file: file,
 			to_file: file,
 			from_range: allChangeSet.beforeLineRange(),
-			to_range: allChangeSet.afterLineRange(),
+			to_range: toLineRange,
 			chunk_context: chunk.context,
 			changes: allChangeSet.getChanges()
 		});
