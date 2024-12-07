@@ -6,7 +6,7 @@ import
 		findWorkspaceFolder,
 		isGitTrackedFile
 	} from './lib/utils';
-import { makePatchForLineRange } from './lib/make-patch-for-line-range';
+import { PatchFromSelection } from './lib/patch-from-selection';
 import { LineRange } from './lib/line-range';
 import { spawnSync } from 'child_process';
 import { kMessageTimeOut } from './constants';
@@ -67,7 +67,13 @@ export async function git_add_selected_lines()
 		// git The file being tracked is
 		const diff = getGitDiff( workspaceFolder, filePath );
 
-		patch = makePatchForLineRange({ diff, selectedRange: selectedLineRange } );
+		// patch = makePatchForLineRange({ diff, selectedRange: selectedLineRange } );
+		const patchFromSelection = new PatchFromSelection({
+			diff: diff,
+			selectionRange: selectedLineRange
+		});
+
+		patch = patchFromSelection.getPatchString();
 	}
 	else
 	{
@@ -86,6 +92,7 @@ export async function git_add_selected_lines()
 			input: patch,
 			stdio: 'pipe',
 			encoding: 'utf-8',
+			shell: process.platform === 'win32', // for Windows support
 		});
 
 		if (applyProcess.error)
@@ -108,6 +115,6 @@ export async function git_add_selected_lines()
 	else
 	{
 		const error = patch as Error;
-		vscode.window.showErrorMessage(`git-add-with-git-add: patch make error\n${error.message}`,{modal: true});
+		vscode.window.showErrorMessage(`git-add-with-git-add: patch error\n${error.message}`,{modal: true});
 	}
 }
