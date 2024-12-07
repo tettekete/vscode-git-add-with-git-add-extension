@@ -228,20 +228,20 @@ suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines Tests',
 	{
 		const changeSet = new ChangeSet({ changes: chunks[1].changes });
 		const modfiedSet = changeSet.getModifyChangesInRange( 31, 31 );
-		const lines_begin = [
+		const lines_match = [
 			'',
 			'ggggggg'
 		];
 
 		const changes = modfiedSet.getChanges();
-		assert.equal( changes.length , lines_begin.length ,'changes.length === ines_begin.length');
+		assert.equal( changes.length , lines_match.length ,'changes.length === ines_begin.length');
 
-		for(let i=0;i<lines_begin.length;i++ )
+		for(let i=0;i<lines_match.length;i++ )
 			{
 				assert.equal(
 					changes[i].content,
-					lines_begin[i],
-					`line [${i}] is "${lines_begin[i]}"`
+					lines_match[i],
+					`line [${i}] is "${lines_match[i]}"`
 				);
 			}
 	});
@@ -250,19 +250,19 @@ suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines Tests',
 	{
 		const changeSet = new ChangeSet({ changes: chunks[1].changes });
 		const modfiedSet = changeSet.getModifyChangesInRange( 31, 31 ,false );
-		const lines_begin = [
+		const lines_match = [
 			'ggggggg'
 		];
 
 		const changes = modfiedSet.getChanges();
-		assert.equal( changes.length , lines_begin.length ,'changes.length === ines_begin.length');
+		assert.equal( changes.length , lines_match.length ,'changes.length === ines_begin.length');
 
-		for(let i=0;i<lines_begin.length;i++ )
+		for(let i=0;i<lines_match.length;i++ )
 			{
 				assert.equal(
 					changes[i].content,
-					lines_begin[i],
-					`line [${i}] is "${lines_begin[i]}"`
+					lines_match[i],
+					`line [${i}] is "${lines_match[i]}"`
 				);
 			}
 	});
@@ -271,20 +271,20 @@ suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines Tests',
 	{
 		const changeSet = new ChangeSet({ changes: chunks[1].changes });
 		const modfiedSet = changeSet.getModifyChangesInRange( 36, 36 );
-		const lines_begin = [
+		const lines_match = [
 			'',
 			'ggggg'
 		];
 
 		const changes = modfiedSet.getChanges();
-		assert.equal( changes.length , lines_begin.length ,'changes.length === ines_begin.length');
+		assert.equal( changes.length , lines_match.length ,'changes.length === ines_begin.length');
 
-		for(let i=0;i<lines_begin.length;i++ )
+		for(let i=0;i<lines_match.length;i++ )
 			{
 				assert.equal(
 					changes[i].content,
-					lines_begin[i],
-					`line [${i}] is "${lines_begin[i]}"`
+					lines_match[i],
+					`line [${i}] is "${lines_match[i]}"`
 				);
 			}
 	});
@@ -293,19 +293,19 @@ suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines Tests',
 	{
 		const changeSet = new ChangeSet({ changes: chunks[1].changes });
 		const modfiedSet = changeSet.getModifyChangesInRange( 36, 36 ,false );
-		const lines_begin = [
+		const lines_match = [
 			'ggggg'
 		];
 
 		const changes = modfiedSet.getChanges();
-		assert.equal( changes.length , lines_begin.length ,'changes.length === ines_begin.length');
+		assert.equal( changes.length , lines_match.length ,'changes.length === ines_begin.length');
 
-		for(let i=0;i<lines_begin.length;i++ )
+		for(let i=0;i<lines_match.length;i++ )
 			{
 				assert.equal(
 					changes[i].content,
-					lines_begin[i],
-					`line [${i}] is "${lines_begin[i]}"`
+					lines_match[i],
+					`line [${i}] is "${lines_match[i]}"`
 				);
 			}
 	});
