@@ -5,6 +5,7 @@ import {
 	UnchangedLine,
 	DeletedLine,
 	AddedLine,
+	MessageLine,
 	AnyFileChange,
 	ChangedFile
 } from 'parse-git-diff';
@@ -41,6 +42,12 @@ export function isDeletedLine( change: AnyLineChange ): change is DeletedLine
 export function isAddedLine( change: AnyLineChange ): change is AddedLine
 {
 	return change.type === 'AddedLine';
+}
+
+/** Type Gurd for MessageLine */
+export function isMessageLine( change: AnyLineChange ): change is MessageLine
+{
+	return change.type === 'MessageLine';
 }
 
 /**  UnchangedLine | AddedLine is after line change*/
