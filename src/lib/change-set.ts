@@ -391,6 +391,8 @@ export class ChangeSet
 		// Add the previous continuous DeletedLine to the change.
 		if( changes.length && include_preceding_deleted_lines )
 		{
+			let foundPendingLine = false;
+			let pendingLines = 0;
 			for(let i=startIdx - 1;i>=0;i-- )
 			{
 				const change = this._changes[i];
@@ -398,6 +400,13 @@ export class ChangeSet
 				{
 					changes.unshift( change );
 					startIdx --;
+					startIdx -= pendingLines;
+					pendingLines = 0;
+				}
+				else if( ! foundPendingLine && isAddedLine( change ) )
+				{
+					foundPendingLine = true;
+					pendingLines ++;
 				}
 				else
 				{

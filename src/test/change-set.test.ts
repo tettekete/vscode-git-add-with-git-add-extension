@@ -310,3 +310,29 @@ suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines Tests',
 			}
 	});
 });
+
+
+suite('ChnageSet.getModifyChangesInRange include_preceding_deleted_lines allows added_line to be included', () =>
+{
+	test('linesAfter 46 to 46 and true(default)',()=>
+	{
+		const changeSet = new ChangeSet({ changes: chunks[1].changes });
+		const modfiedSet = changeSet.getModifyChangesInRange( 46, 46 );
+		const lines_begin = [
+			'such While beings.',
+			'their and cats',
+			'claims remain unverified,'
+		];
+
+		const changes = modfiedSet.getChanges();
+		assert.equal( changes.length , lines_begin.length ,'changes.length === ines_begin.length');
+
+		for(let i=0;i<lines_begin.length;i++ )
+		{
+			assert.ok(
+				changes[i].content.startsWith( lines_begin[i] ),
+				`line [${i}] began "${lines_begin[i]}"`
+			);
+		}
+	});
+});
