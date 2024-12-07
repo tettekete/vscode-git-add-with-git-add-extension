@@ -376,6 +376,7 @@ export class ChangeSet
 		
 		let startIdx		= -1;
 		let endIdx			= -1;
+		let lastLineAfter	= 1;
 
 		const changes:AnyLineChange[] = [];
 
@@ -383,19 +384,22 @@ export class ChangeSet
 		{
 			const change = this._changes[i];
 
+			let thisLineAsAfter = lastLineAfter;
 			if( isValidKey( change , line_type ) )
 			{
-				// まず start 〜 end の中に入ったかどうかのチェックを行いフラグを立てる
-				if( ! hasEnterdRange && change[line_type] >= start )
-				{
-					hasEnterdRange = true;
-				}
-				else if( change[line_type] >= end )
-				{
-					isEndOfRange = true;
-					endIdx = i;
-				}
+				thisLineAsAfter	= change[line_type];
+				lastLineAfter	= change[line_type];
 			}
+
+			// まず start 〜 end の中に入ったかどうかのチェックを行いフラグを立てる
+			if( ! hasEnterdRange && thisLineAsAfter >= start )
+			{
+				hasEnterdRange = true;
+			}
+			else if( thisLineAsAfter >= end )
+			{
+				isEndOfRange = true;
+			}			
 
 			// start 以降ならば、最初の modify 系 change を探す
 			if( hasEnterdRange )
@@ -414,6 +418,7 @@ export class ChangeSet
 			if( hasEnteredModified )
 			{
 				changes.push( change );
+				endIdx = i;
 			}
 
 			if( isEndOfRange )
@@ -424,7 +429,9 @@ export class ChangeSet
 		}
 
 		// Add the previous continuous DeletedLine to the change.
-		if( changes.length && include_preceding_deleted_lines )
+		if( changes.length
+			&& isAddedLine( changes[0] )
+			&& include_preceding_deleted_lines )
 		{
 			let foundPendingLine = false;
 			let pendingLines = 0;
