@@ -1,6 +1,7 @@
 
 import { LineRange } from './line-range';
 import { AnyLineChange } from 'parse-git-diff';
+import { kNoNewlineAtEndOfFile } from '../constants';
 
 export class PatchMaker
 {
@@ -52,20 +53,32 @@ export class PatchMaker
 
 		// Build the patch content first for the calculation of to-file-line-numbers
 		let line_count = 0;
-		for(const change of this.changes )
+		for(let i=0;i<this.changes.length;i++ )
 		{
+			const change = this.changes[i];
+
 			switch( change.type )
 			{
 				case 'DeletedLine':
 					content_lines.push(`-${change.content}`);
 					break;
+
 				case 'UnchangedLine':
 					content_lines.push(` ${change.content}`);
 					line_count ++;
 					break;
+
 				case 'AddedLine':
 					content_lines.push(`+${change.content}`);
 					line_count ++;
+					break;
+				
+				case 'MessageLine':
+					if( i === this.changes.length -1
+						&& change.content === kNoNewlineAtEndOfFile )
+					{
+						content_lines.push(`\\ ${change.content}`);
+					}
 					break;
 			}
 		}

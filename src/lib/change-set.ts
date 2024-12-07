@@ -17,6 +17,7 @@ import
 	isUnchangedLine,
 	isDeletedLine,
 	isAddedLine,
+	isMessageLine,
 	isAfterLineChange,
 	isBeforeLineChange,
 	isModifiedLineChange,
@@ -24,6 +25,7 @@ import
 
 import { isValidKey } from './type-gurd/common';
 import { LineRange } from './line-range';
+import { kNoNewlineAtEndOfFile } from '../constants';
 
 const RangeBasisType = 
 {
@@ -152,7 +154,7 @@ export class ChangeSet
 	}
 
 	/**
-	 * init utility
+	 * Part of the instantiation process
 	 *
 	 */
 	private getFirstLastLineNumbers():
@@ -467,7 +469,7 @@ export class ChangeSet
 		});
 	}
 
-	// ignore_filter は結果リストに push される直前に評価される
+	// push_ok_filter は結果リストに push される直前に評価される
 	// つまり取得済みサイズ数は増えず、インデックスだけが動く
 	getChangesByIndexAndSize( 
 		{
@@ -501,6 +503,7 @@ export class ChangeSet
 		let startIdx	= -1;
 		let endIdx		= -1;
 		let offset = 0;
+		
 		while( true )
 		{
 			const i = startIndex + offset;
@@ -510,7 +513,17 @@ export class ChangeSet
 
 			const change = this._changes[i];
 
-			if( push_ok_filter( change ) )
+			let isNoNewlineAtEndOfFile = false;
+			if( i === this._changes.length -1 )
+			{
+				if( isMessageLine( change ) 
+					&& change.content === kNoNewlineAtEndOfFile )
+				{
+					isNoNewlineAtEndOfFile = true;
+				}
+			}
+
+			if( push_ok_filter( change ) || isNoNewlineAtEndOfFile )
 			{
 				chnages.push( change );
 				if( startIdx < 0 )
@@ -739,10 +752,6 @@ export class ChangeSet
 		return trimNum;
 	}
 
-	// getStartAndEnd( line_type:BeforeOrAfter ):{start:number , end:number}
-	// {
-	// 	return {start:0 ,end:0};
-	// }
 
 	static truncateAfterLineValue(
 		changes:AnyLineChange[] ,
