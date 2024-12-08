@@ -101,25 +101,17 @@ export class ChangeSet
 	constructor(
 		{
 			changes,
-			range_basis,
-			// start_line,
-			// end_line,
 			start_index,
 			end_index,
 		}:
 		{
 			changes:AnyLineChange[]
-			range_basis?: RANGE_BASIS_T;
-			// start_line?: number,
-			// end_line?: number,
 			start_index?: number,
 			end_index?: number,
 		}
 	)
 	{
 		this._changes = changes;
-		if( typeof range_basis !== 'undefined' )	{ this.range_basis = range_basis; }
-
 		this.buildFromToIndex();
 
 		const r = this.getFirstLastLineNumbers();
@@ -571,46 +563,6 @@ export class ChangeSet
 		}
 	}
 
-	// 開発中断
-	getChangesByLineBeforeAndLines(
-		{
-			beforeStartLine,
-			searchDirection = 1,
-			lines,
-		}:
-		{
-			beforeStartLine: number;
-			searchDirection?: -1 | 1;
-			lines?:number;
-		}
-	)
-	{
-		const startIndex = this.getIndexFromBeforeLineNo( beforeStartLine );
-
-		if( typeof startIndex === 'undefined' )
-		{
-			return [];
-		}
-
-		const incrementValue = searchDirection < 0 ? -1 : 1;
-		if( typeof lines === 'undefined' )
-		{
-			lines = this._changes.length;
-		}
-
-		const chnages:AnyLineChange[] = [];
-		let offset = 0;
-		let linesCount = 0;	// ややこしいが、
-		while( true )
-		{
-			const i = startIndex + offset;
-
-			if( linesCount >= lines )		{ break; }
-			if( i < 0 || i >= chnages.length )	{ break; }
-
-		}
-
-	}
 
 	// lineBefore の番号を指定して一致する chnage リスト上のインデックス値を返す
 	// 見つからなかった場合 undefined を返す
@@ -713,9 +665,45 @@ export class ChangeSet
 	 * 開始位置に lineBefore を使い、 lines は after のものを使う
 	 * 事でパッチの to-file-line-numbers 向けの LineRange を返す。
 	 */
-	afterLineRangeForPatch(): LineRange | undefined
+	afterLineRangeForPatch(): LineRange
 	{
 		return LineRange.fromStartWithLines( this.firstLineBefore, this.afterLines );
+	}
+
+	getAsPatchLines(wantarray: boolean = true ):string[] | string
+	{
+		let content_lines:string[]	= [];
+
+		const changesLength = this._changes.length;
+		for(let i=0;i<changesLength;i++ )
+		{
+			const change = this._changes[i];
+
+			switch( change.type )
+			{
+				case 'DeletedLine':
+					content_lines.push(`-${change.content}`);
+					break;
+
+				case 'UnchangedLine':
+					content_lines.push(` ${change.content}`);
+					break;
+
+				case 'AddedLine':
+					content_lines.push(`+${change.content}`);
+					break;
+				
+				case 'MessageLine':
+					if( i === changesLength -1
+						&& change.content === kNoNewlineAtEndOfFile )
+					{
+						content_lines.push(`\\ ${change.content}`);
+					}
+					break;
+			}
+		}
+
+		return wantarray ? content_lines : content_lines.join("\n") + "\n";
 	}
 
 	// for debug

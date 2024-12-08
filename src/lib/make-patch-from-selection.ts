@@ -207,7 +207,7 @@ export class MakePatchFromSelection
 			from_range: allChangeSet.beforeLineRange(),
 			to_range: toLineRange,
 			chunk_context: chunk.context,
-			changes: allChangeSet.getChanges()
+			change_set: allChangeSet
 		});
 	}
 

@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { PatchFromChunk } from './patch-from-chunk';
 import { LineRange } from './line-range';
 import { AnyLineChange ,AddedLine } from 'parse-git-diff';
+import { ChangeSet } from './change-set';
 
 export function makePatchForUntrackedFile(
 	{
@@ -35,13 +36,7 @@ export function makePatchForUntrackedFile(
 	selectionRange.offsetRange( -startLine );
 	const zeroRange	= new LineRange( 0,0 ,false);
 
-	const patchFromChunk = new PatchFromChunk({
-		from_file: '/dev/null',
-		omit_a_prefix: true,
-		to_file: rel_file_path,
-		from_range: zeroRange,
-		to_range: selectionRange
-	});
+	const changes: AnyLineChange[] = [];
 
 	for(let i=startLine;i<=endLine;i++)
 	{
@@ -52,8 +47,19 @@ export function makePatchForUntrackedFile(
 			content: document.lineAt( i ).text
 		};
 
-		patchFromChunk.pushChanges( change );
+		changes.push( change );
 	}
+
+	const change_set = new ChangeSet({ changes: changes });
+
+	const patchFromChunk = new PatchFromChunk({
+		from_file: '/dev/null',
+		omit_a_prefix: true,
+		to_file: rel_file_path,
+		from_range: zeroRange,
+		to_range: selectionRange,
+		change_set: change_set
+	});
 
 	return patchFromChunk.toString();
 }
