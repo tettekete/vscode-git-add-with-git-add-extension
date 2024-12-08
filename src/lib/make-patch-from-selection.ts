@@ -22,7 +22,7 @@ import { PatchMaker } from './patch-maker';
 import { ChangeSet } from './change-set';
 import { kPatchPaddingSize } from '../constants';
 
-export class PatchFromSelection
+export class MakePatchFromSelection
 {
 	private selectedChunks: Chunk[] = [];
 	private selectionRange: LineRange;

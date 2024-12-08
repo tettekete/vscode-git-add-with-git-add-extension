@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import parseGitDiff ,{ Chunk,ChangedFile } from 'parse-git-diff';
 import { isChangedFile , isChunk } from '../lib/type-gurd/parse-git-diff';
-import { PatchFromSelection } from '../lib/patch-from-selection';
+import { MakePatchFromSelection } from '../lib/make-patch-from-selection';
 import { LineRange } from '../lib/line-range';
 
 const diff = `diff --git a/cat-and-aliens-report.md b/cat-and-aliens-report.md
@@ -88,19 +88,19 @@ for(const file of parsedDiff.files )
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// PatchFromSelection Basic Tests
+// MakePatchFromSelection Basic Tests
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-suite('PatchFromSelection Basic Tests', () =>
+suite('MakePatchFromSelection Basic Tests', () =>
 {
 	test('Select line 4 to 6',()=>
 	{
-		const patchFromSelection = new PatchFromSelection({
+		const makePatchFromSelection = new MakePatchFromSelection({
 			diff: diff,
 			selectionRange: new LineRange( 4,6 )
 		});
 
-		const patch = patchFromSelection.getPatchString();
+		const patch = makePatchFromSelection.getPatchString();
 		const expect = `--- a/cat-and-aliens-report.md
 +++ b/cat-and-aliens-report.md
 @@ -3,6 +3,7 @@
@@ -118,12 +118,12 @@ suite('PatchFromSelection Basic Tests', () =>
 
 	test('Select line 20 to 21',()=>
 	{
-		const patchFromSelection = new PatchFromSelection({
+		const makePatchFromSelection = new MakePatchFromSelection({
 			diff: diff,
 			selectionRange: new LineRange( 20,21 )
 		});
 
-		const patch = patchFromSelection.getPatchString();
+		const patch = makePatchFromSelection.getPatchString();
 		const expect = `--- a/cat-and-aliens-report.md
 +++ b/cat-and-aliens-report.md
 @@ -17,8 +17,6 @@
@@ -142,12 +142,12 @@ suite('PatchFromSelection Basic Tests', () =>
 
 	test('Select line 34 to 36',()=>
 	{
-		const patchFromSelection = new PatchFromSelection({
+		const makePatchFromSelection = new MakePatchFromSelection({
 			diff: diff,
 			selectionRange: new LineRange( 34,36 )
 		});
 
-		const patch = patchFromSelection.getPatchString();
+		const patch = makePatchFromSelection.getPatchString();
 		const expect = `--- a/cat-and-aliens-report.md
 +++ b/cat-and-aliens-report.md
 @@ -32,7 +32,7 @@ harbingers of visitors from beyond the skies. Such stories fed into an enduring
@@ -167,12 +167,12 @@ suite('PatchFromSelection Basic Tests', () =>
 
 	test('Select line 1 to 1',()=>
 	{
-		const patchFromSelection = new PatchFromSelection({
+		const makePatchFromSelection = new MakePatchFromSelection({
 			diff: diff,
 			selectionRange: new LineRange( 1,1 )
 		});
 
-		const patch = patchFromSelection.getPatchString();
+		const patch = makePatchFromSelection.getPatchString();
 		const expect = `--- a/cat-and-aliens-report.md
 +++ b/cat-and-aliens-report.md
 @@ -1,4 +1,3 @@
@@ -189,10 +189,10 @@ suite('PatchFromSelection Basic Tests', () =>
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// PatchFromSelection modified in padding range.
+// MakePatchFromSelection modified in padding range.
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-suite('PatchFromSelection modified in padding range.', () =>
+suite('MakePatchFromSelection modified in padding range.', () =>
 {
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
 	// 'Line 1 deleted
@@ -211,12 +211,12 @@ index 48ebfc1..0adfb37 100644
 `;
 		test('Selected 1 to 2',()=>
 		{
-			const patchFromSelection = new PatchFromSelection({
+			const makePatchFromSelection = new MakePatchFromSelection({
 				diff: _diff,
 				selectionRange: new LineRange( 1,2 )
 			});
 
-			const patch = patchFromSelection.getPatchString();
+			const patch = makePatchFromSelection.getPatchString();
 			const expect = `--- a/in-padding-lines.md
 +++ b/in-padding-lines.md
 @@ -1,4 +1,3 @@
@@ -250,12 +250,12 @@ index 48ebfc1..d5b6084 100644
 `;
 		test('Selected 1 to 2',()=>
 		{
-			const patchFromSelection = new PatchFromSelection({
+			const makePatchFromSelection = new MakePatchFromSelection({
 				diff: _diff,
 				selectionRange: new LineRange( 1,2 )
 			});
 
-			const patch = patchFromSelection.getPatchString();
+			const patch = makePatchFromSelection.getPatchString();
 			const expect = `--- a/in-padding-lines.md
 +++ b/in-padding-lines.md
 @@ -1,5 +1,4 @@
@@ -291,12 +291,12 @@ index 48ebfc1..34605c9 100644
 `;
 		test('Selected 2 to 3',()=>
 		{
-			const patchFromSelection = new PatchFromSelection({
+			const makePatchFromSelection = new MakePatchFromSelection({
 				diff: _diff,
 				selectionRange: new LineRange( 2,3 )
 			});
 
-			const patch = patchFromSelection.getPatchString();
+			const patch = makePatchFromSelection.getPatchString();
 			const expect = `--- a/in-padding-lines.md
 +++ b/in-padding-lines.md
 @@ -1,6 +1,5 @@
@@ -335,12 +335,12 @@ index 48ebfc1..85ce6a0 100644
 `;
 		test('Selected 4 to 5',()=>
 		{
-			const patchFromSelection = new PatchFromSelection({
+			const makePatchFromSelection = new MakePatchFromSelection({
 				diff: _diff,
 				selectionRange: new LineRange( 4,5 )
 			});
 
-			const patch = patchFromSelection.getPatchString();
+			const patch = makePatchFromSelection.getPatchString();
 			const expect = `--- a/in-padding-lines.md
 +++ b/in-padding-lines.md
 @@ -2,6 +2,5 @@
@@ -376,12 +376,12 @@ index 48ebfc1..914d90e 100644
 `;
 		test('Selected 5 to 6',()=>
 		{
-			const patchFromSelection = new PatchFromSelection({
+			const makePatchFromSelection = new MakePatchFromSelection({
 				diff: _diff,
 				selectionRange: new LineRange( 5,6 )
 			});
 
-			const patch = patchFromSelection.getPatchString();
+			const patch = makePatchFromSelection.getPatchString();
 			const expect = `--- a/in-padding-lines.md
 +++ b/in-padding-lines.md
 @@ -3,5 +3,4 @@
@@ -416,12 +416,12 @@ index 48ebfc1..0a5e5ac 100644
 `;
 		test('Selected 6 to 7',()=>
 		{
-			const patchFromSelection = new PatchFromSelection({
+			const makePatchFromSelection = new MakePatchFromSelection({
 				diff: _diff,
 				selectionRange: new LineRange( 6,7 )
 			});
 
-			const patch = patchFromSelection.getPatchString();
+			const patch = makePatchFromSelection.getPatchString();
 			const expect = `--- a/in-padding-lines.md
 +++ b/in-padding-lines.md
 @@ -4,4 +4,3 @@
@@ -457,12 +457,12 @@ index 48ebfc1..dc663b3 100644
 `;
 		test('Selected 6 to 7',()=>
 		{
-			const patchFromSelection = new PatchFromSelection({
+			const makePatchFromSelection = new MakePatchFromSelection({
 				diff: _diff,
 				selectionRange: new LineRange( 6,7 )
 			});
 
-			const patch = patchFromSelection.getPatchString();
+			const patch = makePatchFromSelection.getPatchString();
 			const expect = `--- a/in-padding-lines.md
 +++ b/in-padding-lines.md
 @@ -4,4 +4,4 @@

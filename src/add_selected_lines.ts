@@ -6,7 +6,7 @@ import
 		findWorkspaceFolder,
 		isGitTrackedFile
 	} from './lib/utils';
-import { PatchFromSelection } from './lib/patch-from-selection';
+import { MakePatchFromSelection } from './lib/make-patch-from-selection';
 import { LineRange } from './lib/line-range';
 import { spawnSync } from 'child_process';
 import { kMessageTimeOut } from './constants';
@@ -68,7 +68,7 @@ export async function git_add_selected_lines()
 		const diff = getGitDiff( workspaceFolder, filePath );
 
 		// patch = makePatchForLineRange({ diff, selectedRange: selectedLineRange } );
-		const patchFromSelection = new PatchFromSelection({
+		const patchFromSelection = new MakePatchFromSelection({
 			diff: diff,
 			selectionRange: selectedLineRange
 		});
