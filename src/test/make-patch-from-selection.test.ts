@@ -521,3 +521,170 @@ index 48ebfc1..dc663b3 100644
 	});
 	
 });
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// MakePatchFromSelection - cases that cross over chunks.
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+suite('MakePatchFromSelection - cases that cross over chunks selected.', () =>
+{
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	// Select line 22 to 31
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	test('Select line 22 to 31',()=>
+	{
+		const makePatchFromSelection = new MakePatchFromSelection({
+			diff: diff,
+			selectionRange: new LineRange( 22,31 )
+		});
+
+		const patch = makePatchFromSelection.getPatchString();
+		const expect = `--- a/cat-and-aliens-report.md
++++ b/cat-and-aliens-report.md
+@@ -21,7 +21,6 @@
+ - Black cats and astronomical events in Europe
+ - Black cats and astronomical events in Europe
+ - Feline omens in early Asian astronomy
+-- Feline omens in early Asian astronomy
+ 
+ In the medieval period, European folklore included tales of black cats appearing during strange
+ astronomical events. These cats were sometimes linked to sorcery, but others believed they were
+@@ -29,7 +28,7 @@ harbingers of visitors from beyond the skies. Such stories fed into an enduring
+ between cats and the unknown.
+ 
+ ## The Modern Era: UFOs and Cats
+-
++ggggggg
+ The modern UFO phenomenon, beginning in the 20th century, brought a new dimension to the
+ alien communication or as biological recording devices.
+ 
+`;
+		assert.equal( typeof patch , 'string' , 'patch is string.');
+		assert.equal( patch , expect );
+	});
+
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	// Select line 10 to 36(Even wider range
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	test('Select line 10 to 36(Even wider range)',()=>
+	{
+		const makePatchFromSelection = new MakePatchFromSelection({
+			diff: diff,
+			selectionRange: new LineRange( 10,36 )
+		});
+
+		const patch = makePatchFromSelection.getPatchString();
+		const expect = `--- a/cat-and-aliens-report.md
++++ b/cat-and-aliens-report.md
+@@ -8,20 +8,17 @@
+ 
+ ## Ancient Myths and Legends
+ 
+-cosmic origin.
+-divine mystery. Some texts even describe how Bastet was said to come from the "stars," hinting at a
+-gods. The goddess Bastet, a feline deity, was revered as a protector of the home and a symbol of
+-especially those with unusual features like glowing eyes, were often considered emissaries of the
+ The first records of cats being associated with celestial beings date back to ancient Egypt. Cats,
++especially those with unusual features like glowing eyes, were often considered emissaries of the
++gods. The goddess Bastet, a feline deity, was revered as a protector of the home and a symbol of
++divine mystery. Some texts even describe how Bastet was said to come from the "stars," hinting at a
++cosmic origin.
+ 
+ ### Key Myths:
+ 
+ - Bastet as a celestial protector
+-- Bastet as a celestial protector
+-- Black cats and astronomical events in Europe
+ - Black cats and astronomical events in Europe
+ - Feline omens in early Asian astronomy
+-- Feline omens in early Asian astronomy
+ 
+ In the medieval period, European folklore included tales of black cats appearing during strange
+ astronomical events. These cats were sometimes linked to sorcery, but others believed they were
+@@ -29,10 +26,12 @@ harbingers of visitors from beyond the skies. Such stories fed into an enduring
+ between cats and the unknown.
+ 
+ ## The Modern Era: UFOs and Cats
+-
++ggggggg
+ The modern UFO phenomenon, beginning in the 20th century, brought a new dimension to the
++cat-alien narrative. Reports from abductees occasionally mentioned cats behaving oddly during
++encounters with unidentified flying objects. Some speculated that cats might act as conduits for
+ alien communication or as biological recording devices.
+-
++ggggg
+ ### Incident in New Mexico:
+ 
+ - Sightings of strange lights in the sky
+`;
+		assert.equal( typeof patch , 'string' , 'patch is string.');
+		assert.equal( patch , expect );
+	});
+
+
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	// Select line 24 to 34(Only the last chunk is actually used.)
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	// The diff that is actually valid is only the later chunk, even 
+	// though it is selected across chunks.
+	test('Select line 24 to 34(Only the last chunk is actually used.)',()=>
+	{
+		const makePatchFromSelection = new MakePatchFromSelection({
+			diff: diff,
+			selectionRange: new LineRange( 24,34 )
+		});
+
+		const patch = makePatchFromSelection.getPatchString();
+		const expect = `--- a/cat-and-aliens-report.md
++++ b/cat-and-aliens-report.md
+@@ -29,8 +29,10 @@ harbingers of visitors from beyond the skies. Such stories fed into an enduring
+ between cats and the unknown.
+ 
+ ## The Modern Era: UFOs and Cats
+-
++ggggggg
+ The modern UFO phenomenon, beginning in the 20th century, brought a new dimension to the
++cat-alien narrative. Reports from abductees occasionally mentioned cats behaving oddly during
++encounters with unidentified flying objects. Some speculated that cats might act as conduits for
+ alien communication or as biological recording devices.
+ 
+ ### Incident in New Mexico:
+`;
+		assert.equal( typeof patch , 'string' , 'patch is string.');
+		assert.equal( patch , expect );
+	});
+
+
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	// Select line 20 to 28(Only the first chunk is actually used.
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	// The diff that is actually valid is only the previous chunk, even
+	// though it is selected across chunks.
+	test('Select line 20 to 28(Only the first chunk is actually used.)',()=>
+	{
+		const makePatchFromSelection = new MakePatchFromSelection({
+			diff: diff,
+			selectionRange: new LineRange( 20,28 )
+		});
+
+		const patch = makePatchFromSelection.getPatchString();
+		const expect = `--- a/cat-and-aliens-report.md
++++ b/cat-and-aliens-report.md
+@@ -17,11 +17,8 @@
+ ### Key Myths:
+ 
+ - Bastet as a celestial protector
+-- Bastet as a celestial protector
+-- Black cats and astronomical events in Europe
+ - Black cats and astronomical events in Europe
+ - Feline omens in early Asian astronomy
+-- Feline omens in early Asian astronomy
+ 
+ In the medieval period, European folklore included tales of black cats appearing during strange
+ astronomical events. These cats were sometimes linked to sorcery, but others believed they were
+`;
+		assert.equal( typeof patch , 'string' , 'patch is string.');
+		assert.equal( patch , expect );
+	});
+});

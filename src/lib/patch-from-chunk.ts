@@ -65,47 +65,92 @@ export class PatchFromChunk
 		if( omit_a_prefix !== undefined ) { this.omit_a_prefix = omit_a_prefix; }
 	}
 
+	beforeLineRange()
+	{
+		return this.from_range
+				? this.from_range
+				: this.change_set.beforeLineRange()
+				;
+	}
 
+	afterLineRange()
+	{
+		return this.to_range
+				? this.to_range
+				: this.change_set.afterLineRange()
+				;
+	}
+
+	get beforeLines(): number
+	{
+		return this.change_set.beforeLines;
+	}
+
+	get afterLines(): number
+	{
+		return this.change_set.afterLines;
+	}
+
+	fromToFileHeaderLines(): string[]
+	{
+		const fromToFileLines: string[] = [];
+
+		let prefix = 'a/';
+		if( this.omit_a_prefix ) { prefix = ''; }
+		fromToFileLines.push(`--- ${prefix}${this.from_file}`);
+		
+		fromToFileLines.push(`+++ b/${this.to_file}`);
+
+		return fromToFileLines;
+	}
+
+	fromToLineHeader(
+		{
+			afterLineOffset = 0
+		}:
+		{
+			afterLineOffset?: number
+		} = {}
+	): string
+	{
+		if( afterLineOffset === undefined )
+		{
+			afterLineOffset = 0;
+		}
+
+		let beforeLineRange = this.beforeLineRange();
+		let afterLineRange	=  this.afterLineRange();
+
+		if( afterLineOffset !== 0 )
+		{
+			afterLineRange.offsetRange( afterLineOffset );
+		}
+
+		let fromFileLineNumbers	= beforeLineRange.toDiffStyleString();
+		let toFileLineNumbers	= afterLineRange.toDiffStyleString();
+
+		let line_info = `@@ -${fromFileLineNumbers} +${toFileLineNumbers} @@`;
+		if( this.chunk_context.length )
+		{
+			line_info = [line_info , this.chunk_context].join(' ');
+		}
+
+		return line_info;
+	}
+
+	chunkBodyLines(): string[]
+	{
+		return this.change_set.getAsPatchLines();
+	}
+
+	
 	toString(): string | Error
 	{
-		let header_lines:string[]	= [];
-		let content_lines:string[]	= [];
+		let header_lines	= this.fromToFileHeaderLines();
+		header_lines.push( this.fromToLineHeader() );
 
-		// Build the patch content first for the calculation of to-file-line-numbers
-		content_lines = this.change_set.getAsPatchLines() as string[];
-
-		{
-			let prefix = 'a/';
-			if( this.omit_a_prefix ) { prefix = ''; }
-			header_lines.push(`--- ${prefix}${this.from_file}`);
-		}
+		let content_lines	= this.chunkBodyLines();
 		
-		
-		header_lines.push(`+++ b/${this.to_file}`);
-
-		let fromFileLineNumbers = this.change_set.beforeLineRange().toDiffStyleString();
-		let toFileLineNumbers = this.change_set.afterLineRangeForPatch().toDiffStyleString();
-		if( this.from_range )
-		{
-			fromFileLineNumbers = this.from_range.toDiffStyleString();
-		}
-
-		if( this.to_range )
-		{
-			toFileLineNumbers = this.to_range.toDiffStyleString();
-		}
-
-		{
-			let line_info = `@@ -${fromFileLineNumbers} +${toFileLineNumbers} @@`;
-			if( this.chunk_context.length )
-			{
-				line_info = [line_info , this.chunk_context].join(' ');
-			}
-
-			header_lines.push( line_info );
-		}
-		
-
 		return header_lines.concat( content_lines ).join('\n') + "\n";
 	}
 }

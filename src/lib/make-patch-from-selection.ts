@@ -21,6 +21,7 @@ import { LineRange } from "./line-range";
 import { PatchFromChunk } from './patch-from-chunk';
 import { ChangeSet } from './change-set';
 import { kPatchPaddingSize } from '../constants';
+import { PatchBuilder } from './patch-builder';
 
 export class MakePatchFromSelection
 {
@@ -119,17 +120,25 @@ export class MakePatchFromSelection
 	/**
 	 * The de facto main processing method
 	 *
+	 * It creates a PatchFromChunk object based on the modify-change in the overlapping
+	 * range of the received chunk and this.selectionRange, and returns it.
+	 * 
+	 * If there is no modify-change in the overlapping range, it returns an Error
+	 * object.
+	 *
+	 * The processing procedure is outlined as follows:
+	 *
 	 * 1. Get modify-type changes that overlap with the selected range.
 	 * 2. Get the changes that will be used as header padding.
 	 * 3. Get the changes that will be used as footer padding.
 	 * 4. Creates a ChangeSet object that combines three parts.
-	 * 5. A PatchMaker instance is created from this data and returned.
+	 * 5. A PatchFromChunk instance is created from this data and returned.
 	 *
 	 * @private
 	 * @param {Chunk} chunk
-	 * @returns {(PatchMaker | Error)}
+	 * @returns {(PatchFromChunk | Error)}
 	 */
-	private getPatchMakerFromChunkSelection( chunk:Chunk ):PatchFromChunk | Error
+	private getPatchFromChunkFromSelection( chunk:Chunk ):PatchFromChunk | Error
 	{	
 		const fromRange		= LineRange.fromChunkRange( chunk.fromFileRange );
 		const selectedRange	= fromRange.getOverlapRange( this.selectionRange );
@@ -223,32 +232,35 @@ export class MakePatchFromSelection
 			return Error('The selected chunk was not found.');
 		}
 		
-		const patchFromChunks: PatchFromChunk[] = [];
-		const patchList:string[] = [];
+		const patchBuilder = new PatchBuilder();
 
 		for(const chunk of this.selectedChunks )
 		{
-			const patchMaker = this.getPatchMakerFromChunkSelection( chunk );
-			if( patchMaker instanceof PatchFromChunk )
+			const patchFromChunk = this.getPatchFromChunkFromSelection( chunk );
+			if( patchFromChunk instanceof PatchFromChunk )
 			{
-				const patch = patchMaker.toString();
-				if( typeof patch === 'string' )
-				{
-					patchList.push( patch );
-				}
-				else
-				{
-					return patch as Error;
-				}
+				patchBuilder.pushPatch( patchFromChunk );
 			}
-			else
+			else if( patchFromChunk instanceof Error )
 			{
-				return patchMaker as Error;
+				switch( patchFromChunk.message )
+				{
+					case 'There are no modified lines.':
+					case 'There are no over-laped range.':
+						break;
+					
+					default:
+						return patchFromChunk;
+				}
 			}
 		}
 
+		const patch = patchBuilder.getPatchString();
 
-		const patch = patchList.join("\n");
+		if( typeof patch !== 'string' )
+		{
+			return patch as Error;
+		}
 
 		console.debug('---');
 		console.debug('%% patch');
