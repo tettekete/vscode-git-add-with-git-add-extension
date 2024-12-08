@@ -12,6 +12,7 @@ import { spawnSync } from 'child_process';
 import { kMessageTimeOut } from './constants';
 import { makePatchForUntrackedFile } from './lib/make-patch-for-untracked-file';
 import path from 'node:path';
+import { kPatchPaddingSize } from './constants';
 
 export async function git_add_selected_lines()
 {
@@ -65,7 +66,7 @@ export async function git_add_selected_lines()
 	if( await isGitTrackedFile( workspaceFolder , filePath ) )
 	{
 		// git The file being tracked is
-		const diff = getGitDiff( workspaceFolder, filePath );
+		const diff = getGitDiff( workspaceFolder, filePath ,kPatchPaddingSize);
 
 		// patch = makePatchForLineRange({ diff, selectedRange: selectedLineRange } );
 		const patchFromSelection = new MakePatchFromSelection({
