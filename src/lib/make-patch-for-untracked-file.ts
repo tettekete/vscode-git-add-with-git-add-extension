@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { PatchMaker } from './patch-maker';
+import { PatchFromChunk } from './patch-from-chunk';
 import { LineRange } from './line-range';
 import { AnyLineChange ,AddedLine } from 'parse-git-diff';
 
@@ -35,7 +35,7 @@ export function makePatchForUntrackedFile(
 	selectionRange.offsetRange( -startLine );
 	const zeroRange	= new LineRange( 0,0 ,false);
 
-	const patchMaker = new PatchMaker({
+	const patchFromChunk = new PatchFromChunk({
 		from_file: '/dev/null',
 		omit_a_prefix: true,
 		to_file: rel_file_path,
@@ -52,8 +52,8 @@ export function makePatchForUntrackedFile(
 			content: document.lineAt( i ).text
 		};
 
-		patchMaker.pushChanges( change );
+		patchFromChunk.pushChanges( change );
 	}
 
-	return patchMaker.toString();
+	return patchFromChunk.toString();
 }

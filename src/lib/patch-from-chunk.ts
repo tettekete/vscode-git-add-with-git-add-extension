@@ -3,7 +3,7 @@ import { LineRange } from './line-range';
 import { AnyLineChange } from 'parse-git-diff';
 import { kNoNewlineAtEndOfFile } from '../constants';
 
-export class PatchMaker
+export class PatchFromChunk
 {
 	public from_file: string = '/dev/null';
 	public to_file: string = '/dev/null';

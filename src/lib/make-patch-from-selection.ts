@@ -18,7 +18,7 @@ import
 } from './type-gurd/parse-git-diff';
 
 import { LineRange } from "./line-range";
-import { PatchMaker } from './patch-maker';
+import { PatchFromChunk } from './patch-from-chunk';
 import { ChangeSet } from './change-set';
 import { kPatchPaddingSize } from '../constants';
 
@@ -129,7 +129,7 @@ export class MakePatchFromSelection
 	 * @param {Chunk} chunk
 	 * @returns {(PatchMaker | Error)}
 	 */
-	private getPatchMakerFromChunkSelection( chunk:Chunk ):PatchMaker | Error
+	private getPatchMakerFromChunkSelection( chunk:Chunk ):PatchFromChunk | Error
 	{	
 		const fromRange		= LineRange.fromChunkRange( chunk.fromFileRange );
 		const selectedRange	= fromRange.getOverlapRange( this.selectionRange );
@@ -201,7 +201,7 @@ export class MakePatchFromSelection
 			return Error("afterLineRangeForPatch() returns undefined.");
 		}
 
-		return new PatchMaker({
+		return new PatchFromChunk({
 			from_file: file,
 			to_file: file,
 			from_range: allChangeSet.beforeLineRange(),
@@ -223,13 +223,13 @@ export class MakePatchFromSelection
 			return Error('The selected chunk was not found.');
 		}
 		
-		const patchMakers: PatchMaker[] = [];
+		const patchFromChunks: PatchFromChunk[] = [];
 		const patchList:string[] = [];
 
 		for(const chunk of this.selectedChunks )
 		{
 			const patchMaker = this.getPatchMakerFromChunkSelection( chunk );
-			if( patchMaker instanceof PatchMaker )
+			if( patchMaker instanceof PatchFromChunk )
 			{
 				const patch = patchMaker.toString();
 				if( typeof patch === 'string' )
