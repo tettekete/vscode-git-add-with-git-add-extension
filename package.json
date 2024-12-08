@@ -24,7 +24,7 @@
     "commands": [
       {
         "command": "tettekete.git-add-with-git-add",
-        "title": "git add: Current Active File"
+        "title": "git add: Active Window's Files"
       },
       {
         "command": "tettekete.git-add-with-git-add-u",
@@ -32,7 +32,7 @@
       },
       {
         "command": "tettekete.git-add-with-git-add-selected-lines",
-        "title": "git add: Selected Lines(or cursor line)"
+        "title": "git add: Selected Lines(and/or cursor line)"
       }
     ]
   },
