@@ -670,7 +670,7 @@ export class ChangeSet
 		return LineRange.fromStartWithLines( this.firstLineBefore, this.afterLines );
 	}
 
-	getAsPatchLines(wantarray: boolean = true ):string[] | string
+	getAsPatchLines():string[]
 	{
 		let content_lines:string[]	= [];
 
@@ -703,7 +703,7 @@ export class ChangeSet
 			}
 		}
 
-		return wantarray ? content_lines : content_lines.join("\n") + "\n";
+		return content_lines;
 	}
 
 	// for debug
