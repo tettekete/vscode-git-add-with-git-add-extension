@@ -590,7 +590,7 @@ index 48ebfc1..dc663b3 100644
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// MakePatchFromSelection - cases that cross over chunks.
+// MakePatchFromSelection - cases that cross over chunks selected.
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 suite('MakePatchFromSelection - cases that cross over chunks selected.', () =>
@@ -750,6 +750,44 @@ suite('MakePatchFromSelection - cases that cross over chunks selected.', () =>
  In the medieval period, European folklore included tales of black cats appearing during strange
  astronomical events. These cats were sometimes linked to sorcery, but others believed they were
 `;
+		assert.equal( typeof patch , 'string' , 'patch is string.');
+		assert.equal( patch , expect );
+	});
+});
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// MakePatchFromSelection - bugs
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+suite('MakePatchFromSelection - bugs', () =>
+{
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	// The deletion of the first line and the modify of the third line and after
+	// do not apply the deletion of the first line.
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	test('Select line 1 to 6',()=>
+	{
+		const makePatchFromSelection = new MakePatchFromSelection({
+			diff: diff,
+			selectionRange: new LineRange( 1,6 )
+		});
+
+		const patch = makePatchFromSelection.getPatchString();
+		const expect = `--- a/cat-and-aliens-report.md
++++ b/cat-and-aliens-report.md
+@@ -1,8 +1,8 @@
+-# The History of Cats and Aliens: A Cosmic Tale
+ 
+ ## Introduction
+ 
+ For centuries, humanity has been fascinated by the enigmatic nature of cats and the possibility of
++extraterrestrial life. While these two subjects might seem worlds apart, there is a surprising
+ connection that runs deeper than one might initially suspect. This document explores the
+ fiction.
+ 
+`;
+
 		assert.equal( typeof patch , 'string' , 'patch is string.');
 		assert.equal( patch , expect );
 	});

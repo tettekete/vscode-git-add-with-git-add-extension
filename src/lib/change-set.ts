@@ -376,7 +376,7 @@ export class ChangeSet
 
 		let thisLineAsAfter:number | undefined;
 		let isFirstValidLine = false;
-		let pendingBuff:DeletedLine[] = [];
+		let pendingBuff:AnyLineChange[] = [];
 
 		for(let i = 0;i<this._changes.length;i++)
 		{
@@ -427,12 +427,17 @@ export class ChangeSet
 				}
 			}
 
+			if( ! hasEnteredModified && pendingBuff.length )
+			{
+				pendingBuff.push( change );
+			}
+
 			if( hasEnteredModified )
 			{
-				if( thisLineAsAfter === 1 && pendingBuff.length )
+				if( pendingBuff.length )
 				{
 					pendingBuff.forEach((item) => {changes.push( item ); });
-					startIdx -= pendingBuff.length;
+					startIdx = 0;
 					pendingBuff = [];
 				}
 
