@@ -142,8 +142,10 @@ suite('UserError Tests', () =>
 			const commonError = CommonError('somthing error',159);
 			const alertError = AlertError( commonError );
 
-			assert.ok( commonError instanceof CommonError );
-			assert.ok( alertError instanceof AlertError );
+			assert.ok( commonError instanceof CommonError ,'commonError instanceof CommonError');
+			assert.ok( commonError instanceof Error ,'commonError instanceof Error');
+			assert.ok( alertError instanceof AlertError ,'alertError instanceof AlertError' );
+			assert.ok( alertError instanceof Error ,'alertError instanceof Error' );
 
 			assert.equal( alertError.message , commonError.message );
 			assert.equal( commonError.code , 159 ,'commonError.code is 159');
@@ -153,6 +155,9 @@ suite('UserError Tests', () =>
 
 			assert.ok( warnError instanceof WarningError );
 			assert.equal( warnError.code , 999 ,'warnError.code is 999');
+
+			// const error = Error("default Error");
+
 
 		});
 

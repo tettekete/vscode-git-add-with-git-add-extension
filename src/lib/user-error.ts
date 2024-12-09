@@ -118,4 +118,10 @@ const CriticalError		= createErrorClass<CriticalErrorClass>( CriticalErrorClass 
 
 export { CommonError, WarningError ,AlertError ,InformationError ,CriticalError };
 
-export type AnyUserError = WarningErrorClass | AlertErrorClass | InformationErrorClass | Error;
+export type UserError = WarningErrorClass | AlertErrorClass | InformationErrorClass
+export type AnyUserError = UserError | Error;
+
+export function isUserError( error: AnyUserError ): error is UserError
+{
+	return error instanceof UserErrorBase;
+}
