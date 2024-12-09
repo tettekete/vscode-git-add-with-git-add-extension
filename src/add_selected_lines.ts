@@ -14,6 +14,9 @@ import { makePatchForUntrackedFile } from './lib/make-patch-for-untracked-file';
 import path from 'node:path';
 import { kPatchPaddingSize } from './constants';
 
+import { isUserError } from './lib/user-error';
+import type { AnyUserError } from './lib/user-error';
+
 export async function git_add_selected_lines()
 {
 	// validation && get objects
@@ -115,7 +118,23 @@ export async function git_add_selected_lines()
 	}
 	else
 	{
-		const error = patch as Error;
-		vscode.window.showErrorMessage(`git-add-with-git-add: patch error\n${error.message}`,{modal: true});
+		const error = patch as AnyUserError;
+		if( isUserError( error ) )
+		{
+			switch( error.name )
+			{
+				case 'InformationError':
+					vscode.window.showInformationMessage( error.message );
+					break;
+				
+				default:
+					vscode.window.showErrorMessage(`Error\n${error.message}`,{modal: true});
+			}
+		}
+		else
+		{
+			vscode.window.showErrorMessage(`Error\n${error.message}`,{modal: true});
+		}
+		
 	}
 }

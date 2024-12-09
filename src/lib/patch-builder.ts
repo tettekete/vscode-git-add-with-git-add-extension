@@ -3,6 +3,9 @@ import { LineRange } from './line-range';
 import { kNoNewlineAtEndOfFile } from '../constants';
 import { PatchFromChunk } from './patch-from-chunk';
 
+import { InformationError } from './user-error';
+import type { AnyUserError } from './user-error';
+
 export class PatchBuilder
 {
 	#PatchFromChunks: PatchFromChunk[] = [];
@@ -12,12 +15,12 @@ export class PatchBuilder
 		this.#PatchFromChunks.push( patch );
 	}
 
-	getPatchString(): string | Error
+	getPatchString(): string | AnyUserError
 	{
 		switch( this.#PatchFromChunks.length )
 		{
 			case 0:
-				return Error("There are no PatchFromChunk object.");
+				return InformationError("The selection does not include any changes.");
 
 			case 1:
 				return this.#PatchFromChunks[0].toString();

@@ -23,6 +23,16 @@ import { ChangeSet } from './change-set';
 import { kPatchPaddingSize } from '../constants';
 import { PatchBuilder } from './patch-builder';
 
+import {
+	WarningError,
+	AlertError,
+	InformationError,
+	CommonError,
+	CriticalError,
+	isUserError
+} from './user-error';
+import type { AnyUserError } from './user-error';
+
 export class MakePatchFromSelection
 {
 	private selectedChunks: Chunk[] = [];
@@ -138,14 +148,14 @@ export class MakePatchFromSelection
 	 * @param {Chunk} chunk
 	 * @returns {(PatchFromChunk | Error)}
 	 */
-	private getPatchFromChunkFromSelection( chunk:Chunk ):PatchFromChunk | Error
+	private getPatchFromChunkFromSelection( chunk:Chunk ):PatchFromChunk | AnyUserError
 	{	
 		const fromRange		= LineRange.fromChunkRange( chunk.fromFileRange );
 		const selectedRange	= fromRange.getOverlapRange( this.selectionRange );
 
 		if( typeof selectedRange === 'undefined' )
 		{
-			return Error('There are no over-laped range.');
+			return CommonError('There are no over-laped range.');
 		}
 
 		const sourceChangeSet = new ChangeSet({ changes: chunk.changes });
@@ -155,7 +165,7 @@ export class MakePatchFromSelection
 
 		if( ! modifiedChangeSet.length() )
 		{
-			return Error('There are no modified lines.');
+			return CommonError('There are no modified lines.');
 		}
 
 		// 2. Get the changes that will be used as header padding.
@@ -199,16 +209,14 @@ export class MakePatchFromSelection
 
 		if( this.changedFile === undefined )
 		{
+			// This is a TypeScript type checking measure.
+			// It is basically impossible because it has already been validated by the caller.
 			return Error('The file that was changed could not be found.');
 		}
 
 		const file = this.changedFile.path;
 
 		const toLineRange = allChangeSet.afterLineRangeForPatch();
-		if( toLineRange === undefined )
-		{
-			return Error("afterLineRangeForPatch() returns undefined.");
-		}
 
 		return new PatchFromChunk({
 			from_file: file,
@@ -220,16 +228,18 @@ export class MakePatchFromSelection
 		});
 	}
 
-	getPatchString():string | Error
+	getPatchString():string | AnyUserError
 	{
 		if( typeof this.changedFile === 'undefined')
 		{
-			return Error('The file that was changed could not be found.');
+			// This means that the constructor could not find a chunk that overlaps with the selection.
+			return InformationError('The selection does not include any changes.');
 		}
 
 		if( this.selectedChunks.length === 0)
 		{
-			return Error('The selected chunk was not found.');
+			// This is the same thing as above, but with validation to make it more resistant to code changes.
+			return InformationError('The selected chunk was not found.');
 		}
 		
 		const patchBuilder = new PatchBuilder();
@@ -241,17 +251,21 @@ export class MakePatchFromSelection
 			{
 				patchBuilder.pushPatch( patchFromChunk );
 			}
-			else if( patchFromChunk instanceof Error )
+			else if( isUserError( patchFromChunk ) )
 			{
-				switch( patchFromChunk.message )
+				const userError = patchFromChunk;
+				switch( userError.name )
 				{
-					case 'There are no modified lines.':
-					case 'There are no over-laped range.':
+					case 'CommonError':
 						break;
 					
 					default:
-						return patchFromChunk;
+						return userError;
 				}
+			}
+			else
+			{
+				return CommonError( patchFromChunk );
 			}
 		}
 
