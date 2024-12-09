@@ -1,8 +1,41 @@
 import * as assert from 'assert';
-import { WarningError ,AlertError ,InformationError} from '../lib/user-error';
+import { CommonError,WarningError ,AlertError ,InformationError} from '../lib/user-error';
 
 suite('UserError Tests', () =>
 {
+	suite('CommonError Basic Tests', () =>
+	{
+		test('Functional use',() =>
+		{
+			const e = CommonError('common error');
+			
+			assert.ok( e instanceof CommonError ,'e instanceof CommonError');
+			assert.ok( e instanceof Error ,'e instanceof Error');
+			assert.equal(e.message ,'common error');
+			assert.equal(e.name ,'CommonError');
+			assert.equal(e.code ,-1);
+
+			const e2 = CommonError('error with error code.' ,123);
+
+			assert.equal(e2.code ,123);
+		});
+
+		test('Instantiate use',() =>
+		{
+			const e = new CommonError('instantiate common error');
+			
+			assert.ok( e instanceof CommonError ,'e instanceof CommonError');
+			assert.ok( e instanceof Error ,'e instanceof Error');
+			assert.equal(e.message ,'instantiate common error');
+			assert.equal(e.name ,'CommonError');
+			assert.equal(e.code ,-1);
+
+			const e2 = new CommonError('error with error code.' ,456);
+
+			assert.equal(e2.code ,456);
+		});
+	});
+
 	suite('WarningError Basic Tests', () =>
 	{
 		test('Functional use',() =>
@@ -99,6 +132,44 @@ suite('UserError Tests', () =>
 			const e2 = new InformationError('error with error code.' ,298);
 
 			assert.equal(e2.code ,298);
+		});
+	});
+
+	suite('Convert Errors', () =>
+	{
+		test('Basic',() =>
+		{
+			const commonError = CommonError('somthing error',159);
+			const alertError = AlertError( commonError );
+
+			assert.ok( commonError instanceof CommonError );
+			assert.ok( alertError instanceof AlertError );
+
+			assert.equal( alertError.message , commonError.message );
+			assert.equal( commonError.code , 159 ,'commonError.code is 159');
+			assert.equal( alertError.code , 159 ,'alertError.code is 159');
+
+			const warnError = WarningError( alertError , 999 );
+
+			assert.ok( warnError instanceof WarningError );
+			assert.equal( warnError.code , 999 ,'warnError.code is 999');
+
+		});
+
+		test('Error to UserError',() =>
+		{
+			const error = Error('default error');
+			const commonError = CommonError( error );
+
+			assert.ok( commonError instanceof CommonError );
+			assert.equal( commonError.message , 'default error' );
+			assert.equal( commonError.code , -1 );
+
+			const warningError = WarningError( error , 592 );
+			assert.ok( warningError instanceof WarningError );
+			assert.equal( warningError.message , 'default error' );
+			assert.equal( warningError.code , 592 );
+
 		});
 	});
 });

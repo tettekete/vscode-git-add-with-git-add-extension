@@ -1,7 +1,7 @@
 interface UserErrorConstructor
 {
-    new (message?: string , code?: number ): WarningErrorClass;
-    (message?: string, code?: number ): WarningErrorClass;
+	new (message?: string | UserErrorBase | Error, code?: number ): UserErrorBase;
+	(message?: string | UserErrorBase | Error , code?: number ): UserErrorBase;
 }
 
 class UserErrorBase extends Error
@@ -13,18 +13,50 @@ class UserErrorBase extends Error
 		return this.#code;
 	}
 
-	constructor(message?: string , code?: number ) 
+	constructor(message?: string | UserErrorBase | Error, code?: number ) 
 	{
-		super(message);
-
-		if( typeof code === 'number' ){	 this.#code = code; }
+		if( message instanceof UserErrorBase )
+		{
+			super(message.message);
+			if( typeof code === 'number' )
+			{
+				this.#code = code;
+			}
+			else
+			{
+				this.#code = message.code;
+			}
+		}
+		else if ( message instanceof Error )
+		{
+			super(message.message);
+			if( typeof code === 'number' )
+			{
+				this.#code = code;
+			}
+		}
+		else
+		{
+			super(message);
+			if( typeof code === 'number' ){	 this.#code = code; }
+		}	
 	}
 
 }
 
+class CommonErrorClass extends UserErrorBase
+{
+	constructor(message?: string | UserErrorBase | Error, code?: number )
+	{
+		super( message , code );
+		this.name = 'CommonError';
+	}
+}
+
+
 class WarningErrorClass extends UserErrorBase
 {
-	constructor(message?: string , code?: number )
+	constructor(message?: string | UserErrorBase | Error, code?: number )
 	{
 		super( message , code );
 		this.name = 'WarningError';
@@ -33,7 +65,7 @@ class WarningErrorClass extends UserErrorBase
 
 class AlertErrorClass extends UserErrorBase
 {
-	constructor(message?: string , code?: number )
+	constructor(message?: string | UserErrorBase | Error , code?: number )
 	{
 		super( message , code );
 		this.name = 'AlertError';
@@ -42,57 +74,48 @@ class AlertErrorClass extends UserErrorBase
 
 class InformationErrorClass extends UserErrorBase
 {
-	constructor(message?: string , code?: number )
+	constructor(message?: string | UserErrorBase | Error, code?: number )
 	{
 		super( message , code );
 		this.name = 'InformationError';
 	}
 }
 
-
-const WarningError: UserErrorConstructor
-	= function (this: WarningErrorClass | void, message?: string , code?: number )
+class CriticalErrorClass extends UserErrorBase
+{
+	constructor(message?: string | UserErrorBase | Error, code?: number )
 	{
-		if (this instanceof WarningErrorClass)
-		{
-			return new WarningErrorClass( message , code );
-		}
-		else
-		{
-			return new WarningErrorClass( message ,code );
-		}
-	} as UserErrorConstructor;
+		super( message , code );
+		this.name = 'CriticalError';
+	}
+}
 
-const AlertError: UserErrorConstructor
-	= function (this: AlertErrorClass | void, message?: string , code?: number )
-	{
-		if (this instanceof AlertErrorClass)
+const createErrorClass = <T extends UserErrorBase>(
+    ClassType: new (message?: string | UserErrorBase | Error, code?: number) => T
+): UserErrorConstructor =>
+{
+    const ErrorClass: UserErrorConstructor =
+	(
+		function (
+        	this: T | void,
+        	message?: string | UserErrorBase | Error,
+        	code?: number
+    	)
 		{
-			return new AlertErrorClass( message , code );
-		}
-		else
-		{
-			return new AlertErrorClass( message ,code );
-		}
-	} as UserErrorConstructor;
+			return new ClassType(message, code);
+    	} as unknown
+	) as UserErrorConstructor;
 
-const InformationError: UserErrorConstructor
-	= function (this: InformationErrorClass | void, message?: string , code?: number )
-	{
-		if (this instanceof InformationErrorClass)
-		{
-			return new InformationErrorClass( message , code );
-		}
-		else
-		{
-			return new InformationErrorClass( message ,code );
-		}
-	} as UserErrorConstructor;
+    ErrorClass.prototype = ClassType.prototype;
+    return ErrorClass;
+};
 
+const CommonError		= createErrorClass<CommonErrorClass>( CommonErrorClass );
+const WarningError		= createErrorClass<WarningErrorClass>( WarningErrorClass );
+const AlertError		= createErrorClass<AlertErrorClass>( AlertErrorClass );
+const InformationError	= createErrorClass<InformationErrorClass>( InformationErrorClass );
+const CriticalError		= createErrorClass<CriticalErrorClass>( CriticalErrorClass );
 
-WarningError.prototype		= WarningErrorClass.prototype;
-AlertError.prototype		= AlertErrorClass.prototype;
-InformationError.prototype	= InformationErrorClass.prototype;
+export { CommonError, WarningError ,AlertError ,InformationError ,CriticalError };
 
-export { WarningError ,AlertError ,InformationError };
-
+export type AnyUserError = WarningErrorClass | AlertErrorClass | InformationErrorClass | Error;
