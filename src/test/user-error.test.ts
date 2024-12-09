@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { WarningError ,AlertError } from '../lib/user-error';
+import { WarningError ,AlertError ,InformationError} from '../lib/user-error';
 
 suite('UserError Tests', () =>
 {
@@ -64,6 +64,39 @@ suite('UserError Tests', () =>
 			assert.equal(e.code ,-1);
 
 			const e2 = new AlertError('error with error code.' ,298);
+
+			assert.equal(e2.code ,298);
+		});
+	});
+
+	suite('InformationError Basic Tests', () =>
+	{
+		test('Functional use',() =>
+		{
+			const e = InformationError('alert error');
+			
+			assert.ok( e instanceof InformationError ,'e instanceof InformationError');
+			assert.ok( e instanceof Error ,'e instanceof Error');
+			assert.equal(e.message ,'alert error');
+			assert.equal(e.name ,'InformationError');
+			assert.equal(e.code ,-1);
+
+			const e2 = InformationError('error with error code.' ,432);
+
+			assert.equal(e2.code ,432);
+		});
+
+		test('Instantiate use',() =>
+		{
+			const e = new InformationError('instantiate alert error');
+			
+			assert.ok( e instanceof InformationError ,'e instanceof InformationError');
+			assert.ok( e instanceof Error ,'e instanceof Error');
+			assert.equal(e.message ,'instantiate alert error');
+			assert.equal(e.name ,'InformationError');
+			assert.equal(e.code ,-1);
+
+			const e2 = new InformationError('error with error code.' ,298);
 
 			assert.equal(e2.code ,298);
 		});
