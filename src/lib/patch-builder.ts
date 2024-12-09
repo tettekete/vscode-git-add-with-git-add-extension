@@ -5,9 +5,6 @@ import { PatchFromChunk } from './patch-from-chunk';
 
 export class PatchBuilder
 {
-	public from_file: string = '/dev/null';
-	public to_file: string = '/dev/null';
-
 	#PatchFromChunks: PatchFromChunk[] = [];
 
 	pushPatch( patch: PatchFromChunk )
