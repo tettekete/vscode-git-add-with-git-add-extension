@@ -40,6 +40,15 @@ class AlertErrorClass extends UserErrorBase
 	}
 }
 
+class InformationErrorClass extends UserErrorBase
+{
+	constructor(message?: string , code?: number )
+	{
+		super( message , code );
+		this.name = 'InformationError';
+	}
+}
+
 
 const WarningError: UserErrorConstructor
 	= function (this: WarningErrorClass | void, message?: string , code?: number )
@@ -67,9 +76,23 @@ const AlertError: UserErrorConstructor
 		}
 	} as UserErrorConstructor;
 
+const InformationError: UserErrorConstructor
+	= function (this: InformationErrorClass | void, message?: string , code?: number )
+	{
+		if (this instanceof InformationErrorClass)
+		{
+			return new InformationErrorClass( message , code );
+		}
+		else
+		{
+			return new InformationErrorClass( message ,code );
+		}
+	} as UserErrorConstructor;
 
-WarningError.prototype = WarningErrorClass.prototype;
-AlertError.prototype = AlertErrorClass.prototype;
 
-export { WarningError ,AlertError };
+WarningError.prototype		= WarningErrorClass.prototype;
+AlertError.prototype		= AlertErrorClass.prototype;
+InformationError.prototype	= InformationErrorClass.prototype;
+
+export { WarningError ,AlertError ,InformationError };
 
