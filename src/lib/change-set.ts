@@ -370,27 +370,45 @@ export class ChangeSet
 		
 		let startIdx		= -1;
 		let endIdx			= -1;
-		let lastLineAfter	= 1;
+		// let lastLineAfter	= 1;	// 1行目が DeletedLine の時 skip されてしまうのを防ぐためのデフォルト値
 
 		const changes:AnyLineChange[] = [];
+
+		let thisLineAsAfter:number | undefined;
+		let isFirstValidLine = false;
+		let pendingBuff:DeletedLine[] = [];
 
 		for(let i = 0;i<this._changes.length;i++)
 		{
 			const change = this._changes[i];
 
-			let thisLineAsAfter = lastLineAfter;
 			if( isValidKey( change , line_type ) )
 			{
+				isFirstValidLine = thisLineAsAfter === undefined ? true : false;
 				thisLineAsAfter	= change[line_type];
-				lastLineAfter	= change[line_type];
 			}
+
+			// lineAfter が見つかっていない状態
+			if( thisLineAsAfter === undefined )
+			{
+				if( start === 1
+				&& isDeletedLine( change ) )
+				{
+					// かつ start === 1 で DeletedLine ならば後々 changes に加える必要があるかもしれない
+					pendingBuff.push( change );
+				}
+
+				continue;
+			}
+			
 
 			// まず start 〜 end の中に入ったかどうかのチェックを行いフラグを立てる
 			if( ! hasEnterdRange && thisLineAsAfter >= start )
 			{
 				hasEnterdRange = true;
 			}
-			else if( thisLineAsAfter >= end )
+			
+			if( thisLineAsAfter >= end )
 			{
 				isEndOfRange = true;
 			}			
@@ -411,8 +429,25 @@ export class ChangeSet
 
 			if( hasEnteredModified )
 			{
+				if( thisLineAsAfter === 1 && pendingBuff.length )
+				{
+					pendingBuff.forEach((item) => {changes.push( item ); });
+					startIdx -= pendingBuff.length;
+					pendingBuff = [];
+				}
+
 				changes.push( change );
 				endIdx = i;
+			}
+			else if( isEndOfRange && start === 1 )
+			{
+				// modified の塊に入る前に選択範囲の終了を迎えた
+				// かつ選択範囲の開始位置は 1 であるらば pendingBuff の内容こそが
+				// modified-changes である
+				pendingBuff.reverse();
+				pendingBuff.forEach((item) => {changes.unshift( item ); });
+				startIdx = 0;
+				endIdx = pendingBuff.length -1;
 			}
 
 			if( isEndOfRange )

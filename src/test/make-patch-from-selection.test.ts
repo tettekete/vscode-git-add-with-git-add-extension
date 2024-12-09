@@ -270,6 +270,29 @@ index 48ebfc1..c46f797 100644
 			assert.equal( patch , expect );
 
 		});
+
+		test('Selected 1 to 2',()=>
+		{
+			const makePatchFromSelection = new MakePatchFromSelection({
+				diff: _diff,
+				selectionRange: new LineRange( 1,2 )
+			});
+
+			const patch = makePatchFromSelection.getPatchString();
+			const expect = `--- a/in-padding-lines.md
++++ b/in-padding-lines.md
+@@ -1,4 +1,4 @@
+-1: The first line is included in the padding.
++1: Being first isn’t everything, unless it’s pizza delivery.
+ 2: The second line is also included in the padding.
+ 3: The third line is also included in the padding.
+ 4: If the document consists of 7 or more lines, the fourth line is not included in the padding.
+`;
+
+			assert.equal( typeof patch , 'string' , 'patch is string.');
+			assert.equal( patch , expect );
+
+		});
 	});
 
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
@@ -301,6 +324,49 @@ index 48ebfc1..d5b6084 100644
 @@ -1,5 +1,4 @@
  1: The first line is included in the padding.
 -2: The second line is also included in the padding.
+ 3: The third line is also included in the padding.
+ 4: If the document consists of 7 or more lines, the fourth line is not included in the padding.
+ 5: The fifth line is included in the footer padding if it consists of seven lines or less
+`;
+
+			assert.equal( typeof patch , 'string' , 'patch is string.');
+			assert.equal( patch , expect );
+
+		});
+	});
+
+	
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	// 'Line 2 deleted && added
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	suite('Line 2 deleted　&& added',()=>
+	{
+		const _diff = `diff --git a/in-padding-lines.md b/in-padding-lines.md
+index 48ebfc1..9db2432 100644
+--- a/in-padding-lines.md
++++ b/in-padding-lines.md
+@@ -1,5 +1,5 @@
+ 1: The first line is included in the padding.
+-2: The second line is also included in the padding.
++2: Second place: proof that you tried, but not too hard.
+ 3: The third line is also included in the padding.
+ 4: If the document consists of 7 or more lines, the fourth line is not included in the padding.
+ 5: The fifth line is included in the footer padding if it consists of seven lines or less
+`;
+		test('Selected 2 to 2',()=>
+		{
+			const makePatchFromSelection = new MakePatchFromSelection({
+				diff: _diff,
+				selectionRange: new LineRange( 2,2 )
+			});
+
+			const patch = makePatchFromSelection.getPatchString();
+			const expect = `--- a/in-padding-lines.md
++++ b/in-padding-lines.md
+@@ -1,5 +1,5 @@
+ 1: The first line is included in the padding.
+-2: The second line is also included in the padding.
++2: Second place: proof that you tried, but not too hard.
  3: The third line is also included in the padding.
  4: If the document consists of 7 or more lines, the fourth line is not included in the padding.
  5: The fifth line is included in the footer padding if it consists of seven lines or less
