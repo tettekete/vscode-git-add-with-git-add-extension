@@ -1,24 +1,16 @@
 
-import {
-	AnyChunk,
+import
+{
 	AnyLineChange,
-	Chunk,
 	UnchangedLine,
-	DeletedLine,
-	AddedLine,
-	AnyFileChange,
-	ChangedFile
 } from 'parse-git-diff';
 
 import
 {
-	isChangedFile,
-	isChunk,
 	isUnchangedLine,
 	isDeletedLine,
 	isAddedLine,
 	isMessageLine,
-	isAfterLineChange,
 	isBeforeLineChange,
 	isModifiedLineChange,
 } from './type-gurd/parse-git-diff';
@@ -27,52 +19,51 @@ import { isValidKey } from './type-gurd/common';
 import { LineRange } from './line-range';
 import { kNoNewlineAtEndOfFile } from '../constants';
 
-const RangeBasisType = 
-{
-	none: 'none',
-	lineAfter: 'lineAfter',
-	lineBefore: 'lineBefore'
-} as const;
-
 const kNoneType		= 'none';
 const kLineAfter	= 'lineAfter';
 const kLineBefore	= 'lineBefore';
 
-// type RANGE_BASIS_T = (typeof RangeBasisType)[keyof typeof RangeBasisType];
-type RANGE_BASIS_T = typeof kNoneType | typeof kLineAfter | typeof kLineBefore;
 type BeforeOrAfter = typeof kLineAfter | typeof kLineBefore;
 
+/**
+ * Represents a collection of "changes" parsed from a git diff hunk.
+ *
+ * The "changes" referred to here are the `AnyLineChange[]` defined by the 
+ * `parse-git-diff` module.
+ * 
+ * This class handles lists of "change" objects that describe the differences
+ * between file versions, including added, deleted, and unchanged lines. Each
+ * "change" object contains information about the line type and its line number
+ * before and/or after the change.
+ * 
+ * Instances of this class are designed to be immutable. Methods that modify
+ * or filter the "change" list, such as `getModifyChangesInRange` or
+ * `getChangesByIndexAndSize`, return new `ChangeSet` instances while preserving
+ * the original list.
+ * 
+ * Common use cases include extracting specific line ranges for patch creation,
+ * calculating line correspondences between the original and modified files,
+ * and managing subsets of changes for operations such as filtering or merging.
+ *
+ * @property {AnyLineChange[]} #changes - The internal list of line changes passed to the constructor.
+ * @property {Map<number, {index: number, lineAfter?: number}>} #lineBeforeIndex - A map from `lineBefore` values to their corresponding index and `lineAfter` value.
+ * @property {Map<number, {index: number, lineBefore?: number}>} #lineAfterIndex - A map from `lineAfter` values to their corresponding index and `lineBefore` value.
+ * @property {number} startIndex - The starting index of the subset at the source of this instance. In other words, if it was generated directly from the “change” list, it is 0.
+ * @property {number} endIndex - The ending index of the subset at the source of this instance. In other words, if it was generated directly from the “change” list, it is the length of the list - 1.
+ * @property {number} firstLineBefore - The first line number before the change in the current subset.
+ * @property {number} lastLineBefore - The last line number before the change in the current subset.
+ * @property {number} beforeLines - The total number of lines before the change in the current subset.
+ * @property {number} firstLineAfter - The first line number after the change in the current subset.
+ * @property {number} lastLineAfter - The last line number after the change in the current subset.
+ * @property {number} afterLines - The total number of lines after the change in the current subset.
+
+ */
 export class ChangeSet
 {
-	public readonly range_basis: RANGE_BASIS_T = 'none';
-	private _changes:AnyLineChange[] = [];
+	#changes:AnyLineChange[] = [];
 	#lineBeforeIndex: Map<number,{index:number,lineAfter:number | undefined }> = new Map();
 	#lineAfterIndex: Map<number,{index:number,lineBefore:number | undefined }> = new Map();
 
-	/*
-		_start_line , _end_line は `range_basis` が 'lineAfter' なら
-		`lineAfter` の最小値と最大値、`lineBefore` なら `lineBefore` の
-		最小値と最大値がそれぞれ代入される。
-
-		`_lines` はそれら差分 +1 の値を取る
-
-		`range_basis` が `none` の場合はいずれも -1
-	*/
-	// private _start_line: number = -1;
-	// private _end_line: number	= -1;
-	// private _lines: number		= -1;
-
-	/*
-		xxxx_index 系は changesWithToLinesRange などで切り取った際に
-		元の chnages のインデックスのどこからどこまでを切り出したかを記録するためのメンバ。
-
-		したがってコンストラクタで xxxx_index 受け取っていないのであれば、コンストラクタで
-		受けた chnages の最小最大インデックスつまり
-			start_index = 0;
-			end_index = changes.length -1;
-
-		となる。
-	*/
 	public readonly startIndex: number;
 	public readonly endIndex: number;
 
@@ -85,17 +76,17 @@ export class ChangeSet
 
 	getChanges()
 	{
-		return [...this._changes];
+		return [...this.#changes];
 	}
 
 	changeAt( n: number ):AnyLineChange
 	{
-		return this._changes[n];
+		return this.#changes[n];
 	}
 
 	length():number
 	{
-		return this._changes.length;
+		return this.#changes.length;
 	}
 
 	constructor(
@@ -111,7 +102,7 @@ export class ChangeSet
 		}
 	)
 	{
-		this._changes = changes;
+		this.#changes = changes;
 		this.buildFromToIndex();
 
 		const r = this.getFirstLastLineNumbers();
@@ -143,6 +134,9 @@ export class ChangeSet
 			this.endIndex = end_index;
 		
 		}
+
+		// Make it immutable.
+		Object.freeze(this);
 	}
 
 	/**
@@ -167,9 +161,9 @@ export class ChangeSet
 		let afterLines	= 0;
 		
 
-		for(let i=0;i<this._changes.length;i++)
+		for(let i=0;i<this.#changes.length;i++)
 		{
-			const change = this._changes[i];
+			const change = this.#changes[i];
 
 			if( isValidKey( change ,kLineBefore ) )
 			{
@@ -210,11 +204,16 @@ export class ChangeSet
 		};
 	}
 
+
+	/**
+	 * Part of the instantiation process
+	 *
+	 */
 	private buildFromToIndex()
 	{
-		for(let i=0;i<this._changes.length;i++)
+		for(let i=0;i<this.#changes.length;i++)
 		{
-			const change = this._changes[i];
+			const change = this.#changes[i];
 			
 			let lineBefore	= isValidKey(change , kLineBefore) ? change[kLineBefore] : undefined;
 			let lineAfter	= isValidKey(change , kLineAfter) ? change[kLineAfter] : undefined;
@@ -241,25 +240,56 @@ export class ChangeSet
 		}
 	}
 
-	// lineAfter の行番号ベースで指定範囲の change を返す
-	// 現状その間の 'DeletedLine' も change にそのまま加えられる。
-	/*
-		考慮すべき問題点
-		1. 開始位置も終了位置も見つからなかった -> 空のリストを返す
-		2. 開始位置は見つかったが終了位置は見つからなかった -> 開始位置から changes の最後までを返す
-		3. 開始位置が見つからず終了位置のみ見つかった -> change の先頭から終了位置までの塊を返す
-	*/
+
+	/**
+	 * This method returns the “changes” between the start line and end line based on `lineAfter`.
+	 * 
+	 * It creates a new `ChangeSet` instance from a subset of the “changes”
+	 * and returns it.
+	 * 
+	 * If neither the start position nor the end position is found, an empty ChangeSet
+	 * is returned.
+	 * If the start position is not found but the end position is found, a ChangeSet
+	 * from the beginning of the list to the end position is returned.
+	 * 
+	 * If the start position is found but the end position is not found, a ChangeSet
+	 * from the start position to the end of the list is returned.
+	 * 
+	 * @param {number} start - `lineAfter` based start line no
+	 * @param {number} end - `lineAfter` based ending line no
+	 * @returns A `ChangeSet` instance containing the changes within the specified range.
+	 */
 
 	changesWithToLinesRange( start:number , end:number ):ChangeSet
 	{
 		return this.changesWithLinesRange( start , end ,'lineAfter' );
 	}
 
+
+	/**
+	 * This method returns the “changes” between the start line and end line based on `lineBefore`.
+	 * 
+	 * This is the `lineBefore` version of “changesWithToLinesRange()”.
+	 * 
+	 * @param {number} start - `lineBefore` based start line no.
+	 * @param {number} end - `lineBefore` based ending line no.
+	 * @returns A `ChangeSet` instance containing the changes within the specified range.
+	 */
 	changesWithFromLinesRange( start:number , end:number ):ChangeSet
 	{
 		return this.changesWithLinesRange( start , end ,'lineBefore' );
 	}
 
+	
+	/**
+	 * This is the implementation of “changesWithToLinesRange()” and “changesWithToLinesRange()”.
+	 *
+	 * @private
+	 * @param {number} start - Starting line number for search.
+	 * @param {number} end - Ending line number for search.
+	 * @param {BeforeOrAfter} line_type - "lineBefore" or "lineAfter"
+	 * @returns {ChangeSet}
+	 */
 	private changesWithLinesRange(
 		start:number ,
 		end:number ,
@@ -276,9 +306,9 @@ export class ChangeSet
 
 		const changes:AnyLineChange[] = [];
 
-		for(let i = 0;i<this._changes.length;i++)
+		for(let i = 0;i<this.#changes.length;i++)
 		{
-			const change = this._changes[i];
+			const change = this.#changes[i];
 
 			if( isValidKey( change , line_type ) )
 			{
@@ -336,7 +366,7 @@ export class ChangeSet
 
 			for(let i=0;i<=endIdx;i++)
 			{
-				changes.push( this._changes[i] );
+				changes.push( this.#changes[i] );
 			}
 
 			return new ChangeSet({
@@ -357,6 +387,16 @@ export class ChangeSet
 		}
 	}
 
+	/**
+	* Retrieves a subset of changes representing modified lines within a specified range.
+	* This includes added, modified, and optionally preceding deleted lines.
+	*
+	* @param {number} start - The starting line number (inclusive) of the range to search, based on `lineAfter`.
+	* @param {number} end - The ending line number (inclusive) of the range to search, based on `lineAfter`.
+	* @param {boolean} [include_preceding_deleted_lines=true] - Whether to include continuous preceding deleted lines
+	* that appear before the first modified line.
+	* @returns {ChangeSet} A `ChangeSet` instance containing the changes within the specified range.
+	*/
 	getModifyChangesInRange(
 		start:number,
 		end:number,
@@ -370,7 +410,6 @@ export class ChangeSet
 		
 		let startIdx		= -1;
 		let endIdx			= -1;
-		// let lastLineAfter	= 1;	// 1行目が DeletedLine の時 skip されてしまうのを防ぐためのデフォルト値
 
 		const changes:AnyLineChange[] = [];
 
@@ -378,9 +417,9 @@ export class ChangeSet
 		let isFirstValidLine = false;
 		let pendingBuff:AnyLineChange[] = [];
 
-		for(let i = 0;i<this._changes.length;i++)
+		for(let i = 0;i<this.#changes.length;i++)
 		{
-			const change = this._changes[i];
+			const change = this.#changes[i];
 
 			if( isValidKey( change , line_type ) )
 			{
@@ -471,7 +510,7 @@ export class ChangeSet
 			let pendingLines = 0;
 			for(let i=startIdx - 1;i>=0;i-- )
 			{
-				const change = this._changes[i];
+				const change = this.#changes[i];
 				if( isDeletedLine( change ) )
 				{
 					changes.unshift( change );
@@ -501,8 +540,33 @@ export class ChangeSet
 		});
 	}
 
-	// push_ok_filter は結果リストに push される直前に評価される
-	// つまり取得済みサイズ数は増えず、インデックスだけが動く
+
+	/**
+	* Returns a ChangeSet object of the specified size from the specified index.
+	* 
+	* The index of the list is the basis, not “lineAfter” or “lineBefore”.
+	* You can specify the search direction with “searchDirection”.
+	* 
+	* If the end of the list is reached before the size is met, the actual list
+	* size will be smaller than the specified size.
+	* 
+	* You can pass a function to determine whether to actually add to the list
+	* with “push_ok_filter”.
+	* 
+	* In actual use, it is used to extract the header and footer contexts of a
+	* patch.
+	* 
+	* @param {Object} options - The configuration object for the operation.
+	* @param {number} options.startIndex - The starting index in the changes list.
+	* @param {(-1 | 1)} [options.searchDirection=1] - The direction to search: 
+	* `1` for forward or `-1` for backward.
+	* @param {number} [options.size] - The maximum number of changes to include in the result.
+	* If unspecified, includes all remaining changes in the search direction.
+	* @param {(change: AnyLineChange) => boolean} [options.push_ok_filter] - A filter function 
+	* to determine if a change should be included in the result. If unspecified, all changes 
+	* are included.
+	* @returns {ChangeSet} A new `ChangeSet` containing the filtered changes.
+	*/
 	getChangesByIndexAndSize( 
 		{
 			startIndex,
@@ -521,7 +585,7 @@ export class ChangeSet
 		const incrementValue = searchDirection < 0 ? -1 : 1;
 		if( typeof size === 'undefined' )
 		{
-			size = this._changes.length;
+			size = this.#changes.length;
 		}
 
 		let filterd_chnages:AnyLineChange[] = [];
@@ -541,12 +605,12 @@ export class ChangeSet
 			const i = startIndex + offset;
 
 			if( chnages.length >= size )				{ break; }
-			if( i < 0 || i >= this._changes.length )	{ break; }
+			if( i < 0 || i >= this.#changes.length )	{ break; }
 
-			const change = this._changes[i];
+			const change = this.#changes[i];
 
 			let isNoNewlineAtEndOfFile = false;
-			if( i === this._changes.length -1 )
+			if( i === this.#changes.length -1 )
 			{
 				if( isMessageLine( change ) 
 					&& change.content === kNoNewlineAtEndOfFile )
@@ -583,11 +647,21 @@ export class ChangeSet
 		);
 	}
 
+
+	/**
+	* Converts all `DeletedLine` changes in the current `ChangeSet` to `UnchangedLine` changes.
+	* 
+	* This method iterates through the internal list of changes, and for each change of type 
+	* `DeletedLine`, it creates a new `UnchangedLine` instance with the same content and 
+	* `lineBefore` value. The `lineAfter` value is set to match `lineBefore`.
+	* 
+	* Note: This operation modifies the internal `#changes` list directly.
+	*/
 	convertDeletedToUnchnanged()
 	{
-		for(let i=0;i<this._changes.length;i++)
+		for(let i=0;i<this.#changes.length;i++)
 		{
-			const change = this._changes[i];
+			const change = this.#changes[i];
 			if( isDeletedLine( change ) )
 			{
 				const unchnagedLine:UnchangedLine =
@@ -598,14 +672,19 @@ export class ChangeSet
 					lineAfter: change.lineBefore
 				};
 
-				this._changes[i] = unchnagedLine;
+				this.#changes[i] = unchnagedLine;
 			}
 		}
 	}
 
 
-	// lineBefore の番号を指定して一致する chnage リスト上のインデックス値を返す
-	// 見つからなかった場合 undefined を返す
+	/**
+	 * Returns the index value on the list of changes that matches the specified
+	 * “lineBefore” number.
+	 *
+	 * @param {number} beforeLineNo
+	 * @returns {(number | undefined)}
+	 */
 	getIndexFromBeforeLineNo( beforeLineNo:number ):number | undefined
 	{
 		const indexInfo	= this.#lineBeforeIndex.get( beforeLineNo );
@@ -617,7 +696,8 @@ export class ChangeSet
 
 	
 	/**
-	 * afterLineNo に対応する beforeLineNo を探し、見つからない場合 undefined を返す。
+	 * Returns the `beforeLine` number of the "change" corresponding to
+	 * the specified `afterLine`. If it is not found, it returns undefined.
 	 *
 	 * @param {number} afterLineNo
 	 * @returns {(number | undefined)}
@@ -633,13 +713,16 @@ export class ChangeSet
 
 
 	/**
-	 * afterLineNo に対応する beforeLineNo を探し、見つからない場合若い方に遡って最初の
-	 afterLineNo を返す。
-
-	 それも見つからなかった場合 fallback の指定があればその値を返し、なければ undefined を返す。
+	 * Returns the `beforeLine` number corresponding to the specified `afterLine`.
 	 *
-	 * @param {number} afterLineNo - change.lineAfter ベースの行番号
-	 * @param {?number} [fallback]
+	 * The difference from `getBeforeLineNoFormAfterLineNo()` is that if no `beforeLine`
+	 * is found, it returns the first `beforeLine` found by going backwards.
+	 * 
+	 * If no `beforeLine` is found, it returns the value of `fallback` if specified,
+	 * or `undefined` if not.
+	 *
+	 * @param {number} afterLineNo - lineAfter based number
+	 * @param {?number} [fallback] - fallback number if not found.
 	 * @returns {(number | undefined)}
 	 */
 	findBeforeLineNoFormAfterLineNo( afterLineNo:number ,fallback?:number ):number | undefined
@@ -665,7 +748,7 @@ export class ChangeSet
 		{
 			for(let i=indexInfo.index -1;i>=0;i--)
 			{
-				const chnage = this._changes[i];
+				const chnage = this.#changes[i];
 				if( isBeforeLineChange( chnage ) )
 				{
 					return chnage.lineBefore;
@@ -680,7 +763,15 @@ export class ChangeSet
 		}
 	}
 
-	concat( ...args:ChangeSet[] )
+	
+	/**
+	 * Like Array.prototype.concat(), it returns a combined ChangeSet that combines
+	 * the received ChangeSet.
+	 *
+	 * @param {...ChangeSet[]} - a ChangeSet or list of ChangeSet
+	 * @returns {ChangeSet}
+	 */
+	concat( ...args:ChangeSet[] ):ChangeSet
 	{
 		let new_change:AnyLineChange[] = this.getChanges();
 		for(const chnageSet of args )
@@ -691,33 +782,55 @@ export class ChangeSet
 		return new ChangeSet({ changes: new_change });
 	}
 
-	beforeLineRange()
+	
+	/**
+	 * Returns a LineRange object based on “lineBefore”.
+	 *
+	 * @returns {LineRange}
+	 */
+	beforeLineRange():LineRange
 	{
 		return LineRange.fromStartWithLines( this.firstLineBefore ,this.beforeLines );
 	}
 
-	afterLineRange()
+	
+	/**
+	 * Returns a LineRange object based on “lineAfter”.
+	 *
+	 * @returns {LineRange}
+	 */
+	afterLineRange():LineRange
 	{
 		return LineRange.fromStartWithLines( this.firstLineAfter ,this.afterLines );
 	}
 
 	/**
-	 * 開始位置に lineBefore を使い、 lines は after のものを使う
-	 * 事でパッチの to-file-line-numbers 向けの LineRange を返す。
+	 * For the patch “to-file-line-numbers”, it uses lineBefore for the start
+	 * position, and returns a LineRange object using after for the lines.
+	 *
+	 * @returns {LineRange}
 	 */
 	afterLineRangeForPatch(): LineRange
 	{
 		return LineRange.fromStartWithLines( this.firstLineBefore, this.afterLines );
 	}
 
+
+	/**
+	 * This returns a simple patch-style text list of the changes in this ChangeSet.
+	 *
+	 * It does not include the various headers in diff.
+	 *
+	 * @returns {string[]}
+	 */
 	getAsPatchLines():string[]
 	{
 		let content_lines:string[]	= [];
 
-		const changesLength = this._changes.length;
+		const changesLength = this.#changes.length;
 		for(let i=0;i<changesLength;i++ )
 		{
-			const change = this._changes[i];
+			const change = this.#changes[i];
 
 			switch( change.type )
 			{
@@ -750,7 +863,7 @@ export class ChangeSet
 	description()
 	{
 		const lines: string[] = [];
-		for(const change of this._changes )
+		for(const change of this.#changes )
 		{
 			lines.push(`{type: "${change.type}},content: "${change.content}"`);
 		}
@@ -759,6 +872,15 @@ export class ChangeSet
 	}
 
 
+	/**
+	 * Class Method
+	 *
+	 * Removes the trailing UnchangedLine from the received `AnyLineChange[]`.
+	 *
+	 * @static
+	 * @param {AnyLineChange[]} changes
+	 * @returns {number}
+	 */
 	static trimTrailingUnchangedLines(
 		changes:AnyLineChange[]
 	):number
@@ -781,6 +903,21 @@ export class ChangeSet
 	}
 
 
+	
+	/**
+	 * Class Method
+	 *
+	 * Delete the "change" from the end of the received `AnyLineChange[]` to
+	 * the line number specified by `lineNo` (this line will not be deleted).
+	 *
+	 * The line number to be specified can be specified as `lineType` based on
+	 * `lineAfter` or `lineBefore`.
+	 *
+	 * @static
+	 * @param {AnyLineChange[]} changes
+	 * @param {('lineAfter' | 'lineBefore')} lineType
+	 * @param {number} lineNo
+	 */
 	static truncateAfterLineValue(
 		changes:AnyLineChange[] ,
 		lineType: 'lineAfter' | 'lineBefore',
@@ -803,7 +940,7 @@ export class ChangeSet
 			}
 			else
 			{
-				// 問答無用で truncate
+				// If it is not the specified lineType, truncate
 				changes.pop();
 			}
 		}
