@@ -24,15 +24,15 @@
     "commands": [
       {
         "command": "tettekete.git-add-with-git-add",
-        "title": "git add: Active Window's Files"
+        "title": "git add: File in Active Editor"
       },
       {
         "command": "tettekete.git-add-with-git-add-u",
-        "title": "git add -u: Update Tracked Files"
+        "title": "git add: -u (Update Tracked Files)"
       },
       {
         "command": "tettekete.git-add-with-git-add-selected-lines",
-        "title": "git add: Selected Lines(and/or cursor line)"
+        "title": "git add: Selected Lines or Cursor Line"
       }
     ]
   },
