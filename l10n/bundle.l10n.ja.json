@@ -1,0 +1,15 @@
+{
+  "No active file found": "アクティブになっているエディタがありません。",
+  "The active file is not part of any workspace folder.": "ワークスペース内のフォルダに含まれていないファイルです",
+  "There is no git repository in the workspace.": "git 追跡対象のフォルダではありません",
+  "git add \"{0}\" Failed:": "git add \"{0}\" に失敗しました:",
+  "git add \"{0}\" succeeded.": "git add \"{0}\" が問題無く成功しました",
+  "This project does not have a git repository.": "ワークスペース内に git リポジトリがありません。",
+  "git add -u failed.": "git add -u に失敗しました",
+  "git add -u completed successfully.": "git add -u に成功しました",
+  "when apply diff\n{0}": "選択範囲の変更適用時にエラーが発生しました:\n{0}",
+  "git apply failed:\n{0}": "git apply に失敗しました:\n{0}",
+  "The patch has been successfully applied.": "選択範囲の変更が git add されました",
+  "The selection does not include any changes.": "選択範囲内に変更がありません",
+  "The selected chunk was not found.": "選択範囲内に diff チャンクが見つかりませんでした"
+}

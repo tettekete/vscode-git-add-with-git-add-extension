@@ -23,7 +23,7 @@ export async function git_add_selected_lines()
 	const editor	= vscode.window.activeTextEditor;
 	if (! editor)
 	{
-		vscode.window.showErrorMessage(`git-add-with-git-add: No active file found`,{modal: true});
+		vscode.window.showErrorMessage( vscode.l10n.t('No active file found'),{modal: true});
 		return;
 	}
 
@@ -34,13 +34,13 @@ export async function git_add_selected_lines()
 
 	if ( ! workspaceFolder )
 	{
-		vscode.window.showErrorMessage('git-add-with-git-add: The active file is not part of any workspace folder.',{modal: true});
+		vscode.window.showErrorMessage( vscode.l10n.t('The active file is not part of any workspace folder.'),{modal: true});
 		return;
 	}
 
 	if( ! await isGitTrackedDir( workspaceFolder ) )
 	{
-		vscode.window.showErrorMessage('git-add-with-git-add:There is no git repository in the workspace.',{modal: true});
+		vscode.window.showErrorMessage( vscode.l10n.t('There is no git repository in the workspace.'),{modal: true});
 		return;
 	}
 	
@@ -101,18 +101,18 @@ export async function git_add_selected_lines()
 
 		if (applyProcess.error)
 		{
-			vscode.window.showErrorMessage(`git-add-with-git-add: when apply diff\n${applyProcess.error.message}`,{modal: true});
+			vscode.window.showErrorMessage( vscode.l10n.t('when apply diff\n{0}',applyProcess.error.message),{modal: true});
 			return;
 		}
 		else if (applyProcess.status !== 0)
 		{
-			vscode.window.showErrorMessage(`git-add-with-git-add: "git apply failed:\n${applyProcess.stderr}`,{modal: true});
+			vscode.window.showErrorMessage( vscode.l10n.t('git apply failed:\n{0}',applyProcess.stderr),{modal: true});
 			return;
 		}
 		else
 		{
 			console.log("Filtered diff applied successfully!");
-			vscode.window.setStatusBarMessage( `The patch has been successfully applied.` ,kMessageTimeOut);
+			vscode.window.setStatusBarMessage( vscode.l10n.t('The patch has been successfully applied.') ,kMessageTimeOut);
 			return;
 		}
 	}

@@ -1,3 +1,5 @@
+import * as vscode from 'vscode';
+
 import parseGitDiff,
 {
 	GitDiff,
@@ -233,13 +235,13 @@ export class MakePatchFromSelection
 		if( typeof this.changedFile === 'undefined')
 		{
 			// This means that the constructor could not find a chunk that overlaps with the selection.
-			return InformationError('The selection does not include any changes.');
+			return InformationError(vscode.l10n.t('The selection does not include any changes.'));
 		}
 
 		if( this.selectedChunks.length === 0)
 		{
 			// This is the same thing as above, but with validation to make it more resistant to code changes.
-			return InformationError('The selected chunk was not found.');
+			return InformationError(vscode.l10n.t('The selected chunk was not found.'));
 		}
 		
 		const patchBuilder = new PatchBuilder();
