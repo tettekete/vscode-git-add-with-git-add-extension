@@ -1,0 +1,15 @@
+{
+  "No active file found": "No active file found",
+  "The active file is not part of any workspace folder.": "The active file is not part of any workspace folder.",
+  "There is no git repository in the workspace.": "There is no git repository in the workspace.",
+  "git add \"{0}\" Failed:": "git add \"{0}\" Failed:",
+  "git add \"{0}\" succeeded.": "git add \"{0}\" succeeded.",
+  "This project does not have a git repository.": "This project does not have a git repository.",
+  "git add -u failed.": "git add -u failed.",
+  "git add -u completed successfully.": "git add -u completed successfully.",
+  "when apply diff\n{0}": "when apply diff\n{0}",
+  "git apply failed:\n{0}": "git apply failed:\n{0}",
+  "The patch has been successfully applied.": "The patch has been successfully applied.",
+  "The selection does not include any changes.": "The selection does not include any changes.",
+  "The selected chunk was not found.": "The selected chunk was not found."
+}

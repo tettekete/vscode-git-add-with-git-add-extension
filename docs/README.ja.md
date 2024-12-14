@@ -1,5 +1,7 @@
 # git add with git add
 
+VSCode で `git add` を行うにはコマンドパレットで `git stage changes` とタイプする必要があります。
+
 この機能拡張はコマンドパレット上から  `git add` と入力して `git add` コマンドを実行する機能を提供します。
 
 ## 出来ること

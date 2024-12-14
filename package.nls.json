@@ -1,0 +1,5 @@
+{
+	"contributes.commands0.title": "git add: File in Active Editor",
+	"contributes.commands1.title": "git add: -u (Update Tracked Files)",
+	"contributes.commands2.title": "git add: Selected Lines or Cursor Line"
+}

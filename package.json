@@ -2,7 +2,7 @@
   "name": "git-add-with-git-add",
   "displayName": "git add with git add",
   "description": "Run git add via Command Palette with 'git add'",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.95.0"
   },
@@ -24,18 +24,19 @@
     "commands": [
       {
         "command": "tettekete.git-add-with-git-add",
-        "title": "git add: File in Active Editor"
+        "title": "%contributes.commands0.title%"
       },
       {
         "command": "tettekete.git-add-with-git-add-u",
-        "title": "git add: -u (Update Tracked Files)"
+        "title": "%contributes.commands1.title%"
       },
       {
         "command": "tettekete.git-add-with-git-add-selected-lines",
-        "title": "git add: Selected Lines or Cursor Line"
+        "title": "%contributes.commands2.title%"
       }
     ]
   },
+  "l10n": "./l10n",
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "rm -rf ./dist ; webpack",
@@ -53,6 +54,7 @@
     "@types/vscode": "^1.95.0",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.7.0",
+    "@vscode/l10n-dev": "^0.0.35",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
     "eslint": "^9.13.0",
@@ -62,6 +64,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@vscode/l10n": "^0.0.18",
     "parse-git-diff": "^0.0.16"
   }
 }

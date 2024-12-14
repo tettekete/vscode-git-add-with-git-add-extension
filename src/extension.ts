@@ -59,7 +59,7 @@ function git_add()
 	const editor = vscode.window.activeTextEditor;
 	if (! editor)
 	{
-		vscode.window.showErrorMessage(`git-add-with-git-add: No active file found`,{modal: true});
+		vscode.window.showErrorMessage(vscode.l10n.t('No active file found'),{modal: true});
 		return;
 	}
 
@@ -68,7 +68,7 @@ function git_add()
 
 	if ( ! workspaceFolder )
 	{
-		vscode.window.showErrorMessage('git-add-with-git-add: The active file is not part of any workspace folder.',{modal: true});
+		vscode.window.showErrorMessage(vscode.l10n.t('The active file is not part of any workspace folder.'),{modal: true});
 		return;
 	}
 
@@ -79,7 +79,7 @@ function git_add()
 		(error, stdout, stderr) => 
 		{
 			if (error) {
-				vscode.window.showErrorMessage('git-add-with-git-add:There is no git repository in the workspace.',{modal: true});
+				vscode.window.showErrorMessage(vscode.l10n.t('There is no git repository in the workspace.'),{modal: true});
 				return;
 			}
 
@@ -93,7 +93,7 @@ function git_add()
 				{
 					if (error)
 					{
-						vscode.window.showErrorMessage(`Git Add Failed:`,
+						vscode.window.showErrorMessage(vscode.l10n.t('git add "{0}" Failed:',rel_path),
 						{
 							detail: `message: ${error.message}\n\nSTDERR: ${stderr}`,
 							modal: true
@@ -102,7 +102,7 @@ function git_add()
 					else
 					{
 						// vscode.window.showInformationMessage(`Git Add Successful: ${rel_path}`);
-						vscode.window.setStatusBarMessage( `git add ${rel_path} succeeded.` ,kMessageTimeOut);
+						vscode.window.setStatusBarMessage( vscode.l10n.t('git add "{0}" succeeded.',rel_path) ,kMessageTimeOut);
 					}
 				}
 			);
@@ -116,7 +116,7 @@ async function git_add_u()
 
 	if( ! git_trackde_dirs )
 	{
-		vscode.window.showErrorMessage('This project does not have a git repository.',{modal:true});
+		vscode.window.showErrorMessage(vscode.l10n.t('This project does not have a git repository.'),{modal:true});
 		return;
 	}
 
@@ -130,7 +130,7 @@ async function git_add_u()
 				if (error)
 				{
 					vscode.window.showErrorMessage(
-							`Error: git add -u failed.`,
+							vscode.l10n.t('git add -u failed.'),
 							{
 								detail: `message: ${error.message}\n\nSTDERR: ${stderr}`,
 								modal: true
@@ -138,7 +138,7 @@ async function git_add_u()
 					return;
 				}
 				
-				vscode.window.setStatusBarMessage( `git add -u completed successfully.` ,kMessageTimeOut);
+				vscode.window.setStatusBarMessage( vscode.l10n.t('git add -u completed successfully.') ,kMessageTimeOut);
 			}
 		);
 	}

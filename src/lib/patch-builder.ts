@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 
 import { LineRange } from './line-range';
 import { kNoNewlineAtEndOfFile } from '../constants';
@@ -20,7 +21,7 @@ export class PatchBuilder
 		switch( this.#PatchFromChunks.length )
 		{
 			case 0:
-				return InformationError("The selection does not include any changes.");
+				return InformationError(vscode.l10n.t("The selection does not include any changes."));
 
 			case 1:
 				return this.#PatchFromChunks[0].toString();
