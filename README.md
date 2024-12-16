@@ -1,6 +1,6 @@
 # git　add　with　git　add
 
-To perform “git add” in VSCode, you need to type “git stage changes” in the command palette.
+To perform `git add` in VSCode, you need to type `git stage changes` in the command palette.
 
 This is a VSCode extension that provides `git add` commands accessible from the Command Palette by typing `git add`.
 
