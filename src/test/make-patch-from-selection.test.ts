@@ -791,4 +791,175 @@ suite('MakePatchFromSelection - bugs', () =>
 		assert.equal( typeof patch , 'string' , 'patch is string.');
 		assert.equal( patch , expect );
 	});
+
+	suite('found bug on 2024-12-20',()=>
+	{
+		const _diff = `diff --git a/package.json b/package.json
+index 7b07b71..b015451 100644
+--- a/package.json
++++ b/package.json
+@@ -21,6 +21,17 @@
+   "activationEvents": [],
+   "main": "./dist/extension.js",
+   "contributes": {
++    "configuration": {
++        "type": "object",
++        "title": "git add with git add",
++        "properties": {
++            "git-add-with-git-add.showExplorerCommand": {
++                "type": "boolean",
++                "default": true,
++                "description": "Display command in Explorer context menu"
++            }
++        }
++    },
+     "commands": [
+       {
+         "command": "tettekete.git-add-with-git-add",
+@@ -33,8 +44,40 @@
+       {
+         "command": "tettekete.git-add-with-git-add-selected-lines",
+         "title": "%contributes.commands2.title%"
++      },
++      {
++        "command": "tettekete.git-add-wga-from-explorer",
++        "title": "git add (from Explorer)"
++      },
++      {
++        "command": "tettekete.git-add-wga-unstage-from-explorer",
++        "title": "git restore --staged (from Explorer)"
+       }
+-    ]
++    ],
++    "menus": {
++        "explorer/context": [
++          {
++              "command": "tettekete.git-add-wga-from-explorer",
++              "when": "config.git-add-with-git-add.showExplorerCommand && (explorerResourceIsFolder || resourceFilename)",
++              "group": "1_git_add_with_git_add"
++          },
++            {
++              "command": "tettekete.git-add-wga-unstage-from-explorer",
++              "when": "config.git-add-with-git-add.showExplorerCommand && (explorerResourceIsFolder || resourceFilename)",
++              "group": "1_git_add_with_git_add"
++          }
++        ],
++        "commandPalette": [
++                {
++                    "command": "tettekete.git-add-wga-from-explorer",
++                    "when": "explorerViewletFocus"
++                },
++                {
++                    "command": "tettekete.git-add-wga-unstage-from-explorer",
++                    "when": "explorerViewletFocus"
++                }
++            ]
++    }
+   },
+   "l10n": "./l10n",
+   "scripts": {
+`;
+		
+		// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+		// 2024-12-20: line 21 to 37
+		// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+		test('2024-12-20: line 21 to 37',()=>
+		{
+			const makePatchFromSelection = new MakePatchFromSelection({
+			diff: _diff,
+			selectionRange: new LineRange( 21,37 )
+		});
+
+		const patch = makePatchFromSelection.getPatchString();
+		const expect = `--- a/package.json
++++ b/package.json
+@@ -21,6 +21,17 @@
+   "activationEvents": [],
+   "main": "./dist/extension.js",
+   "contributes": {
++    "configuration": {
++        "type": "object",
++        "title": "git add with git add",
++        "properties": {
++            "git-add-with-git-add.showExplorerCommand": {
++                "type": "boolean",
++                "default": true,
++                "description": "Display command in Explorer context menu"
++            }
++        }
++    },
+     "commands": [
+       {
+         "command": "tettekete.git-add-with-git-add",
+`;
+
+		assert.equal( typeof patch , 'string' , 'patch is string.');
+		assert.equal( patch , expect );
+		});
+
+
+		// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+		// 2024-12-20: line 47 to 51
+		// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+		test('2024-12-20: line 47 to 51',()=>
+		{
+			const makePatchFromSelection = new MakePatchFromSelection({
+			diff: _diff,
+			selectionRange: new LineRange( 47,51 )
+		});
+
+		const patch = makePatchFromSelection.getPatchString();
+		const expect = `--- a/package.json
++++ b/package.json
+@@ -33,6 +33,11 @@
+       {
+         "command": "tettekete.git-add-with-git-add-selected-lines",
+         "title": "%contributes.commands2.title%"
++      },
++      {
++        "command": "tettekete.git-add-wga-from-explorer",
++        "title": "git add (from Explorer)"
++      },
+       }
+     ]
+   },
+`;
+
+		assert.equal( typeof patch , 'string' , 'patch is string.');
+		assert.equal( patch , expect );
+		});
+
+
+		// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+		// 2024-12-20: line 52 to 56
+		// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+		test('2024-12-20: line 52 to 56',()=>
+		{
+			const makePatchFromSelection = new MakePatchFromSelection({
+			diff: _diff,
+			selectionRange: new LineRange( 52,56 )
+		});
+
+		const patch = makePatchFromSelection.getPatchString();
+		const expect = `--- a/package.json
++++ b/package.json
+@@ -33,8 +33,11 @@
+       {
+         "command": "tettekete.git-add-with-git-add-selected-lines",
+         "title": "%contributes.commands2.title%"
++      {
++        "command": "tettekete.git-add-wga-unstage-from-explorer",
++        "title": "git restore --staged (from Explorer)"
+       }
+-    ]
++    ],
+   },
+   "l10n": "./l10n",
+   "scripts": {
+`;
+
+		assert.equal( typeof patch , 'string' , 'patch is string.');
+		assert.equal( patch , expect );
+		});
+	});
 });
