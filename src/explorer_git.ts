@@ -1,9 +1,22 @@
 import * as vscode from 'vscode';
-import { execGitAddFiles } from './lib/git-add-files';
+import { execCommandWithFiles } from './lib/exec-git-commands';
 import { findWorkspaceFolder ,isGitTrackedDir ,isWorkspaceFolder} from './lib/utils';
 import path from 'node:path';
 
+const kGitAddCommand	= 'git add';
+const kGitRestoreStaged	= 'git restore --staged'
+
 export async function git_add_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
+{
+	git_command_from_explorer( kGitAddCommand , uri , selectedFiles );
+}
+
+export async function git_unstage_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
+{
+	git_command_from_explorer( kGitRestoreStaged , uri , selectedFiles );
+}
+
+async function git_command_from_explorer( command:string , uri: vscode.Uri, selectedFiles?: vscode.Uri[])
 {
 	if( ! uri )
 	{
@@ -41,9 +54,24 @@ export async function git_add_from_explorer(uri: vscode.Uri, selectedFiles?: vsc
 			*/
 			const okLabel		= vscode.l10n.t('OK');
 			const cancelLabel	= vscode.l10n.t('Cancel');
+			let dialogMessage = '';
+			switch( command )
+			{
+				case kGitAddCommand:
+					dialogMessage = vscode.l10n.t('If you open the context menu in an empty area of the Explorer, the entire workspace folder will be targeted. Do you want to add everything with git add?');
+					break;
+				
+				case kGitRestoreStaged:
+					dialogMessage = vscode.l10n.t('If you open the context menu in an empty area of the Explorer, the entire workspace folder will be targeted. Do you want to unstage everything with git restore --staged?');
+					break;
+
+				default:
+					dialogMessage = vscode.l10n.t('If you open the context menu in an empty area of the Explorer, the entire workspace folder will be targeted. Do you want to proccess everything?');
+					break;
+			}
 
 			const result = await vscode.window.showInformationMessage(
-				vscode.l10n.t('If you open the context menu in an empty area of the Explorer, the entire workspace folder will be targeted. Do you want to add everything with git add?'),
+				dialogMessage,
 				{ modal: true },
 				cancelLabel,
 				okLabel
@@ -102,7 +130,8 @@ export async function git_add_from_explorer(uri: vscode.Uri, selectedFiles?: vsc
 	const errors: Error[] = [];
 	for( const workspaceFolder in byWorkspaceFolder )
 	{
-		const result = await execGitAddFiles(
+		const result = await execCommandWithFiles(
+						command,
 						byWorkspaceFolder[workspaceFolder],
 						workspaceFolder
 					);

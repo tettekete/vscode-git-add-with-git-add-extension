@@ -13,7 +13,20 @@ type CommandResult = {
 	stderr: string
 };
 
+
 export async function execGitAddFiles( files: string[] ,cwd: string ):Promise<CommandResult>
+{
+	return await execCommandWithFiles('git add', files , cwd);
+}
+
+
+export async function execGitRestoreStaged( files: string[] ,cwd: string ):Promise<CommandResult>
+{
+	return await execCommandWithFiles('git restore --staged', files , cwd);
+}
+
+
+export async function execCommandWithFiles( command: string ,files: string[] ,cwd: string ):Promise<CommandResult>
 {
 	const filesAsArgs = files.map((file) =>
 	{
@@ -34,7 +47,7 @@ export async function execGitAddFiles( files: string[] ,cwd: string ):Promise<Co
 	try
 	{
 		const { stdout , stderr } = await execAsync(
-			`git add ${filesAsArgs.join(' ')}`,
+			`${command} ${filesAsArgs.join(' ')}`,
 			option,
 		);
 

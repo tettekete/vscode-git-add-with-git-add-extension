@@ -158,7 +158,7 @@ export function isWorkspaceFolder( dirPath: string ):boolean
  * @param {string} argument - The string to escape.
  * @returns {string} The escaped string, safe for use in a shell command.
  */
-export function escapeArgumentForShell( argument: string )
+export function escapeArgumentForShell( argument: string ): string
 {
 	const platform = os.platform();
 

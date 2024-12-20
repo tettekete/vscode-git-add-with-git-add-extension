@@ -5,8 +5,8 @@ import * as path from 'path';
 
 import { findWorkspaceFolder } from './lib/utils';
 import { git_add_selected_lines } from './add_selected_lines';
-import { git_add_from_explorer } from './explorer_git_add';
-import { git_unstage_from_explorer } from './explorer_git_restore_staged';
+import { git_add_from_explorer } from './explorer_git';
+import { git_unstage_from_explorer } from './explorer_git';
 
 import { kMessageTimeOut } from './constants';
 
@@ -160,7 +160,8 @@ export function activate(context: vscode.ExtensionContext)
 								run_git_add,
 								run_git_add_u,
 								run_git_add_l,
-								run_git_add_from_explorer
+								run_git_add_from_explorer,
+								run_unstage_from_explorer
 							);
 }
 
