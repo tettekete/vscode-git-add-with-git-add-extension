@@ -152,8 +152,13 @@ export class MakePatchFromSelection
 	 */
 	private getPatchFromChunkFromSelection( chunk:Chunk ):PatchFromChunk | AnyUserError
 	{	
-		const fromRange		= LineRange.fromChunkRange( chunk.fromFileRange );
-		const selectedRange	= fromRange.getOverlapRange( this.selectionRange );
+		
+		let chunkLines = Math.max( chunk.fromFileRange.lines , chunk.toFileRange.lines );
+		const chunkRange	= LineRange.fromStartWithLines(
+								chunk.toFileRange.start,
+								chunkLines
+							);
+		const selectedRange	= chunkRange.getOverlapRange( this.selectionRange );
 
 		if( typeof selectedRange === 'undefined' )
 		{
