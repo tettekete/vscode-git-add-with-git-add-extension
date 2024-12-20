@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { execSync ,exec } from 'child_process';
 import { promisify } from 'util';
+import path from 'node:path';
 
 const execAsync = promisify(exec);
 
@@ -112,3 +113,37 @@ export function findWorkspaceFolder(filePath: string): string | undefined
 
     return undefined;
 }
+
+/**
+ * Checks whether the specified directory path exactly matches one of the workspace
+ * folders in the current VSCode workspace.
+ *
+ * The directory path is normalized for comparison, so you don't need to worry
+ * about the end of the path.
+ *
+ * @param {string} dirPath - The path of the directory to check.
+ * @returns {boolean} `true` if the directory matches a workspace folder; otherwise, `false`.
+ */
+export function isWorkspaceFolder( dirPath: string ):boolean
+{
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+
+	if ( ! workspaceFolders )
+	{
+		return false;
+	}
+
+	const normalizedDirPath = path.normalize( dirPath );
+
+	for (const folder of workspaceFolders)
+	{
+		const normalizedFolder = path.normalize( folder.uri.fsPath );
+		if ( normalizedDirPath === normalizedFolder )
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
