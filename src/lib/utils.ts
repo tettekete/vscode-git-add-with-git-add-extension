@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { execSync ,exec } from 'child_process';
 import { promisify } from 'util';
+import * as os from 'os';
 import path from 'node:path';
 
 const execAsync = promisify(exec);
@@ -147,3 +148,28 @@ export function isWorkspaceFolder( dirPath: string ):boolean
 	return false;
 }
 
+/**
+ * Escapes a string to make it safe for use as a shell command argument.
+ * 
+ * This function ensures that the provided argument is properly escaped for
+ * the target platform (Windows or Unix-like systems), preventing issues
+ * such as command injection or improper parsing of special characters.
+ * 
+ * @param {string} argument - The string to escape.
+ * @returns {string} The escaped string, safe for use in a shell command.
+ */
+export function escapeArgumentForShell( argument: string )
+{
+	const platform = os.platform();
+
+	if (platform === 'win32')
+	{
+		// Windows: Enclose in double quotes and escape the double quotes.
+		return `"${argument.replace(/"/g, '\\"')}"`;
+	}
+	else
+	{
+		// macOS/Linux: Enclose in single quotes and escape the single quotes.
+		return `'${argument.replace(/'/g, "'\\''")}'`;
+	}
+}
