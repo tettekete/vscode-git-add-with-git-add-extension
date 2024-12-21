@@ -47,11 +47,11 @@
       },
       {
         "command": "tettekete.git-add-wga-from-explorer",
-        "title": "git add"
+        "title": "%command.tettekete.git-add-wga-from-explorer%"
       },
       {
         "command": "tettekete.git-add-wga-unstage-from-explorer",
-        "title": "git restore --staged (Unstage Changes)"
+        "title": "%command.tettekete.git-add-wga-unstage-from-explorer%"
       }
     ],
     "menus": {
