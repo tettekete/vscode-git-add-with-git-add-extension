@@ -5,7 +5,7 @@ import path from 'node:path';
 import { kMessageTimeOut } from './constants';
 
 const kGitAddCommand	= 'git add';
-const kGitRestoreStaged	= 'git restore --staged'
+const kGitRestoreStaged	= 'git restore --staged';
 
 export async function git_add_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
 {
