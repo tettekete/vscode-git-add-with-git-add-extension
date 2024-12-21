@@ -1,4 +1,4 @@
-
+import * as vscode from 'vscode';
 import { exec } from 'node:child_process';
 import path from 'node:path';
 import { promisify } from 'node:util';
@@ -64,6 +64,11 @@ export async function execCommandWithFiles( command: string ,files: string[] ,cw
 		{
 			error = Error(`${e}`);
 		}
+	}
+
+	if(! error )
+	{
+		vscode.commands.executeCommand("workbench.files.action.refreshFilesExplorer");
 	}
 
 	return {
