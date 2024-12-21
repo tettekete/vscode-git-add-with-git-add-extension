@@ -17,6 +17,7 @@
   "The patch has been successfully applied.": "選択範囲の変更が git add されました",
   "The selected chunk was not found.": "選択範囲内に diff チャンクが見つかりませんでした",
   "The selection does not include any changes.": "選択範囲内に変更がありません",
+  "The workspace folder is not a git repository.": "ワークスペースフォルダは git リポジトリではありません",
   "There is no git repository in the workspace.": "git 追跡対象のフォルダではありません",
   "There were files that were not being tracked": "git 追跡対象ではないファイルが含まれていました",
   "This command can only be executed from the Explorer.": "このコマンドはエクスプローラーからのみ実行可能です。",

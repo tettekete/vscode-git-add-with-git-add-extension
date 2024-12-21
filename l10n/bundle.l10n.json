@@ -17,6 +17,7 @@
   "The patch has been successfully applied.": "The patch has been successfully applied.",
   "The selected chunk was not found.": "The selected chunk was not found.",
   "The selection does not include any changes.": "The selection does not include any changes.",
+  "The workspace folder is not a git repository.": "The workspace folder is not a git repository.",
   "There is no git repository in the workspace.": "There is no git repository in the workspace.",
   "There were files that were not being tracked": "There were files that were not being tracked",
   "This command can only be executed from the Explorer.": "This command can only be executed from the Explorer.",

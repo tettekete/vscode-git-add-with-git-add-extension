@@ -3,7 +3,12 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as path from 'path';
 
-import { findWorkspaceFolder } from './lib/utils';
+import {
+	findWorkspaceFolder,
+	isGitTrackedDir
+} from './lib/utils';
+
+import { execGitAddFiles } from './lib/exec-git-commands';
 import { git_add_selected_lines } from './add_selected_lines';
 import { git_add_from_explorer } from './explorer_git';
 import { git_unstage_from_explorer } from './explorer_git';
@@ -57,7 +62,7 @@ async function findGitTrackedDirs():Promise<string[] | undefined>
 	return undefined;
 }
 
-function git_add()
+async function git_add()
 {
 	const editor = vscode.window.activeTextEditor;
 	if (! editor)
@@ -76,41 +81,34 @@ function git_add()
 	}
 
 	// Check if the workspace folder is a Git repository
-	exec(
-		'git rev-parse --is-inside-work-tree',
-		{ cwd: workspaceFolder },
-		(error, stdout, stderr) => 
+	if( await isGitTrackedDir( workspaceFolder ) )
+	{
+		const r = await execGitAddFiles( [filePath] , workspaceFolder );
+
+		const rel_path = path.relative( workspaceFolder , filePath );
+		if( r.error )
 		{
-			if (error) {
-				vscode.window.showErrorMessage(vscode.l10n.t('There is no git repository in the workspace.'),{modal: true});
-				return;
-			}
-
-			const rel_path = path.relative( workspaceFolder , filePath );
-
-			// Execute `git add` for the current file
-			exec(
-				`git add "${rel_path}"`,
-				{ cwd: workspaceFolder },
-				(error, stdout, stderr) =>
+			vscode.window.showErrorMessage(
+				vscode.l10n.t('git add "{0}" Failed:',rel_path),
 				{
-					if (error)
-					{
-						vscode.window.showErrorMessage(vscode.l10n.t('git add "{0}" Failed:',rel_path),
-						{
-							detail: `message: ${error.message}\n\nSTDERR: ${stderr}`,
-							modal: true
-						});
-					}
-					else
-					{
-						// vscode.window.showInformationMessage(`Git Add Successful: ${rel_path}`);
-						vscode.window.setStatusBarMessage( vscode.l10n.t('git add "{0}" succeeded.',rel_path) ,kMessageTimeOut);
-					}
-				}
+					detail: `message: ${r.error.message}\n\nSTDERR: ${r.stderr}`,
+					modal: true
+				});
+		}
+		else
+		{
+			vscode.window.setStatusBarMessage(
+				vscode.l10n.t('git add "{0}" succeeded.',rel_path),
+				kMessageTimeOut
 			);
 		}
-	);
+	}
+	else
+	{
+		vscode.window.showErrorMessage(
+			vscode.l10n.t('The workspace folder is not a git repository.')
+		);
+	}
 }
 
 async function git_add_u()
