@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { execCommandWithFiles } from './lib/exec-git-commands';
 import { findWorkspaceFolder ,isGitTrackedDir ,isWorkspaceFolder} from './lib/utils';
 import path from 'node:path';
+import { kMessageTimeOut } from './constants';
 
 const kGitAddCommand	= 'git add';
 const kGitRestoreStaged	= 'git restore --staged'
@@ -83,7 +84,7 @@ async function git_command_from_explorer( command:string , uri: vscode.Uri, sele
 			}
 			else
 			{
-				vscode.window.showInformationMessage(vscode.l10n.t('Operation canceled.'));
+				vscode.window.setStatusBarMessage(vscode.l10n.t('Operation canceled.') ,kMessageTimeOut);
 			} 
 		}
 		else
@@ -126,8 +127,9 @@ async function git_command_from_explorer( command:string , uri: vscode.Uri, sele
 		}
 	}
 
-	// git add files
+	// exec git commands
 	const errors: Error[] = [];
+	const warnings: {[key:string]: number } = {};
 	for( const workspaceFolder in byWorkspaceFolder )
 	{
 		const result = await execCommandWithFiles(
@@ -138,6 +140,21 @@ async function git_command_from_explorer( command:string , uri: vscode.Uri, sele
 		
 		if( result.error !== undefined )
 		{
+			if( command === kGitRestoreStaged )
+			{
+				if( result.error.message.match( /did not match any file\(s\) known to git/ ) )
+				{
+					// If the command is Unstage and the error message is for an un-tracked file, make it a low-key warning
+					const warn = vscode.l10n.t('There were files that were not being tracked');
+					if(! warnings.hasOwnProperty( warn ) )
+					{
+						warnings[warn] = 0;
+					}
+					warnings[warn] ++;
+
+					continue;
+				}
+			}
 			errors.push( result.error );
 		}
 	}
@@ -146,7 +163,15 @@ async function git_command_from_explorer( command:string , uri: vscode.Uri, sele
 	{
 		const messages = errors.map((e)=> e.message ).join("\n");
 		vscode.window.showWarningMessage(
-			vscode.l10n.t('An error occurred during the git add process:\n{0}' , messages )
+			vscode.l10n.t('An error occurred during the {command} process:\n{error}' , {command,error:messages} )
 		);
+	}
+
+	if( Object.keys( warnings ).length )
+	{
+		for(const warn in warnings )
+		{
+			vscode.window.setStatusBarMessage( warn ,kMessageTimeOut);
+		}
 	}
 }
