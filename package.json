@@ -21,6 +21,17 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+        "type": "object",
+        "title": "git add with git add",
+        "properties": {
+            "git-add-with-git-add.showExplorerCommand": {
+                "type": "boolean",
+                "default": true,
+                "description": "Display command in Explorer context menu"
+            }
+        }
+    },
     "commands": [
       {
         "command": "tettekete.git-add-with-git-add",
@@ -33,6 +44,49 @@
       {
         "command": "tettekete.git-add-with-git-add-selected-lines",
         "title": "%contributes.commands2.title%"
+      },
+      {
+        "command": "tettekete.git-add-wga-from-explorer",
+        "title": "%command.tettekete.git-add-wga-from-explorer%"
+      },
+      {
+        "command": "tettekete.git-add-wga-unstage-from-explorer",
+        "title": "%command.tettekete.git-add-wga-unstage-from-explorer%"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+            "submenu": "gawga.submenu",
+            "when": "config.git-add-with-git-add.showExplorerCommand && (explorerResourceIsFolder || resourceFilename)",
+            "group": "1_git_add_with_git_add"
+        }
+      ],
+      "gawga.submenu":[
+        {
+          "command": "tettekete.git-add-wga-from-explorer",
+          "group": "1st-group"
+        },
+        {
+          "command": "tettekete.git-add-wga-unstage-from-explorer",
+          "group": "1st-group"
+        }
+      ],
+      "commandPalette": [
+        {
+            "command": "tettekete.git-add-wga-from-explorer",
+            "when": "explorerViewletFocus"
+        },
+        {
+            "command": "tettekete.git-add-wga-unstage-from-explorer",
+            "when": "explorerViewletFocus"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "gawga.submenu",
+        "label": "git add with git add"
       }
     ]
   },

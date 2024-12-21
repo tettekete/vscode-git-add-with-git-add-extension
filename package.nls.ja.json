@@ -1,5 +1,7 @@
 {
 	"contributes.commands0.title": "git add: アクティブエディタのファイルを git add する",
 	"contributes.commands1.title": "git add: -u (更新のあった追跡中のファイルを git add する)",
-	"contributes.commands2.title": "git add: 選択範囲・カーソル位置の変更を git add する"
+	"contributes.commands2.title": "git add: 選択範囲・カーソル位置の変更を git add する",
+	"command.tettekete.git-add-wga-from-explorer": "git add する",
+	"command.tettekete.git-add-wga-unstage-from-explorer": "git restore --staged (ステージから外す)"
 }

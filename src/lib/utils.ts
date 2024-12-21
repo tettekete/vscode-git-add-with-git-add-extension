@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import { execSync ,exec } from 'child_process';
 import { promisify } from 'util';
+import * as os from 'os';
+import path from 'node:path';
 
 const execAsync = promisify(exec);
 
@@ -111,4 +113,63 @@ export function findWorkspaceFolder(filePath: string): string | undefined
 	}
 
     return undefined;
+}
+
+/**
+ * Checks whether the specified directory path exactly matches one of the workspace
+ * folders in the current VSCode workspace.
+ *
+ * The directory path is normalized for comparison, so you don't need to worry
+ * about the end of the path.
+ *
+ * @param {string} dirPath - The path of the directory to check.
+ * @returns {boolean} `true` if the directory matches a workspace folder; otherwise, `false`.
+ */
+export function isWorkspaceFolder( dirPath: string ):boolean
+{
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+
+	if ( ! workspaceFolders )
+	{
+		return false;
+	}
+
+	const normalizedDirPath = path.normalize( dirPath );
+
+	for (const folder of workspaceFolders)
+	{
+		const normalizedFolder = path.normalize( folder.uri.fsPath );
+		if ( normalizedDirPath === normalizedFolder )
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Escapes a string to make it safe for use as a shell command argument.
+ * 
+ * This function ensures that the provided argument is properly escaped for
+ * the target platform (Windows or Unix-like systems), preventing issues
+ * such as command injection or improper parsing of special characters.
+ * 
+ * @param {string} argument - The string to escape.
+ * @returns {string} The escaped string, safe for use in a shell command.
+ */
+export function escapeArgumentForShell( argument: string ): string
+{
+	const platform = os.platform();
+
+	if (platform === 'win32')
+	{
+		// Windows: Enclose in double quotes and escape the double quotes.
+		return `"${argument.replace(/"/g, '\\"')}"`;
+	}
+	else
+	{
+		// macOS/Linux: Enclose in single quotes and escape the single quotes.
+		return `'${argument.replace(/'/g, "'\\''")}'`;
+	}
 }
