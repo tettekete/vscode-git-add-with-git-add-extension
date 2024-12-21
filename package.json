@@ -47,37 +47,48 @@
       },
       {
         "command": "tettekete.git-add-wga-from-explorer",
-        "title": "git add (from Explorer)"
+        "title": "git add"
       },
       {
         "command": "tettekete.git-add-wga-unstage-from-explorer",
-        "title": "git restore --staged (from Explorer)"
+        "title": "git restore --staged (Unstage Changes)"
       }
     ],
     "menus": {
-        "explorer/context": [
-          {
-              "command": "tettekete.git-add-wga-from-explorer",
-              "when": "config.git-add-with-git-add.showExplorerCommand && (explorerResourceIsFolder || resourceFilename)",
-              "group": "1_git_add_with_git_add"
-          },
-            {
-              "command": "tettekete.git-add-wga-unstage-from-explorer",
-              "when": "config.git-add-with-git-add.showExplorerCommand && (explorerResourceIsFolder || resourceFilename)",
-              "group": "1_git_add_with_git_add"
-          }
-        ],
-        "commandPalette": [
-                {
-                    "command": "tettekete.git-add-wga-from-explorer",
-                    "when": "explorerViewletFocus"
-                },
-                {
-                    "command": "tettekete.git-add-wga-unstage-from-explorer",
-                    "when": "explorerViewletFocus"
-                }
-            ]
-    }
+      "explorer/context": [
+        {
+            "submenu": "gawga.submenu",
+            "when": "config.git-add-with-git-add.showExplorerCommand && (explorerResourceIsFolder || resourceFilename)",
+            "group": "1_git_add_with_git_add"
+        }
+      ],
+      "gawga.submenu":[
+        {
+          "command": "tettekete.git-add-wga-from-explorer",
+          "group": "1st-group"
+        },
+        {
+          "command": "tettekete.git-add-wga-unstage-from-explorer",
+          "group": "1st-group"
+        }
+      ],
+      "commandPalette": [
+        {
+            "command": "tettekete.git-add-wga-from-explorer",
+            "when": "explorerViewletFocus"
+        },
+        {
+            "command": "tettekete.git-add-wga-unstage-from-explorer",
+            "when": "explorerViewletFocus"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "gawga.submenu",
+        "label": "git add with git add"
+      }
+    ]
   },
   "l10n": "./l10n",
   "scripts": {
