@@ -28,7 +28,12 @@
             "git-add-with-git-add.showExplorerCommand": {
                 "type": "boolean",
                 "default": true,
-                "description": "Display command in Explorer context menu"
+                "description": "%config.git-add-with-git-add.showExplorerCommand%"
+            },
+            "git-add-with-git-add.dialogOnWorkspaceSelection": {
+                "type": "boolean",
+                "default": true,
+                "description": "%config.git-add-with-git-add.dialogOnWorkspaceSelection%"
             }
         }
     },
@@ -50,8 +55,20 @@
         "title": "%command.tettekete.git-add-wga-from-explorer%"
       },
       {
+        "command": "tettekete.git-add-wga-u-from-explorer",
+        "title": "%command.tettekete.git-add-wga-u-from-explorer%"
+      },
+      {
+        "command": "tettekete.git-add-wga-restore-from-explorer",
+        "title": "%command.tettekete.git-add-wga-restore-from-explorer%"
+      },
+      {
         "command": "tettekete.git-add-wga-unstage-from-explorer",
         "title": "%command.tettekete.git-add-wga-unstage-from-explorer%"
+      }
+      ,{
+        "command": "tettekete.context-debug",
+        "title": "context-debug"
       }
     ],
     "menus": {
@@ -68,13 +85,29 @@
           "group": "1st-group"
         },
         {
-          "command": "tettekete.git-add-wga-unstage-from-explorer",
+          "command": "tettekete.git-add-wga-u-from-explorer",
           "group": "1st-group"
+        },
+        {
+          "command": "tettekete.git-add-wga-unstage-from-explorer",
+          "group": "2nd-group"
+        }
+        ,{
+          "command": "tettekete.context-debug",
+          "group": "0_debug"
+        }
+        ,{
+          "command": "tettekete.git-add-wga-restore-from-explorer",
+          "group": "3_destructive_commands"
         }
       ],
       "commandPalette": [
         {
             "command": "tettekete.git-add-wga-from-explorer",
+            "when": "explorerViewletFocus"
+        },
+        {
+            "command": "tettekete.git-add-wga-u-from-explorer",
             "when": "explorerViewletFocus"
         },
         {

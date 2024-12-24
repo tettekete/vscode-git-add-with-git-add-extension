@@ -1,141 +1,163 @@
 import * as vscode from 'vscode';
-import { execCommandWithFiles } from './lib/exec-git-commands';
+import { execGitCommandWithFiles } from './lib/exec-git-commands';
 import { findWorkspaceFolder ,isGitTrackedDir ,isWorkspaceFolder} from './lib/utils';
 import path from 'node:path';
 import { kMessageTimeOut } from './constants';
 
-const kGitAddCommand	= 'git add';
-const kGitRestoreStaged	= 'git restore --staged';
+import type { ValidGitCommands } from './constants';
+import {
+	kGitAdd,
+	kGitAddUpdate,
+	kGitRestoreStaged,
+	kGitRestore,
+} from './constants';
 
+// - - - - - - - - - - - - - - - - - - - -
+// git_add_from_explorer
+// - - - - - - - - - - - - - - - - - - - -
 export async function git_add_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
 {
-	git_command_from_explorer( kGitAddCommand , uri , selectedFiles );
+	git_command_from_explorer( kGitAdd , uri , selectedFiles );
 }
 
+// - - - - - - - - - - - - - - - - - - - -
+// git_add_u_from_explorer
+// - - - - - - - - - - - - - - - - - - - -
+export async function git_add_u_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
+{
+	git_command_from_explorer( kGitAddUpdate , uri , selectedFiles );
+}
+
+// - - - - - - - - - - - - - - - - - - - -
+// git_unstage_from_explorer
+// - - - - - - - - - - - - - - - - - - - -
 export async function git_unstage_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
 {
 	git_command_from_explorer( kGitRestoreStaged , uri , selectedFiles );
 }
 
-async function git_command_from_explorer( command:string , uri: vscode.Uri, selectedFiles?: vscode.Uri[])
+// - - - - - - - - - - - - - - - - - - - -
+// git_restore_from_explorer
+// - - - - - - - - - - - - - - - - - - - -
+export async function git_restore_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
 {
-	if( ! uri )
+	git_command_from_explorer( kGitRestore , uri , selectedFiles );
+}
+
+// - - - - - - - - - - - - - - - - - - - -
+// private: git_command_from_explorer
+// - - - - - - - - - - - - - - - - - - - -
+async function git_command_from_explorer( command:ValidGitCommands , uri: vscode.Uri, selectedFiles?: vscode.Uri[])
+{
+	if( !( uri instanceof vscode.Uri ) )
 	{
 		vscode.window.showWarningMessage(
 			vscode.l10n.t('This command can only be executed from the Explorer.')
 		);
 	}
 
-	const fileList:string[] = [];
-	if (selectedFiles && selectedFiles.length > 0)
+	if( ! selectedFiles )
 	{
-		selectedFiles.forEach((file) =>
-		{
-			fileList.push( file.fsPath );
-		});
-		
-		console.debug(`selected files: \n${fileList.join('\n')}`);
+		selectedFiles = [];
 	}
-	else if( uri )
-	{
-		console.debug(`selected file: \n${uri.fsPath}`);
 
+	// Check whether the target is a workspace folder. 
+	let isTargetWorkspaceFolder = false;
+	let usePeriodWhenEmptyFiles = false;
+
+	if( ! selectedFiles.length )
+	{
 		if( isWorkspaceFolder( uri.fsPath ) )
 		{
-			/*
-			Even when a file is selected in the Explorer via the GUI, opening the context
-			menu in an empty area of the Explorer results in the directory of the workspace
-			folder being passed, likely due to a design flaw in the VSCode API.
+			isTargetWorkspaceFolder = true;
+		}
+		else
+		{
+			vscode.window.showInformationMessage(
+				vscode.l10n.t('No file is selected.')
+			);
+			return;
+		}
+	}
 
-			It is unlikely that this 'invisible' behavior aligns with the user's intent.
+	// Create a file list grouped by each workspace folder.
+	const byWorkspaceFolder:{[key:string]: string[]} = {};
+	if( isTargetWorkspaceFolder )
+	{
+		const config        		= vscode.workspace.getConfiguration();
+		const requiresConfirmation	= config.get<boolean>('git-add-with-git-add.dialogOnWorkspaceSelection');
 
-			Therefore, a dialog is displayed to confirm the user's intent. Additionally,
-			since the need to perform a `git add` on the entire project is rare, the default
-			button in the dialog is set to 'Cancel'.
-			*/
+		if( requiresConfirmation )
+		{
 			const okLabel		= vscode.l10n.t('OK');
 			const cancelLabel	= vscode.l10n.t('Cancel');
-			let dialogMessage = '';
-			switch( command )
-			{
-				case kGitAddCommand:
-					dialogMessage = vscode.l10n.t('If you open the context menu in an empty area of the Explorer, the entire workspace folder will be targeted. Do you want to add everything with git add?');
-					break;
-				
-				case kGitRestoreStaged:
-					dialogMessage = vscode.l10n.t('If you open the context menu in an empty area of the Explorer, the entire workspace folder will be targeted. Do you want to unstage everything with git restore --staged?');
-					break;
-
-				default:
-					dialogMessage = vscode.l10n.t('If you open the context menu in an empty area of the Explorer, the entire workspace folder will be targeted. Do you want to proccess everything?');
-					break;
-			}
-
+			const dialogMessage = vscode.l10n.t('Do you want to run "{command}" on the entire workspace folder?',{command});
+			const dialogDetail	= vscode.l10n.t('For Reference: You can configure this dialog to not appear when the entire workspace folder is targeted.');
+			
 			const result = await vscode.window.showInformationMessage(
 				dialogMessage,
-				{ modal: true },
+				{
+					modal: true,
+					detail: dialogDetail
+				},
 				cancelLabel,
 				okLabel
 			);
 
-			if (result === okLabel)
-			{
-				fileList.push( path.join( uri.fsPath , '*' ) );
-			}
-			else
+			if (result !== okLabel)
 			{
 				vscode.window.setStatusBarMessage(vscode.l10n.t('Operation canceled.') ,kMessageTimeOut);
+				return;
 			} 
 		}
-		else
-		{
-			fileList.push( uri.fsPath );
-		}
+
+		byWorkspaceFolder[uri.fsPath] = [];
+		usePeriodWhenEmptyFiles = true;
 	}
 	else
 	{
-		vscode.window.showInformationMessage(
-			vscode.l10n.t('No file is selected.')
-		);
-		return;
-	}
-
-	// 選択されたファイルは異なるリポジトリ = workspace フォルダーに跨がっている可能性があるので
-	// それぞれに分離します。
-
-	const byWorkspaceFolder:{[key:string]: string[]} = {};
-	for(const file of fileList )
-	{
-		const workspaceFolder = findWorkspaceFolder( file );
-		if( workspaceFolder === undefined )
+		// エクスプローラー上でワークスペースを跨がっての選択は出来無いはずだが、念のため
+		// {"waorkspace-folder": [ "file1" ,"file2" ,... ] というデータ構造に整理します。
+		// このデータ構造の方がワークスペースフォルダ全体が対象のケースも同じ処理で回しやすいという
+		// 利点もあります。
+		for(const fileUri of selectedFiles )
 		{
-			continue;
-		}
+			const file = fileUri.fsPath;
+			const workspaceFolder = findWorkspaceFolder( file );
 
-		if( ! await isGitTrackedDir( workspaceFolder ) )
-		{
-			continue;
-		}
+			if( workspaceFolder === undefined )
+			{
+				continue;
+			}
 
-		if( ! byWorkspaceFolder.hasOwnProperty( workspaceFolder ) )
-		{
-			byWorkspaceFolder[workspaceFolder] = [ file ];
-		}
-		else
-		{
-			byWorkspaceFolder[workspaceFolder].push( file );
+			if( ! await isGitTrackedDir( workspaceFolder ) )
+			{
+				continue;
+			}
+
+			if( ! byWorkspaceFolder.hasOwnProperty( workspaceFolder ) )
+			{
+				byWorkspaceFolder[workspaceFolder] = [ file ];
+			}
+			else
+			{
+				byWorkspaceFolder[workspaceFolder].push( file );
+			}
 		}
 	}
-
+	
 	// exec git commands
 	const errors: Error[] = [];
 	const warnings: {[key:string]: number } = {};
 	for( const workspaceFolder in byWorkspaceFolder )
 	{
-		const result = await execCommandWithFiles(
-						command,
-						byWorkspaceFolder[workspaceFolder],
-						workspaceFolder
+		const result = await execGitCommandWithFiles(
+						{
+							command,
+							files: byWorkspaceFolder[workspaceFolder],
+							cwd: workspaceFolder,
+							usePeriodWhenEmptyFiles
+						}
 					);
 		
 		if( result.error !== undefined )

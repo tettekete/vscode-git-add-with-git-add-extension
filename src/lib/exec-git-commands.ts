@@ -4,6 +4,14 @@ import path from 'node:path';
 import { promisify } from 'node:util';
 import { escapeArgumentForShell } from './utils';
 
+import type { ValidGitCommands } from '../constants';
+import {
+	kGitAdd,
+	kGitAddUpdate,
+	kGitRestoreStaged,
+	kGitRestore,
+} from '../constants';
+
 
 const execAsync = promisify(exec);
 
@@ -16,17 +24,40 @@ type CommandResult = {
 
 export async function execGitAddFiles( files: string[] ,cwd: string ):Promise<CommandResult>
 {
-	return await execCommandWithFiles('git add', files , cwd);
+	return await execGitCommandWithFiles(
+		{
+			command: kGitAdd,
+			files,
+			cwd
+		});
 }
 
 
 export async function execGitRestoreStaged( files: string[] ,cwd: string ):Promise<CommandResult>
 {
-	return await execCommandWithFiles('git restore --staged', files , cwd);
+	return await execGitCommandWithFiles(
+		{
+			command: kGitRestoreStaged,
+			files,
+			cwd
+		});
 }
 
 
-export async function execCommandWithFiles( command: string ,files: string[] ,cwd: string ):Promise<CommandResult>
+export async function execGitCommandWithFiles(
+	{
+		command
+		,files
+		,cwd
+		,usePeriodWhenEmptyFiles = false
+	}:
+	{
+		command: ValidGitCommands,
+		files: string[] ,
+		cwd: string,
+		usePeriodWhenEmptyFiles?: boolean
+	}
+):Promise<CommandResult>
 {
 	const filesAsArgs = files.map((file) =>
 	{
@@ -34,21 +65,27 @@ export async function execCommandWithFiles( command: string ,files: string[] ,cw
 		return escapeArgumentForShell( relPath );
 	});
 
-	const option:{[key: string]:unknown} = {};
+	const execOption:{[key: string]:unknown} = {};
 
 	if( cwd )
 	{
-		option['cwd'] = cwd;
+		execOption['cwd'] = cwd;
 	}
 
 	let _stdout:string = '';
 	let _stderr:string = '';
 	let error:Error|undefined = undefined;
+	let commandText = `${command} ${filesAsArgs.join(' ')}`;
+
+	if( files.length === 0 && usePeriodWhenEmptyFiles )
+	{
+		commandText = `${command} .`;
+	}
 	try
 	{
 		const { stdout , stderr } = await execAsync(
-			`${command} ${filesAsArgs.join(' ')}`,
-			option,
+			commandText,
+			execOption,
 		);
 
 		_stdout = stdout;

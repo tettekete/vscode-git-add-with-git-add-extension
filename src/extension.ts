@@ -11,7 +11,9 @@ import {
 import { execGitAddFiles } from './lib/exec-git-commands';
 import { git_add_selected_lines } from './add_selected_lines';
 import { git_add_from_explorer } from './explorer_git';
+import { git_restore_from_explorer } from './explorer_git';
 import { git_unstage_from_explorer } from './explorer_git';
+import { git_add_u_from_explorer } from './explorer_git';
 
 import { kMessageTimeOut } from './constants';
 
@@ -152,8 +154,14 @@ export function activate(context: vscode.ExtensionContext)
 	const run_git_add	= vscode.commands.registerCommand('tettekete.git-add-with-git-add', git_add );
 	const run_git_add_u	= vscode.commands.registerCommand('tettekete.git-add-with-git-add-u', git_add_u );
 	const run_git_add_l	= vscode.commands.registerCommand('tettekete.git-add-with-git-add-selected-lines', git_add_selected_lines );
-	const run_git_add_from_explorer	= vscode.commands.registerCommand('tettekete.git-add-wga-from-explorer', git_add_from_explorer );
-	const run_unstage_from_explorer	= vscode.commands.registerCommand('tettekete.git-add-wga-unstage-from-explorer', git_unstage_from_explorer );
+	const run_git_add_from_explorer		= vscode.commands.registerCommand('tettekete.git-add-wga-from-explorer', git_add_from_explorer );
+	const run_git_add_u_from_explorer	= vscode.commands.registerCommand('tettekete.git-add-wga-u-from-explorer', git_add_u_from_explorer );
+	const run_restore_from_explorer		= vscode.commands.registerCommand('tettekete.git-add-wga-restore-from-explorer', git_restore_from_explorer );
+	const run_unstage_from_explorer		= vscode.commands.registerCommand('tettekete.git-add-wga-unstage-from-explorer', git_unstage_from_explorer );
+
+	const debug = vscode.commands.registerCommand('tettekete.context-debug', (...args) => {
+		console.debug('Command called with arguments:', args);
+	});
 
 
 	context.subscriptions.push(
@@ -161,7 +169,10 @@ export function activate(context: vscode.ExtensionContext)
 								run_git_add_u,
 								run_git_add_l,
 								run_git_add_from_explorer,
+								run_git_add_u_from_explorer,
+								run_restore_from_explorer,
 								run_unstage_from_explorer
+								,debug
 							);
 }
 
