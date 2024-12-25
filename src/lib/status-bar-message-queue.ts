@@ -9,6 +9,8 @@ export class StatusBarMessageQueue
 	private currentTimeout: NodeJS.Timeout | null = null;
 	// Skip setting for identical messages
 	private skipDuplicateMessages = true;
+	private maxTimeout: number = 10000;
+	private lowPriorityThreshold = 99;
 
 	// Since this is a singleton implementation, the constructor should be private.
 	private constructor() {}
@@ -38,10 +40,41 @@ export class StatusBarMessageQueue
 		}
 
 		this.queue.push({ message, timeout, priority });
+		this.adjustTimeouts();
 		this.queue.sort((a, b) => b.priority - a.priority);
 
 		if (!this.isProcessing) {
 			this.processQueue();
+		}
+	}
+
+	/**
+	 * Adjust so that the total timeout for priorities below or equal to lowPriorityThreshold
+	 * does not exceed maxTimeout.
+	 * However, ensure a minimum display time of 100 ms for each message.
+	 */
+	private adjustTimeouts(): void {
+		let totalTimeout = this.queue
+			.filter((item) =>
+			{
+				return item.priority <= this.lowPriorityThreshold;
+			})
+			.reduce( (sum, item) => sum + item.timeout, 0);
+
+		if (totalTimeout > this.maxTimeout) {
+			const coef = totalTimeout / this.maxTimeout ;
+
+			this.queue = this.queue.map((item) =>
+			{
+				if( item.priority > this.lowPriorityThreshold )
+				{
+					return item;
+				}
+
+				const adjustedTime = Math.floor( item.timeout * coef );
+				const adjustedTimeout = Math.max( adjustedTime, 100); // 最低100msを保証
+				return { ...item, timeout: adjustedTimeout };
+			});
 		}
 	}
 
@@ -97,5 +130,14 @@ export class StatusBarMessageQueue
 	public setSkipDuplicateMessages(skip: boolean)
 	{
 		this.skipDuplicateMessages = skip;
+	}
+
+	public setMaxTimeout( ms: number )
+	{
+		if( ms < 100 ){ return false;}
+
+		this.maxTimeout = ms;
+
+		return true;
 	}
 }
