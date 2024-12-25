@@ -1,6 +1,7 @@
 {
   "An error occurred during the {command} process:\n{error}": "{command} の処理中に以下のエラーが発生しました。\n{error}",
   "Cancel": "キャンセル",
+  "Do you want to run \"{command}\" on the entire workspace folder?": "ワークスペースフォルダ全体を対象に \"{command}\" を実行しますか？",
   "git add -u completed successfully.": "git add -u に成功しました",
   "git add -u failed.": "git add -u に失敗しました",
   "git add \"{0}\" Failed:": "git add \"{0}\" に失敗しました:",
@@ -11,6 +12,7 @@
   "If you open the context menu in an empty area of the Explorer, the entire workspace folder will be targeted. Do you want to unstage everything with git restore --staged?": "エクスプローラーの空白部分をクリックしてコンテキストメニューを開いた場合、ワークスペースフォルダ全体が処理対象となります。全てのディレクトリ・ファイルを git restore --staged しますか？",
   "No active file found": "アクティブになっているエディタがありません。",
   "No file is selected.": "ファイルが選択されていません。",
+  "OK Don't show this dialog again": "OK（今後このダイアログを出さない）",
   "OK": "OK",
   "Operation canceled.": "操作はキャンセルされました。",
   "The active file is not part of any workspace folder.": "ワークスペース内のフォルダに含まれていないファイルです",

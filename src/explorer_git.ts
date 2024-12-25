@@ -91,6 +91,7 @@ async function git_command_from_explorer( command:ValidGitCommands , uri: vscode
 		{
 			const okLabel		= vscode.l10n.t('OK');
 			const cancelLabel	= vscode.l10n.t('Cancel');
+			const okDontDialog	= vscode.l10n.t("OK Don't show this dialog again")
 			const dialogMessage = vscode.l10n.t('Do you want to run "{command}" on the entire workspace folder?',{command});
 			const dialogDetail	= vscode.l10n.t('For Reference: You can configure this dialog to not appear when the entire workspace folder is targeted.');
 			
@@ -101,17 +102,27 @@ async function git_command_from_explorer( command:ValidGitCommands , uri: vscode
 					detail: dialogDetail
 				},
 				cancelLabel,
-				okLabel
+				okLabel,
+				okDontDialog
 			);
 
-			if (result !== okLabel)
+			if (result !== okLabel && result !== okDontDialog )
 			{
 				StatusBarMessageQueue.getInstance().enqueue(
 					vscode.l10n.t('Operation canceled.'),
 					kMessageTimeOut
 				);
 				return;
-			} 
+			}
+
+			if( result === okDontDialog )
+			{
+				await vscode.workspace.getConfiguration().update(
+					'git-add-with-git-add.dialogOnWorkspaceSelection',
+					false,
+					vscode.ConfigurationTarget.Global
+				);
+			}
 		}
 
 		byWorkspaceFolder[uri.fsPath] = [];
