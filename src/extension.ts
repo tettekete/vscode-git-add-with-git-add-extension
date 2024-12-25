@@ -160,11 +160,6 @@ export function activate(context: vscode.ExtensionContext)
 	const run_restore_from_explorer		= vscode.commands.registerCommand('tettekete.git-add-wga-restore-from-explorer', git_restore_from_explorer );
 	const run_unstage_from_explorer		= vscode.commands.registerCommand('tettekete.git-add-wga-unstage-from-explorer', git_unstage_from_explorer );
 
-	const debug = vscode.commands.registerCommand('tettekete.context-debug', (...args) => {
-		console.debug('Command called with arguments:', args);
-	});
-
-
 	context.subscriptions.push(
 								run_git_add,
 								run_git_add_u,
@@ -173,7 +168,6 @@ export function activate(context: vscode.ExtensionContext)
 								run_git_add_u_from_explorer,
 								run_restore_from_explorer,
 								run_unstage_from_explorer
-								,debug
 							);
 }
 
