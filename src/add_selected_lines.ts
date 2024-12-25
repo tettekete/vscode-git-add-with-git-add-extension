@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { StatusBarMessageQueue } from './lib/status-bar-message-queue';
 import
 	{
 		isGitTrackedDir, 
@@ -112,7 +113,10 @@ export async function git_add_selected_lines()
 		else
 		{
 			console.log("Filtered diff applied successfully!");
-			vscode.window.setStatusBarMessage( vscode.l10n.t('The patch has been successfully applied.') ,kMessageTimeOut);
+			StatusBarMessageQueue.getInstance().enqueue(
+				vscode.l10n.t('The patch has been successfully applied.'),
+				kMessageTimeOut
+			);
 			return;
 		}
 	}

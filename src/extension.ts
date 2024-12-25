@@ -8,6 +8,7 @@ import {
 	isGitTrackedDir
 } from './lib/utils';
 
+import { StatusBarMessageQueue } from './lib/status-bar-message-queue';
 import { execGitAddFiles } from './lib/exec-git-commands';
 import { git_add_selected_lines } from './add_selected_lines';
 import { git_add_from_explorer } from './explorer_git';
@@ -99,7 +100,7 @@ async function git_add()
 		}
 		else
 		{
-			vscode.window.setStatusBarMessage(
+			StatusBarMessageQueue.getInstance().enqueue(
 				vscode.l10n.t('git add "{0}" succeeded.',rel_path),
 				kMessageTimeOut
 			);
@@ -141,7 +142,7 @@ async function git_add_u()
 					return;
 				}
 				
-				vscode.window.setStatusBarMessage( vscode.l10n.t('git add -u completed successfully.') ,kMessageTimeOut);
+				StatusBarMessageQueue.getInstance().enqueue( vscode.l10n.t('git add -u completed successfully.') ,kMessageTimeOut);
 			}
 		);
 	}

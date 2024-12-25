@@ -3,7 +3,7 @@ import { execGitCommandWithFiles } from './lib/exec-git-commands';
 import { findWorkspaceFolder ,isGitTrackedDir ,isWorkspaceFolder} from './lib/utils';
 import path from 'node:path';
 import { kMessageTimeOut } from './constants';
-
+import { StatusBarMessageQueue } from './lib/status-bar-message-queue';
 import type { ValidGitCommands } from './constants';
 import {
 	kGitAdd,
@@ -106,7 +106,10 @@ async function git_command_from_explorer( command:ValidGitCommands , uri: vscode
 
 			if (result !== okLabel)
 			{
-				vscode.window.setStatusBarMessage(vscode.l10n.t('Operation canceled.') ,kMessageTimeOut);
+				StatusBarMessageQueue.getInstance().enqueue(
+					vscode.l10n.t('Operation canceled.'),
+					kMessageTimeOut
+				);
 				return;
 			} 
 		}
@@ -189,11 +192,16 @@ async function git_command_from_explorer( command:ValidGitCommands , uri: vscode
 		);
 	}
 
+	const messageQueue = StatusBarMessageQueue.getInstance();
 	if( Object.keys( warnings ).length )
 	{
 		for(const warn in warnings )
 		{
-			vscode.window.setStatusBarMessage( warn ,kMessageTimeOut);
+			messageQueue.enqueue( warn , kMessageTimeOut / 2 );
 		}
 	}
+	messageQueue.enqueue( 
+		vscode.l10n.t('{command} completed successfully',{command}),
+		kMessageTimeOut
+	);
 }
