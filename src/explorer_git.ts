@@ -244,6 +244,11 @@ async function git_command_from_explorer(
 	const warnings: {[key:string]: number } = {};
 	for( const workspaceFolder in byWorkspaceFolder )
 	{
+		if( preExecCallback )
+		{
+			await preExecCallback( byWorkspaceFolder[workspaceFolder] , workspaceFolder );
+		}
+
 		const result = await execGitCommandWithFiles(
 						{
 							command,
