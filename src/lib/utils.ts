@@ -30,8 +30,14 @@ export function getGitDiff(
 		unified_option = `--unified=${unified}`;
 	}
 
+	let relPath = file_path;
+	if( path.isAbsolute( file_path ) )
+	{
+		relPath = path.relative( repo_dir , file_path );
+	}
+	const safePath = escapeArgumentForShell( relPath );
 	const stdout = execSync(
-								`git diff ${unified_option} "${file_path}"`,
+								`git diff ${unified_option} ${safePath}`,
 								{cwd: repo_dir }
 							).toString();
 	if( stdout.length )
@@ -77,8 +83,15 @@ export async function isGitTrackedFile( repo_dir: string ,file_path: string )
 
 	try
 	{
+		let relPath = file_path;
+		if( path.isAbsolute( file_path ) )
+		{
+			relPath = path.relative( repo_dir , file_path );
+		}
+		
+		const safePath = escapeArgumentForShell( relPath );
 		const { stdout , stderr } = await execAsync(
-			`git ls-files --error-unmatch ${file_path}`,
+			`git ls-files --error-unmatch ${safePath}`,
 			{ cwd: repo_dir },
 		);
 	}
