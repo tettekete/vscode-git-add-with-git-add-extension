@@ -1,6 +1,11 @@
 import * as vscode from 'vscode';
 import { execGitCommandWithFiles } from './lib/exec-git-commands';
-import { findWorkspaceFolder ,isGitTrackedDir ,isWorkspaceFolder} from './lib/utils';
+import {
+	findWorkspaceFolder,
+	isGitTrackedDir,
+	isWorkspaceFolder,
+	isGitTrackedFile
+} from './lib/utils';
 import path from 'node:path';
 import { kMessageTimeOut } from './constants';
 import { StatusBarMessageQueue } from './lib/status-bar-message-queue';
@@ -42,6 +47,21 @@ export async function git_unstage_from_explorer(uri: vscode.Uri, selectedFiles?:
 export async function git_restore_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
 {
 	git_command_from_explorer( kGitRestore , uri , selectedFiles );
+}
+
+async function untrackedFileWarning( files: string[] , workspace: string )
+{
+	for(const file of files )
+	{
+		if( ! await isGitTrackedFile( workspace , file ) )
+		{
+			const relPath = path.relative( workspace , file );
+			StatusBarMessageQueue.getInstance().enqueue(
+				vscode.l10n.t('{file} is untracked file',{file: relPath }),
+				kMessageTimeOut
+			);
+		}
+	}
 }
 
 // - - - - - - - - - - - - - - - - - - - -
