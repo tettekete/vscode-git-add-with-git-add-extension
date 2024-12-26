@@ -60,6 +60,32 @@ export async function git_unstage_from_explorer(uri: vscode.Uri, selectedFiles?:
 // - - - - - - - - - - - - - - - - - - - -
 export async function git_restore_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
 {
+	// git restore は破壊的なコマンドであるためダイアログを出します
+	const config        = vscode.workspace.getConfiguration();
+	const showDialog	= config.get<boolean>('myAwesomeExtension.priority', true );
+
+	if( showDialog )
+	{
+		const okLabel		= vscode.l10n.t('OK');
+		const cancelLabel	= vscode.l10n.t('Cancel');
+		const dialogMessage = vscode.l10n.t('git restore will discard all the changes you made. Are you sure you want to proceed?');
+
+		const result	= await vscode.window.showInformationMessage(
+							dialogMessage,
+							{
+								modal: true
+							},
+							cancelLabel,
+							okLabel
+						);
+		
+		if (result !== okLabel )
+		{
+			StatusBarMessageQueue.getInstance().enqueue(vscode.l10n.t('Operation canceled.') ,kMessageTimeOut);
+			return;
+		}
+	}
+
 	git_command_from_explorer(
 		{
 			command: kGitRestore,
