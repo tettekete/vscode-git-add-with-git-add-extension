@@ -7,5 +7,6 @@
 	"command.tettekete.git-add-wga-restore-from-explorer": "git restore",
 	"command.tettekete.git-add-wga-unstage-from-explorer": "git restore --staged (Unstage Changes)",
 	"config.git-add-with-git-add.showExplorerCommand": "Display command in Explorer context menu",
-	"config.git-add-with-git-add.dialogOnWorkspaceSelection": "VSCode treats commands triggered from the Explorer's empty area as targeting the entire workspace folder, ignoring the visually selected file. Enable this setting to show a warning dialog for such actions. Default is ON."
+	"config.git-add-with-git-add.dialogOnWorkspaceSelection": "VSCode treats commands triggered from the Explorer's empty area as targeting the entire workspace folder, ignoring the visually selected file. Enable this setting to show a warning dialog for such actions. Default is ON.",
+	"config.git-add-with-git-add.dialogOnExecRestore": "Display a warning dialog when executing git restore"
 }

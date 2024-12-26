@@ -7,5 +7,6 @@
 	"command.tettekete.git-add-wga-restore-from-explorer": "git restore する",
 	"command.tettekete.git-add-wga-unstage-from-explorer": "git restore --staged (ステージから外す)",
 	"config.git-add-with-git-add.showExplorerCommand": "エクスプローラーのコンテキストメニューにコマンドを表示する",
-	"config.git-add-with-git-add.dialogOnWorkspaceSelection": "VSCode は、エクスプローラの空の領域からトリガされたコマンドを、視覚的に選択されたファイルを無視して、ワークスペース フォルダ全体をターゲットとして扱います。この設定を有効にすると、そのような操作に対して警告ダイアログが表示されます。デフォルトは ON です。"
+	"config.git-add-with-git-add.dialogOnWorkspaceSelection": "VSCode は、エクスプローラの空の領域からトリガされたコマンドを、視覚的に選択されたファイルを無視して、ワークスペース フォルダ全体をターゲットとして扱います。この設定を有効にすると、そのような操作に対して警告ダイアログが表示されます。デフォルトは ON です。",
+	"config.git-add-with-git-add.dialogOnExecRestore": "エクスプローラーから git restore を実行するときに警告ダイアログを表示する"
 }
