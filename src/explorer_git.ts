@@ -170,7 +170,7 @@ async function git_command_from_explorer(
 		{
 			const okLabel		= vscode.l10n.t('OK');
 			const cancelLabel	= vscode.l10n.t('Cancel');
-			const okDontDialog	= vscode.l10n.t("OK Don't show this dialog again")
+			const okDontDialog	= vscode.l10n.t("OK Don't show this dialog again");
 			const dialogMessage = vscode.l10n.t('Do you want to run "{command}" on the entire workspace folder?',{command});
 			const dialogDetail	= vscode.l10n.t('For Reference: You can configure this dialog to not appear when the entire workspace folder is targeted.');
 			
