@@ -1,16 +1,28 @@
 import * as vscode from 'vscode';
 
+import { DynamicWait } from './dynamic-wait';
+
+type MessageQueueItem =
+{
+	message: string;
+	timeout: number;
+	priority: number;
+	initialTimeout: number;
+};
 export class StatusBarMessageQueue
 {
-	private static instance: StatusBarMessageQueue | null = null;
+	static #instance: StatusBarMessageQueue | null = null;
 
-	private queue: { message: string; timeout: number; priority: number }[] = [];
-	private isProcessing = false;
-	private currentTimeout: NodeJS.Timeout | null = null;
+	#queue: MessageQueueItem[] = [];
+	#activeMessage:MessageQueueItem | null = null;
+
+	#isProcessing = false;
+	#dynamicWait = new DynamicWait();
+
 	// Skip setting for identical messages
-	private skipDuplicateMessages = true;
-	private maxTimeout: number = 10000;
-	private lowPriorityThreshold = 99;
+	#skipDuplicateMessages = true;
+	#maxTimeout: number = 10000;
+	#lowPriorityThreshold = 99;
 
 	// Since this is a singleton implementation, the constructor should be private.
 	private constructor() {}
@@ -20,11 +32,11 @@ export class StatusBarMessageQueue
 	 */
 	public static getInstance(): StatusBarMessageQueue
 	{
-		if( ! this.instance )
+		if( ! this.#instance )
 		{
-			this.instance = new StatusBarMessageQueue();
+			this.#instance = new StatusBarMessageQueue();
 		}
-		return this.instance;
+		return this.#instance;
 	}
 
 	/**
@@ -34,48 +46,23 @@ export class StatusBarMessageQueue
 	 */
     public async enqueue(message: string, timeout: number, priority = 0): Promise<void>
 	{
-		if (this.skipDuplicateMessages && this.queue.some(q => q.message === message))
+		if (this.#skipDuplicateMessages && this.#queue.some(q => q.message === message))
 		{
 			return;
 		}
 
-		this.queue.push({ message, timeout, priority });
-		this.adjustTimeouts();
-		this.queue.sort((a, b) => b.priority - a.priority);
+		console.debug(`enqueue: ${message} / ${timeout}` );
 
-		if (!this.isProcessing) {
+		const initialTimeout = timeout;
+		this.#queue.push({ message, timeout, priority ,initialTimeout});
+		this.adjustTimeouts();
+		this.#queue.sort((a, b) => b.priority - a.priority);
+
+		if ( ! this.#isProcessing)
+		{
 			this.processQueue();
 		}
-	}
-
-	/**
-	 * Adjust so that the total timeout for priorities below or equal to lowPriorityThreshold
-	 * does not exceed maxTimeout.
-	 * However, ensure a minimum display time of 100 ms for each message.
-	 */
-	private adjustTimeouts(): void {
-		let totalTimeout = this.queue
-			.filter((item) =>
-			{
-				return item.priority <= this.lowPriorityThreshold;
-			})
-			.reduce( (sum, item) => sum + item.timeout, 0);
-
-		if (totalTimeout > this.maxTimeout) {
-			const coef = totalTimeout / this.maxTimeout ;
-
-			this.queue = this.queue.map((item) =>
-			{
-				if( item.priority > this.lowPriorityThreshold )
-				{
-					return item;
-				}
-
-				const adjustedTime = Math.floor( item.timeout * coef );
-				const adjustedTimeout = Math.max( adjustedTime, 100); // 最低100msを保証
-				return { ...item, timeout: adjustedTimeout };
-			});
-		}
+		console.debug(`adjusted: ${this.#queue.map( item => `${item.message} / ${item.timeout}` ).join("\n")}` );
 	}
 
 
@@ -85,13 +72,10 @@ export class StatusBarMessageQueue
 	 * @param {number} timeout - timeout(ms)
 	 */
 	public showNow(message: string, timeout: number): void {
-		if (this.currentTimeout)
-		{
-			clearTimeout(this.currentTimeout);
-			this.currentTimeout = null;
-		}
+		this.#dynamicWait.cancel();
 
-		this.queue = [{ message, timeout, priority: Infinity }];
+		const initialTimeout = timeout;
+		this.#queue = [{ message, timeout, priority: Infinity ,initialTimeout}];
 		
 		this.processQueue();
 	}
@@ -102,26 +86,80 @@ export class StatusBarMessageQueue
 	 */
 	private async processQueue(): Promise<void>
 	{
-		this.isProcessing = true;
+		this.#isProcessing = true;
 
-		while (this.queue.length > 0)
+		while (this.#queue.length > 0)
 		{
-			const { message, timeout } = this.queue.shift()!;
+			const queueItem = this.#queue.shift()!;
 
-			vscode.window.setStatusBarMessage(message , timeout);
+			this.#activeMessage = queueItem;
 
-			this.currentTimeout = setTimeout(
-				() => {},
-				timeout
-			);
+			vscode.window.setStatusBarMessage(queueItem.message , queueItem.initialTimeout);
 
-			// wait timeout
-			await new Promise(resolve => setTimeout(resolve, timeout));
+			await this.#dynamicWait.wait( queueItem.timeout );
 		}
 
-		this.isProcessing = false;
-		this.currentTimeout = null;
+		this.#activeMessage = null;
+		this.#isProcessing = false;
 	}
+
+	/**
+	 * Adjust so that the total timeout for priorities below or equal to lowPriorityThreshold
+	 * does not exceed maxTimeout.
+	 * However, ensure a minimum display time of 100 ms for each message.
+	 */
+	private adjustTimeouts(): void
+	{
+		let totalTimeout = this.getTotalTimeout();
+
+		if (totalTimeout > this.#maxTimeout)
+		{
+			const coef = this.#maxTimeout / totalTimeout;
+
+			// 表示中のメッセージの残り時間を短縮
+			if( this.#activeMessage )
+			{
+				const newTimeout = Math.floor( this.#activeMessage.initialTimeout * coef );
+
+				this.#dynamicWait.update( newTimeout );
+			}
+
+			this.#queue = this.#queue.map((item) =>
+			{
+				if( item.priority > this.#lowPriorityThreshold )
+				{
+					return item;
+				}
+
+				let adjustedTimeout	= Math.floor( item.initialTimeout * coef );
+				adjustedTimeout		= Math.max( adjustedTimeout, 100); // 最低100msを保証
+				return { ...item, timeout: adjustedTimeout };
+			});
+		}
+	}
+
+	private getTotalTimeout(): number
+	{
+		if( this.#activeMessage )
+		{
+			return this.#activeMessage?.initialTimeout + this.totalTimeOutInQueue();
+		}
+
+		return this.totalTimeOutInQueue();
+		
+	}
+
+	private totalTimeOutInQueue()
+	{
+		const lowPriorityQueue = this.#queue
+			.filter((item) =>
+			{
+				return item.priority <= this.#lowPriorityThreshold;
+			});
+		
+		return lowPriorityQueue.reduce( (sum, item) => sum + item.initialTimeout, 0);
+	}
+
 
 	/**
 	 * The setter method for 'Skip setting for identical messages'.
@@ -129,14 +167,14 @@ export class StatusBarMessageQueue
 	 */
 	public setSkipDuplicateMessages(skip: boolean)
 	{
-		this.skipDuplicateMessages = skip;
+		this.#skipDuplicateMessages = skip;
 	}
 
 	public setMaxTimeout( ms: number )
 	{
 		if( ms < 100 ){ return false;}
 
-		this.maxTimeout = ms;
+		this.#maxTimeout = ms;
 
 		return true;
 	}
