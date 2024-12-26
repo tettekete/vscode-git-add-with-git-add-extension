@@ -17,12 +17,14 @@ import {
 	kGitRestore,
 } from './constants';
 
+const dialogOnExecRestoreConfigKey = 'git-add-with-git-add.dialogOnExecRestore';
+
 // - - - - - - - - - - - - - - - - - - - -
 // git_add_from_explorer
 // - - - - - - - - - - - - - - - - - - - -
 export async function git_add_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
 {
-	git_command_from_explorer( kGitAdd , uri , selectedFiles );
+	git_command_from_explorer({ command: kGitAdd , uri , selectedFiles });
 }
 
 // - - - - - - - - - - - - - - - - - - - -
@@ -30,7 +32,13 @@ export async function git_add_from_explorer(uri: vscode.Uri, selectedFiles?: vsc
 // - - - - - - - - - - - - - - - - - - - -
 export async function git_add_u_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
 {
-	git_command_from_explorer( kGitAddUpdate , uri , selectedFiles );
+	git_command_from_explorer(
+		{
+			command:kGitAddUpdate,
+			uri,
+			selectedFiles,
+			preExecCallback: untrackedFileWarning
+		});
 }
 
 // - - - - - - - - - - - - - - - - - - - -
@@ -38,7 +46,13 @@ export async function git_add_u_from_explorer(uri: vscode.Uri, selectedFiles?: v
 // - - - - - - - - - - - - - - - - - - - -
 export async function git_unstage_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
 {
-	git_command_from_explorer( kGitRestoreStaged , uri , selectedFiles );
+	git_command_from_explorer(
+		{
+			command:kGitRestoreStaged,
+			uri,
+			selectedFiles,
+			preExecCallback: untrackedFileWarning
+		});
 }
 
 // - - - - - - - - - - - - - - - - - - - -
@@ -46,7 +60,13 @@ export async function git_unstage_from_explorer(uri: vscode.Uri, selectedFiles?:
 // - - - - - - - - - - - - - - - - - - - -
 export async function git_restore_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
 {
-	git_command_from_explorer( kGitRestore , uri , selectedFiles );
+	git_command_from_explorer(
+		{
+			command: kGitRestore,
+			uri,
+			selectedFiles,
+			preExecCallback: untrackedFileWarning
+		} );
 }
 
 async function untrackedFileWarning( files: string[] , workspace: string )
@@ -67,7 +87,20 @@ async function untrackedFileWarning( files: string[] , workspace: string )
 // - - - - - - - - - - - - - - - - - - - -
 // private: git_command_from_explorer
 // - - - - - - - - - - - - - - - - - - - -
-async function git_command_from_explorer( command:ValidGitCommands , uri: vscode.Uri, selectedFiles?: vscode.Uri[])
+async function git_command_from_explorer( 
+	{
+		command
+		,uri
+		,selectedFiles
+		,preExecCallback
+	}:
+	{
+		command:ValidGitCommands,
+		uri: vscode.Uri,
+		selectedFiles?: vscode.Uri[],
+		preExecCallback?: (files:string[] , workspaceFolder:string ) => Promise<void>
+	}
+)
 {
 	if( !( uri instanceof vscode.Uri ) )
 	{
