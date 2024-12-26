@@ -277,6 +277,26 @@ async function git_command_from_explorer(
 			}
 			errors.push( result.error );
 		}
+		else
+		{
+			let file = byWorkspaceFolder[workspaceFolder]
+						.map((absPath) => {return path.relative( workspaceFolder , absPath );} )
+						.join(' ');
+			
+			if( isTargetWorkspaceFolder )
+			{
+				file = '.';
+			}
+			else if( file.length > 32 )
+			{
+				file = file.substring(0,32) + '...';
+			}
+
+			StatusBarMessageQueue.getInstance().enqueue( 
+				vscode.l10n.t('{command} {file} completed successfully',{command,file}),
+				kMessageTimeOut
+			);
+		}
 	}
 
 	if( errors.length )
@@ -285,18 +305,15 @@ async function git_command_from_explorer(
 		vscode.window.showWarningMessage(
 			vscode.l10n.t('An error occurred during the {command} process:\n{error}' , {command,error:messages} )
 		);
+		
+		return;
 	}
 
-	const messageQueue = StatusBarMessageQueue.getInstance();
 	if( Object.keys( warnings ).length )
 	{
 		for(const warn in warnings )
 		{
-			messageQueue.enqueue( warn , kMessageTimeOut / 2 );
+			StatusBarMessageQueue.getInstance().enqueue( warn , kMessageTimeOut );
 		}
-	}
-	messageQueue.enqueue( 
-		vscode.l10n.t('{command} completed successfully',{command}),
-		kMessageTimeOut
-	);
+	}	
 }
