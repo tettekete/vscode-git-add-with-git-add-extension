@@ -103,11 +103,6 @@ export async function execGitCommandWithFiles(
 		}
 	}
 
-	if(! error )
-	{
-		vscode.commands.executeCommand("workbench.files.action.refreshFilesExplorer");
-	}
-
 	return {
 		error: error,
 		stdout: _stdout,

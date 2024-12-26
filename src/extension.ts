@@ -146,8 +146,6 @@ async function git_add_u()
 			}
 		);
 	}
-
-	vscode.commands.executeCommand("workbench.files.action.refreshFilesExplorer");
 }
 
 export function activate(context: vscode.ExtensionContext)
