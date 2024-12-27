@@ -17,7 +17,11 @@ VSCode で `git add` を行うにはコマンドパレットで `git stage chang
 
 この機能拡張はコマンドパレット上から  `git add` と入力して `git add` コマンドを実行する機能を提供します。
 
+![command palette](images/command-palette.jpg)
+
 またエクスプローラー上のコンテキストメニューから `git add` や `git add -u` の他、`git restore --staged`(アンステージ)などを行う事が出来ます。
+
+![context menu in explorer](images/context-menu.jpg)
 
 
 ## コマンドパレットからの操作
