@@ -1,10 +1,26 @@
+<p align="center">English / <a href="https://tettekete.github.io/vscode-git-add-with-git-add-extension/README.ja.html">日本語</a></p>
+
+**目次:**
+
+- [git add with git add](#git-add-with-git-add)
+	- [コマンドパレットからの操作](#コマンドパレットからの操作)
+		- [使い方](#使い方)
+		- [コマンドと実行内容](#コマンドと実行内容)
+	- [エクスプローラー上のコンテキストメニュー](#エクスプローラー上のコンテキストメニュー)
+- [動機](#動機)
+- [必要環境](#必要環境)
+
+
 # git add with git add
 
 VSCode で `git add` を行うにはコマンドパレットで `git stage changes` とタイプする必要があります。
 
 この機能拡張はコマンドパレット上から  `git add` と入力して `git add` コマンドを実行する機能を提供します。
 
-## 出来ること
+またエクスプローラー上のコンテキストメニューから `git add` や `git add -u` の他、`git restore --staged`(アンステージ)などを行う事が出来ます。
+
+
+## コマンドパレットからの操作
 
 コマンドパレットから `git add` と入力し、サジェストされた `git add: File in Active Editor` を選ぶことで、現在アクティブとなっているファイルを `git add` します。
 
@@ -13,7 +29,7 @@ VSCode で `git add` を行うにはコマンドパレットで `git stage chang
 `git add: -u (Update Tracked Files)` で追跡中の更新があったファイルを全て `git add` することも出来ます。
 
 
-# 使い方
+### 使い方
 
 1. コマンドパレットを開きます
    - mac: `cmd` + `shift` + `p`
@@ -22,7 +38,8 @@ VSCode で `git add` を行うにはコマンドパレットで `git stage chang
    - `git add -u` と入力すれば `git add: -u (Update Tracked Files)` がサジェストされます
 3. サジェストされたコマンドを実行すれば現在アクティブなファイルが `git add` されます
 
-## コマンドと実行されることのまとめ
+
+### コマンドと実行内容
 
 
 - **`git add: File in Active Editor`**:
@@ -36,6 +53,19 @@ VSCode で `git add` を行うにはコマンドパレットで `git stage chang
 - **`git add: -u (Update Tracked Files)`**:
 
 	`git` 追跡中で更新のあるファイルが `git add` されます。つまり `git add -u` が実行されます。
+
+
+## エクスプローラー上のコンテキストメニュー
+
+エクスプローラー上のコンテキストメニューからファイルやフォルダに対して以下のコマンドが実行出来ます。
+
+- `git add`
+- `git add -u`
+- `git restore --staged`
+- `git restore`
+
+複数のファイルを選択している場合、選択されたアイテムの上でコンテキストメニューを開いてください。
+エクスプローラー下部の空白部分からコンテキストメニューを開いた場合ワークスペースフォルダ全体が対象となりますのでご注意ください。
 
 
 # 動機
