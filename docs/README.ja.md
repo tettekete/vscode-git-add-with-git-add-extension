@@ -1,4 +1,4 @@
-<p align="center">English / <a href="https://tettekete.github.io/vscode-git-add-with-git-add-extension/README.ja.html">日本語</a></p>
+<p align="center"><a href="https://tettekete.github.io/vscode-git-add-with-git-add-extension/">English</a> / 日本語</p>
 
 **目次:**
 
