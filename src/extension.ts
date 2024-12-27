@@ -3,8 +3,19 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as path from 'path';
 
-import { findWorkspaceFolder } from './lib/utils';
+import {
+	findWorkspaceFolder,
+	isGitTrackedDir
+} from './lib/utils';
+
+import { StatusBarMessageQueue } from './lib/status-bar-message-queue';
+import { execGitAddFiles } from './lib/exec-git-commands';
 import { git_add_selected_lines } from './add_selected_lines';
+import { git_add_from_explorer } from './explorer_git';
+import { git_restore_from_explorer } from './explorer_git';
+import { git_unstage_from_explorer } from './explorer_git';
+import { git_add_u_from_explorer } from './explorer_git';
+
 import { kMessageTimeOut } from './constants';
 
 const execAsync = promisify(exec);
@@ -54,7 +65,7 @@ async function findGitTrackedDirs():Promise<string[] | undefined>
 	return undefined;
 }
 
-function git_add()
+async function git_add()
 {
 	const editor = vscode.window.activeTextEditor;
 	if (! editor)
@@ -73,41 +84,34 @@ function git_add()
 	}
 
 	// Check if the workspace folder is a Git repository
-	exec(
-		'git rev-parse --is-inside-work-tree',
-		{ cwd: workspaceFolder },
-		(error, stdout, stderr) => 
+	if( await isGitTrackedDir( workspaceFolder ) )
+	{
+		const r = await execGitAddFiles( [filePath] , workspaceFolder );
+
+		const rel_path = path.relative( workspaceFolder , filePath );
+		if( r.error )
 		{
-			if (error) {
-				vscode.window.showErrorMessage(vscode.l10n.t('There is no git repository in the workspace.'),{modal: true});
-				return;
-			}
-
-			const rel_path = path.relative( workspaceFolder , filePath );
-
-			// Execute `git add` for the current file
-			exec(
-				`git add "${rel_path}"`,
-				{ cwd: workspaceFolder },
-				(error, stdout, stderr) =>
+			vscode.window.showErrorMessage(
+				vscode.l10n.t('git add "{0}" Failed:',rel_path),
 				{
-					if (error)
-					{
-						vscode.window.showErrorMessage(vscode.l10n.t('git add "{0}" Failed:',rel_path),
-						{
-							detail: `message: ${error.message}\n\nSTDERR: ${stderr}`,
-							modal: true
-						});
-					}
-					else
-					{
-						// vscode.window.showInformationMessage(`Git Add Successful: ${rel_path}`);
-						vscode.window.setStatusBarMessage( vscode.l10n.t('git add "{0}" succeeded.',rel_path) ,kMessageTimeOut);
-					}
-				}
+					detail: `message: ${r.error.message}\n\nSTDERR: ${r.stderr}`,
+					modal: true
+				});
+		}
+		else
+		{
+			StatusBarMessageQueue.getInstance().enqueue(
+				vscode.l10n.t('git add "{0}" succeeded.',rel_path),
+				kMessageTimeOut
 			);
 		}
-	);
+	}
+	else
+	{
+		vscode.window.showErrorMessage(
+			vscode.l10n.t('The workspace folder is not a git repository.')
+		);
+	}
 }
 
 async function git_add_u()
@@ -138,7 +142,7 @@ async function git_add_u()
 					return;
 				}
 				
-				vscode.window.setStatusBarMessage( vscode.l10n.t('git add -u completed successfully.') ,kMessageTimeOut);
+				StatusBarMessageQueue.getInstance().enqueue( vscode.l10n.t('git add -u completed successfully.') ,kMessageTimeOut);
 			}
 		);
 	}
@@ -147,11 +151,22 @@ async function git_add_u()
 export function activate(context: vscode.ExtensionContext)
 {
 	const run_git_add	= vscode.commands.registerCommand('tettekete.git-add-with-git-add', git_add );
-	const run_git_ad_u	= vscode.commands.registerCommand('tettekete.git-add-with-git-add-u', git_add_u );
-	const run_git_ad_l	= vscode.commands.registerCommand('tettekete.git-add-with-git-add-selected-lines', git_add_selected_lines );
+	const run_git_add_u	= vscode.commands.registerCommand('tettekete.git-add-with-git-add-u', git_add_u );
+	const run_git_add_l	= vscode.commands.registerCommand('tettekete.git-add-with-git-add-selected-lines', git_add_selected_lines );
+	const run_git_add_from_explorer		= vscode.commands.registerCommand('tettekete.git-add-wga-from-explorer', git_add_from_explorer );
+	const run_git_add_u_from_explorer	= vscode.commands.registerCommand('tettekete.git-add-wga-u-from-explorer', git_add_u_from_explorer );
+	const run_restore_from_explorer		= vscode.commands.registerCommand('tettekete.git-add-wga-restore-from-explorer', git_restore_from_explorer );
+	const run_unstage_from_explorer		= vscode.commands.registerCommand('tettekete.git-add-wga-unstage-from-explorer', git_unstage_from_explorer );
 
-
-	context.subscriptions.push( run_git_add ,run_git_ad_u ,run_git_ad_l );
+	context.subscriptions.push(
+								run_git_add,
+								run_git_add_u,
+								run_git_add_l,
+								run_git_add_from_explorer,
+								run_git_add_u_from_explorer,
+								run_restore_from_explorer,
+								run_unstage_from_explorer
+							);
 }
 
 // This method is called when your extension is deactivated

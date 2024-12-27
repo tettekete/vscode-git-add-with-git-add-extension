@@ -13,3 +13,6 @@ vsc-extension-quickstart.md
 **/*.ts
 **/.vscode-test.*
 _untracked/**
+docs/**
+!docs/images/git-add-with-git-add.png
+!docs/README.ja.md

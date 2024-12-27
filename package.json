@@ -2,7 +2,7 @@
   "name": "git-add-with-git-add",
   "displayName": "git add with git add",
   "description": "Run git add via Command Palette with 'git add'",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "engines": {
     "vscode": "^1.95.0"
   },
@@ -21,6 +21,27 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+        "type": "object",
+        "title": "git add with git add",
+        "properties": {
+            "git-add-with-git-add.showExplorerCommand": {
+                "type": "boolean",
+                "default": true,
+                "description": "%config.git-add-with-git-add.showExplorerCommand%"
+            },
+            "git-add-with-git-add.dialogOnWorkspaceSelection": {
+                "type": "boolean",
+                "default": true,
+                "description": "%config.git-add-with-git-add.dialogOnWorkspaceSelection%"
+            },
+            "git-add-with-git-add.dialogOnExecRestore": {
+                "type": "boolean",
+                "default": true,
+                "description": "%config.git-add-with-git-add.dialogOnExecRestore%"
+            }
+        }
+    },
     "commands": [
       {
         "command": "tettekete.git-add-with-git-add",
@@ -33,6 +54,69 @@
       {
         "command": "tettekete.git-add-with-git-add-selected-lines",
         "title": "%contributes.commands2.title%"
+      },
+      {
+        "command": "tettekete.git-add-wga-from-explorer",
+        "title": "%command.tettekete.git-add-wga-from-explorer%"
+      },
+      {
+        "command": "tettekete.git-add-wga-u-from-explorer",
+        "title": "%command.tettekete.git-add-wga-u-from-explorer%"
+      },
+      {
+        "command": "tettekete.git-add-wga-restore-from-explorer",
+        "title": "%command.tettekete.git-add-wga-restore-from-explorer%"
+      },
+      {
+        "command": "tettekete.git-add-wga-unstage-from-explorer",
+        "title": "%command.tettekete.git-add-wga-unstage-from-explorer%"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+            "submenu": "gawga.submenu",
+            "when": "config.git-add-with-git-add.showExplorerCommand && (explorerResourceIsFolder || resourceFilename)",
+            "group": "1_git_add_with_git_add"
+        }
+      ],
+      "gawga.submenu":[
+        {
+          "command": "tettekete.git-add-wga-from-explorer",
+          "group": "1st-group"
+        },
+        {
+          "command": "tettekete.git-add-wga-u-from-explorer",
+          "group": "1st-group"
+        },
+        {
+          "command": "tettekete.git-add-wga-unstage-from-explorer",
+          "group": "2nd-group"
+        },
+        {
+          "command": "tettekete.git-add-wga-restore-from-explorer",
+          "group": "3_destructive_commands"
+        }
+      ],
+      "commandPalette": [
+        {
+            "command": "tettekete.git-add-wga-from-explorer",
+            "when": "explorerViewletFocus"
+        },
+        {
+            "command": "tettekete.git-add-wga-u-from-explorer",
+            "when": "explorerViewletFocus"
+        },
+        {
+            "command": "tettekete.git-add-wga-unstage-from-explorer",
+            "when": "explorerViewletFocus"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "gawga.submenu",
+        "label": "git add with git add"
       }
     ]
   },
@@ -46,7 +130,8 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "l10n": "npx @vscode/l10n-dev export --outDir ./l10n ./src"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.9",
