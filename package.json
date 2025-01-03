@@ -23,16 +23,11 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
-    "configuration": {
-        "type": "object",
-        "title": "git add with git add",
-        "properties": {
-            "git-add-with-git-add.showExplorerCommand": {
-                "type": "boolean",
-                "default": true,
-                "description": "%config.git-add-with-git-add.showExplorerCommand%"
-            },
-            "git-add-with-git-add.dialogOnWorkspaceSelection": {
+    "configuration": [
+      {
+        "title": "%config.title.dialogs%",
+        "properties":{
+          "git-add-with-git-add.dialogOnWorkspaceSelection": {
                 "type": "boolean",
                 "default": true,
                 "description": "%config.git-add-with-git-add.dialogOnWorkspaceSelection%"
@@ -41,7 +36,23 @@
                 "type": "boolean",
                 "default": true,
                 "description": "%config.git-add-with-git-add.dialogOnExecRestore%"
-            },
+            }
+        }
+      },
+      {
+        "title": "%config.title.context-menu%",
+        "properties":{
+          "git-add-with-git-add.showExplorerCommand": {
+                "type": "boolean",
+                "default": true,
+                "description": "%config.git-add-with-git-add.showExplorerCommand%"
+           }
+        }
+
+      },
+      {
+        "title": "%config.title.file-status-bar%",
+        "properties": {
             "git-add-with-git-add.showFileStatusInStatusBar": {
                 "type": "string",
                 "enum":[
@@ -68,7 +79,7 @@
                 "description": "%config.git-add-with-git-add.fileStatusPriority%"
             }
         }
-    },
+    }],
     "commands": [
       {
         "command": "tettekete.git-add-with-git-add",
