@@ -18,7 +18,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
@@ -39,6 +41,31 @@
                 "type": "boolean",
                 "default": true,
                 "description": "%config.git-add-with-git-add.dialogOnExecRestore%"
+            },
+            "git-add-with-git-add.showFileStatusInStatusBar": {
+                "type": "string",
+                "enum":[
+                  "none",
+                  "status-bar-item",
+                  "status-message"
+                ],
+                "enumItemLabels": [
+                  "%git-add-with-git-add.showFileStatusInStatusBar.none%",
+                  "%git-add-with-git-add.showFileStatusInStatusBar.status-bar-item%",
+                  "%git-add-with-git-add.showFileStatusInStatusBar.status-message%"
+                ],
+                "default": "none",
+                "description": "%config.git-add-with-git-add.showFileStatusInStatusBar%"
+            },
+            "git-add-with-git-add.fileStatusFormat": {
+                "type": "string",
+                "default": "{git_staus}:{rel_path}",
+                "description": "%config.git-add-with-git-add.fileStatusFormat%"
+            },
+            "git-add-with-git-add.fileStatusPriority": {
+                "type": "number",
+                "default": 0,
+                "description": "%config.git-add-with-git-add.fileStatusPriority%"
             }
         }
     },
