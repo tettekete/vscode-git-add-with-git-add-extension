@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { createStatusBarText } from './lib/file-status-in-bar';
 
 let statusBarItem: vscode.StatusBarItem | undefined;
 let activeEditorListener: vscode.Disposable | undefined;
@@ -41,8 +42,6 @@ function registerConfigChangeListener()
 		if (event.affectsConfiguration('git-add-with-git-add.showFileStatusInStatusBar'))
 		{
 			setupShowFileStatusInStatusBar();
-			// registerActiveEditorListener();
-			// updateStatusBar(vscode.window.activeTextEditor);
 		}
 	});
 }
@@ -82,10 +81,10 @@ async function updateFileStatusAsMessage( editor?: vscode.TextEditor ):Promise<v
 	if (editor && editor.document)
 	{
 		const filePath = editor.document.uri.fsPath;
-		message = `File: ${filePath}`;
+		message = await createStatusBarText( editor );
 	}
 
-	statusMessageDisposer = vscode.window.setStatusBarMessage(`${message} in updateFileStatusAsMessage()`);
+	statusMessageDisposer = vscode.window.setStatusBarMessage(`${message}`);
 }
 
 async function updateFileStatusInStatusItem( editor?: vscode.TextEditor ):Promise<void>
@@ -100,14 +99,14 @@ async function updateFileStatusInStatusItem( editor?: vscode.TextEditor ):Promis
 		}
 	}
 
-	let message = 'No file open';
+	let message = '$(chevron-right)No file open';
 	if (editor && editor.document)
 	{
 		const filePath = editor.document.uri.fsPath;
-		message = `File: ${filePath}`;
+		message = await createStatusBarText( editor );
 	}
 
-	statusBarItem.text		= `${message} in showFileStatusAsItem()`;
+	statusBarItem.text		= `${message}`;
 }
 
 function _createFileStatusItem()

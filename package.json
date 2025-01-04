@@ -70,7 +70,7 @@
             },
             "git-add-with-git-add.fileStatusFormat": {
                 "type": "string",
-                "default": "{git_staus}:{rel_path}",
+                "default": "$(chevron-right)${git_short_stat} : ${rel_path}",
                 "description": "%config.git-add-with-git-add.fileStatusFormat%"
             },
             "git-add-with-git-add.fileStatusPriority": {
