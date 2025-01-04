@@ -201,3 +201,8 @@ export function renderTemplate(
 		}
 	);
 }
+
+export function escapeRegexMeta(str: string): string
+{
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
