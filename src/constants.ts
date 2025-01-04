@@ -16,6 +16,8 @@ export const kValidGitCommands =
 	kGitAddUpdate:		'git add -u',
 	kGitRestoreStaged:	'git restore --staged',
 	kGitRestore:		'git restore',
+	kGitStatusPorcelain:'git status --porcelain',
+	kGitDiffCachedNameStatus: 'git diff --cached --name-status'
 } as const;
 
 
@@ -26,3 +28,5 @@ export const kGitAdd: typeof kValidGitCommands['kGitAdd'] = kValidGitCommands.kG
 export const kGitAddUpdate: typeof kValidGitCommands['kGitAddUpdate'] = kValidGitCommands.kGitAddUpdate;
 export const kGitRestoreStaged: typeof kValidGitCommands['kGitRestoreStaged'] = kValidGitCommands.kGitRestoreStaged;
 export const kGitRestore: typeof kValidGitCommands['kGitRestore'] = kValidGitCommands.kGitRestore;
+export const kGitStatusPorcelain: typeof kValidGitCommands['kGitStatusPorcelain'] = kValidGitCommands.kGitStatusPorcelain;
+export const kGitDiffCachedNameStatus: typeof kValidGitCommands['kGitDiffCachedNameStatus'] = kValidGitCommands.kGitDiffCachedNameStatus;
