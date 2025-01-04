@@ -61,7 +61,12 @@ export async function execGitCommandWithFiles(
 {
 	const filesAsArgs = files.map((file) =>
 	{
-		const relPath = path.relative( cwd , file );
+		let relPath = file;
+		if( path.isAbsolute( relPath ) )
+		{
+			relPath = path.relative( cwd , file );
+		}
+		
 		return escapeArgumentForShell( relPath );
 	});
 
