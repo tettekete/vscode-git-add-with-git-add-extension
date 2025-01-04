@@ -186,3 +186,18 @@ export function escapeArgumentForShell( argument: string ): string
 		return `'${argument.replace(/'/g, "'\\''")}'`;
 	}
 }
+
+
+export function renderTemplate(
+	template: string ,
+	kvObject:Record<string,string | number>
+):string
+{
+	return template.replace(
+		/\$\{(\w[\w\-]*)\}/g,
+		(match,key) =>
+		{
+			return key in kvObject ? `${kvObject[key]}` : '';
+		}
+	);
+}
