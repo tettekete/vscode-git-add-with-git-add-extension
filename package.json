@@ -70,12 +70,12 @@
             },
             "git-add-with-git-add.fileStatusFormat": {
                 "type": "string",
-                "default": "$(chevron-right)${git_short_stat} : ${rel_path}",
+                "default": "${git_short_stat} : ${rel_path}",
                 "description": "%config.git-add-with-git-add.fileStatusFormat%"
             },
             "git-add-with-git-add.fileStatusPriority": {
                 "type": "number",
-                "default": 0,
+                "default": 1,
                 "description": "%config.git-add-with-git-add.fileStatusPriority%"
             }
         }
