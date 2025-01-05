@@ -17,16 +17,21 @@ export const kValidGitCommands =
 	kGitRestoreStaged:	'git restore --staged',
 	kGitRestore:		'git restore',
 	kGitStatusPorcelain:'git status --porcelain',
-	kGitDiffCachedNameStatus: 'git diff --cached --name-status'
+	kGitStatusPorcelainUno:		'git status --porcelain -uno',
+	kGitDiffCachedNameStatus:	'git diff --cached --name-status',
 } as const;
+
+export const
+{
+	kGitAdd,
+	kGitAddUpdate,
+	kGitRestoreStaged,
+	kGitRestore,
+	kGitStatusPorcelain,
+	kGitDiffCachedNameStatus,
+	kGitStatusPorcelainUno
+} = kValidGitCommands;
 
 
 type ValidGitCommandsKey = keyof typeof kValidGitCommands; 
 export type ValidGitCommands = (typeof kValidGitCommands)[ValidGitCommandsKey];
-
-export const kGitAdd: typeof kValidGitCommands['kGitAdd'] = kValidGitCommands.kGitAdd;
-export const kGitAddUpdate: typeof kValidGitCommands['kGitAddUpdate'] = kValidGitCommands.kGitAddUpdate;
-export const kGitRestoreStaged: typeof kValidGitCommands['kGitRestoreStaged'] = kValidGitCommands.kGitRestoreStaged;
-export const kGitRestore: typeof kValidGitCommands['kGitRestore'] = kValidGitCommands.kGitRestore;
-export const kGitStatusPorcelain: typeof kValidGitCommands['kGitStatusPorcelain'] = kValidGitCommands.kGitStatusPorcelain;
-export const kGitDiffCachedNameStatus: typeof kValidGitCommands['kGitDiffCachedNameStatus'] = kValidGitCommands.kGitDiffCachedNameStatus;
