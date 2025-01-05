@@ -1,10 +1,18 @@
 import * as vscode from 'vscode';
 import { createStatusBarText } from './lib/file-status-in-bar';
+import {
+	GAWGADisposer,
+	onGitStatusChanged
+} from './lib/git-status-listener';
+import type { GSLValidEventsT } from './lib/git-status-listener';
+
+const condeIconInStatusItem = '$(chevron-right)';
 
 let statusBarItem: vscode.StatusBarItem | undefined;
 let activeEditorListener: vscode.Disposable | undefined;
 let configChangeListener: vscode.Disposable | undefined;
 let statusMessageDisposer: vscode.Disposable | undefined;
+let gitStatusDisposer: GAWGADisposer | undefined;
 
 export function activateShowFileStatusInStatusBar()
 {
@@ -47,6 +55,17 @@ function registerConfigChangeListener()
 }
 
 
+function registerGitStatusLisntener(  updateDisplayCallback: ( editor?: vscode.TextEditor ) => void )
+{
+	if( gitStatusDisposer )
+	{
+		gitStatusDisposer.dispose();
+	}
+
+	gitStatusDisposer = onGitStatusChanged( (e:GSLValidEventsT) => {updateDisplayCallback();} );
+}
+
+
 function setupShowFileStatusInStatusBar()
 {
 	const config = vscode.workspace.getConfiguration();
@@ -58,12 +77,13 @@ function setupShowFileStatusInStatusBar()
 			_createFileStatusItem();
 			updateFileStatusInStatusItem( vscode.window.activeTextEditor );
 			registerActiveEditorListener( updateFileStatusInStatusItem );
-			
+			registerGitStatusLisntener( updateFileStatusInStatusItem );
 			break;
 
 		case 'status-message':
 			statusBarItem?.dispose();
 			registerActiveEditorListener( updateFileStatusAsMessage );
+			registerGitStatusLisntener( updateFileStatusAsMessage );
 			updateFileStatusAsMessage( vscode.window.activeTextEditor );
 			break;
 		
@@ -71,6 +91,7 @@ function setupShowFileStatusInStatusBar()
 			statusMessageDisposer?.dispose();
 			statusBarItem?.dispose();
 			activeEditorListener?.dispose();
+			gitStatusDisposer?.dispose();
 			break;
 	}
 }
@@ -78,6 +99,11 @@ function setupShowFileStatusInStatusBar()
 async function updateFileStatusAsMessage( editor?: vscode.TextEditor ):Promise<void>
 {
 	let message = 'No file open';
+	if( ! editor )
+	{
+		editor = vscode.window.activeTextEditor;
+	}
+
 	if (editor && editor.document)
 	{
 		const filePath = editor.document.uri.fsPath;
@@ -99,14 +125,20 @@ async function updateFileStatusInStatusItem( editor?: vscode.TextEditor ):Promis
 		}
 	}
 
-	let message = '$(chevron-right)No file open';
+	let message = 'No file open';
+
+	if( ! editor )
+	{
+		editor = vscode.window.activeTextEditor;
+	}
+
 	if (editor && editor.document)
 	{
 		const filePath = editor.document.uri.fsPath;
 		message = await createStatusBarText( editor );
 	}
 
-	statusBarItem.text		= `${message}`;
+	statusBarItem.text		= `${condeIconInStatusItem}${message}`;
 }
 
 function _createFileStatusItem()
@@ -120,8 +152,7 @@ function _createFileStatusItem()
 	const priority		= config.get<number>('git-add-with-git-add.fileStatusPriority', 0);
 
 	statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left ,priority);
-	// statusBarItem.tooltip	= vscode.l10n.t('Open SourceTree for the current workspace');
-	// statusBarItem.command	= 'tettekete.openSourcetreeButton';
+	statusBarItem.tooltip	= vscode.l10n.t("Displayed by 'git add with git add'");
 
 	statusBarItem.show();
 }
