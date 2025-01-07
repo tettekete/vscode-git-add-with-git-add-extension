@@ -12,10 +12,16 @@ import {
 import { kGitStatusUpdateEvent } from '../constants';
 
 
+/**
+ * A singleton class to periodically perform git status and monitor its update status.
+ *
+ * @class GitStatusObserverClass
+ * @typedef {GitStatusObserverClass}
+ */
 class GitStatusObserverClass
 {
 	static #instance:GitStatusObserverClass;
-	#conditionsByWF:Record<string,string> = {};
+	#conditionsByWF:Record<string,string> = {};	// Stores the results of `git status --porcelain -uno` for each workspace.
 	#pollingInterval:number	= 5;
 	#timeout: NodeJS.Timeout | undefined;
 	#eventEmitter: EventEmitter | undefined;
@@ -44,6 +50,16 @@ class GitStatusObserverClass
 		this.#pollingInterval = Math.floor( sec * 1000 );
 	}
 
+	
+	/**
+	 * Methods for setting the EventEmitter instance and event name for event emission.
+	 *
+	 * When there is a change in the result of git status, an event is issued based
+	 * on the information set here.
+	 *
+	 * @param {EventEmitter} eventEmitter
+	 * @param {string} eventName
+	 */
 	setEventEmitter( eventEmitter: EventEmitter ,eventName: string )
 	{
 		this.#eventEmitter = eventEmitter;
@@ -90,6 +106,18 @@ class GitStatusObserverClass
 		clearTimeout( this.#timeout );
 	}
 
+	
+	/**
+	 * Perform `git status --porcelain -uno` for each workspace to check for any
+	 * updates since the last time.
+	 *
+	 * If there is an update, return true.
+	 *
+	 * @private
+	 * @async
+	 * @param {boolean} [init=false]
+	 * @returns {Promise<boolean>}
+	 */
 	private async checkStatus( init :boolean = false):Promise<boolean>
 	{
 		const workspaceFolders = vscode.workspace.workspaceFolders;

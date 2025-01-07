@@ -17,6 +17,13 @@ type Listener =
 }
 
 
+
+/**
+ * Listener singleton class for git status change events.
+ *
+ * @class GitStatusListener
+ * @typedef {GitStatusListener}
+ */
 class GitStatusListener
 {
 	static #instance:GitStatusListener;
@@ -75,6 +82,16 @@ class GitStatusListener
 		});
 	}
 
+	
+	/**
+	 * A method that actually invokes the callback registered in the event listener.
+	 *
+	 * It is sent to the debounce function in dispatchEvent, and this method is
+	 * called after debouncing.
+	 *
+	 * @private
+	 * @param {ValidGitStatusEventsT} eventType
+	 */
 	private invokeListeners( eventType: ValidGitStatusEventsT )
 	{
 		this.#listeners.forEach(( item ) =>
@@ -86,6 +103,12 @@ class GitStatusListener
 		});
 	}
 
+	/**
+	 * Methods to receive external event occurrences. 
+	 * Once sent to the debounce function, the event is not immediately issued.
+	 *
+	 * @param eventType - Only kGitStatusUpdateEvent == 'update' so far.
+	 */
 	dispatchEvent( eventType: ValidGitStatusEventsT )
 	{
 		this.#debouncers[eventType]( eventType );
@@ -93,11 +116,27 @@ class GitStatusListener
 }
 
 
+/**
+ * Register function to git status event listener.
+ *
+ * Note that no function is provided for removal from the event listener, as
+ * it returns an object for dispose.
+ *
+ * @export
+ * @param {( events:ValidGitStatusEventsT ) => void} listener
+ * @returns {GAWGADisposer}
+ */
 export function onGitStatusChanged( listener: ( events:ValidGitStatusEventsT ) => void ):GAWGADisposer
 {
 	return GitStatusListener.instance().addListener( kGitStatusUpdateEvent , listener );
 }
 
+
+/**
+ * Function to receive external git status change events.
+ *
+ * @export
+ */
 export function dispatchGitStatusUpdateEvent()
 {
 	return GitStatusListener.instance().dispatchEvent( kGitStatusUpdateEvent );
