@@ -92,13 +92,6 @@ class GitStatusListener
 	}
 }
 
-class GitStatusObserver
-{
-	static #instance:GitStatusObserver;
-
-	private constructor(){}
-
-}
 
 export function onGitStatusChanged( listener: ( events:ValidGitStatusEventsT ) => void ):GAWGADisposer
 {
