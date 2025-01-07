@@ -137,6 +137,7 @@ async function updateFileStatusAsMessage( editor?: vscode.TextEditor ):Promise<v
 		message = await createStatusBarText( editor );
 	}
 
+	if( statusMessageDisposer ){ statusMessageDisposer.dispose(); }
 	statusMessageDisposer = vscode.window.setStatusBarMessage(`${message}`);
 }
 
