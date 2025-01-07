@@ -75,7 +75,7 @@ class GitStatusListener
 		});
 	}
 
-	invokeListeners( eventType: ValidGitStatusEventsT )
+	private invokeListeners( eventType: ValidGitStatusEventsT )
 	{
 		this.#listeners.forEach(( item ) =>
 		{

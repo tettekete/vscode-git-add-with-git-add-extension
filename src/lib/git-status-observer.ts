@@ -65,7 +65,7 @@ class GitStatusObserverClass
 		this._startNextTimeout();
 	}
 
-	_startNextTimeout()
+	private _startNextTimeout()
 	{
 		clearTimeout( this.#timeout );
 		this.#timeout = setTimeout( async () =>
@@ -90,7 +90,7 @@ class GitStatusObserverClass
 		clearTimeout( this.#timeout );
 	}
 
-	async checkStatus( init :boolean = false):Promise<boolean>
+	private async checkStatus( init :boolean = false):Promise<boolean>
 	{
 		const workspaceFolders = vscode.workspace.workspaceFolders;
 		if(! workspaceFolders )
