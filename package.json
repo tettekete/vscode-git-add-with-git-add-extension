@@ -77,6 +77,11 @@
                 "type": "number",
                 "default": 1,
                 "description": "%config.git-add-with-git-add.fileStatusPriority%"
+            },
+            "git-add-with-git-add.gitStatusPollingInterval": {
+                "type": "number",
+                "default": 5,
+                "description": "%config.git-add-with-git-add.gitStatusPollingInterval%"
             }
         }
     }],
