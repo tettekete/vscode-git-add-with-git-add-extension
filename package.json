@@ -57,13 +57,13 @@
                 "type": "string",
                 "enum":[
                   "none",
-                  "status-bar-item",
-                  "status-message"
+                  "status-message",
+                  "status-bar-item"
                 ],
                 "enumItemLabels": [
                   "%git-add-with-git-add.showFileStatusInStatusBar.none%",
-                  "%git-add-with-git-add.showFileStatusInStatusBar.status-bar-item%",
-                  "%git-add-with-git-add.showFileStatusInStatusBar.status-message%"
+                  "%git-add-with-git-add.showFileStatusInStatusBar.status-message%",
+                  "%git-add-with-git-add.showFileStatusInStatusBar.status-bar-item%"
                 ],
                 "default": "none",
                 "description": "%config.git-add-with-git-add.showFileStatusInStatusBar%"
