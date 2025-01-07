@@ -47,7 +47,7 @@ class GitStatusObserverClass
 
 	set pollingInterval( sec: number )
 	{
-		this.#pollingInterval = Math.floor( sec * 1000 );
+		this.#pollingInterval = Math.max( Math.floor( sec * 1000 ) , 300 );
 	}
 
 	
