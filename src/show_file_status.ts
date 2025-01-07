@@ -1,10 +1,17 @@
 import * as vscode from 'vscode';
+import { VSCConfig } from './lib/vsc-config';
 import { createStatusBarText } from './lib/file-status-in-bar';
 import {
+	dispatchGitStatusUpdateEvent,
 	onGitStatusChanged
 } from './lib/git-status-listener';
 import { GAWGADisposer } from './lib/gawga-disposer';
 import type { ValidGitStatusEventsT } from './constants';
+import { GitStatusObserver } from './lib/git-status-observer';
+import {
+	kGitStatusUpdated,
+	gitEventBus
+} from './lib/git-status-event-bus';
 
 const condeIconInStatusItem = '$(chevron-right)';
 
@@ -47,9 +54,14 @@ function registerConfigChangeListener()
 
 	configChangeListener = vscode.workspace.onDidChangeConfiguration((event) =>
 	{
-		if (event.affectsConfiguration('git-add-with-git-add.showFileStatusInStatusBar'))
+		if( event.affectsConfiguration('git-add-with-git-add.showFileStatusInStatusBar') )
 		{
 			setupShowFileStatusInStatusBar();
+		}
+
+		if( event.affectsConfiguration('git-add-with-git-add.gitStatusPollingInterval') )
+		{
+			GitStatusObserver.pollingInterval = VSCConfig.gitStatusPollingInterval( 5 )!;
 		}
 	});
 }
@@ -66,10 +78,22 @@ function registerGitStatusLisntener(  updateDisplayCallback: ( editor?: vscode.T
 }
 
 
+function startGitStatusObserver()
+{
+	GitStatusObserver.start();
+	gitEventBus.removeListener( kGitStatusUpdated , dispatchGitStatusUpdateEvent );
+	gitEventBus.on( kGitStatusUpdated , dispatchGitStatusUpdateEvent );
+}
+
+function stopGitStatusObserver()
+{
+	gitEventBus.removeListener( kGitStatusUpdated , dispatchGitStatusUpdateEvent );
+	GitStatusObserver.stop();
+}
+
 function setupShowFileStatusInStatusBar()
 {
-	const config = vscode.workspace.getConfiguration();
-	const showFileStatusConfig	= config.get<string>('git-add-with-git-add.showFileStatusInStatusBar','none');
+	const showFileStatusConfig = VSCConfig.showFileStatusInStatusBar( 'none' );
 	switch( showFileStatusConfig )
 	{
 		case 'status-bar-item':
@@ -78,6 +102,7 @@ function setupShowFileStatusInStatusBar()
 			updateFileStatusInStatusItem( vscode.window.activeTextEditor );
 			registerActiveEditorListener( updateFileStatusInStatusItem );
 			registerGitStatusLisntener( updateFileStatusInStatusItem );
+			startGitStatusObserver();
 			break;
 
 		case 'status-message':
@@ -85,6 +110,7 @@ function setupShowFileStatusInStatusBar()
 			registerActiveEditorListener( updateFileStatusAsMessage );
 			registerGitStatusLisntener( updateFileStatusAsMessage );
 			updateFileStatusAsMessage( vscode.window.activeTextEditor );
+			startGitStatusObserver();
 			break;
 		
 		default:
@@ -92,6 +118,7 @@ function setupShowFileStatusInStatusBar()
 			statusBarItem?.dispose();
 			activeEditorListener?.dispose();
 			gitStatusDisposer?.dispose();
+			stopGitStatusObserver();
 			break;
 	}
 }
@@ -148,8 +175,7 @@ function _createFileStatusItem()
 		statusBarItem.dispose();
 	}
 
-	const config		= vscode.workspace.getConfiguration();
-	const priority		= config.get<number>('git-add-with-git-add.fileStatusPriority', 0);
+	const priority	= VSCConfig.fileStatusPriority( 1 );
 
 	statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left ,priority);
 	statusBarItem.tooltip	= vscode.l10n.t("Displayed by 'git add with git add'");
