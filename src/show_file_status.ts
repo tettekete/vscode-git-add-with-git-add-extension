@@ -153,6 +153,7 @@ async function updateFileStatusInStatusItem( editor?: vscode.TextEditor ):Promis
 		}
 	}
 
+	statusBarItem.hide();
 	let message = 'No file open';
 
 	if( ! editor )
@@ -167,6 +168,7 @@ async function updateFileStatusInStatusItem( editor?: vscode.TextEditor ):Promis
 	}
 
 	statusBarItem.text		= `${condeIconInStatusItem}${message}`;
+	statusBarItem.show();
 }
 
 function _createFileStatusItem()
@@ -180,7 +182,5 @@ function _createFileStatusItem()
 
 	statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left ,priority);
 	statusBarItem.tooltip	= vscode.l10n.t("Displayed by 'git add with git add'");
-
-	statusBarItem.show();
 }
 
