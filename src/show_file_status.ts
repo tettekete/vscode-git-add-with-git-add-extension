@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import { createStatusBarText } from './lib/file-status-in-bar';
 import {
-	GAWGADisposer,
 	onGitStatusChanged
 } from './lib/git-status-listener';
+import { GAWGADisposer } from './lib/gawga-disposer';
 import type { ValidGitStatusEventsT } from './constants';
 
 const condeIconInStatusItem = '$(chevron-right)';

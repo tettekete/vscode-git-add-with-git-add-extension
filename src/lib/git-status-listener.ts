@@ -1,28 +1,11 @@
 
 import { createDebouncedFunction } from './create-debounced-function';
-export class GAWGADisposer
-{
-	#disposeFunction: (()=> void) | undefined = undefined;
+import { GAWGADisposer } from './gawga-disposer';
 import {
 	kGitStatusUpdateEvent,
 	ValidGitStatusEvents,
 	ValidGitStatusEventsT
 } from '../constants';
-
-	constructor( disposer: () => void )
-	{
-		this.#disposeFunction = disposer;
-	}
-
-	dispose()
-	{
-		if( this.#disposeFunction )
-		{
-			this.#disposeFunction();
-			this.#disposeFunction = undefined;
-		}
-	}
-}
 
 type EventDebouncers = {[key in ValidGitStatusEventsT]:(...args: any)=>void}
 
