@@ -4,7 +4,7 @@ import {
 	GAWGADisposer,
 	onGitStatusChanged
 } from './lib/git-status-listener';
-import type { GSLValidEventsT } from './lib/git-status-listener';
+import type { ValidGitStatusEventsT } from './constants';
 
 const condeIconInStatusItem = '$(chevron-right)';
 
@@ -62,7 +62,7 @@ function registerGitStatusLisntener(  updateDisplayCallback: ( editor?: vscode.T
 		gitStatusDisposer.dispose();
 	}
 
-	gitStatusDisposer = onGitStatusChanged( (e:GSLValidEventsT) => {updateDisplayCallback();} );
+	gitStatusDisposer = onGitStatusChanged( (e:ValidGitStatusEventsT) => {updateDisplayCallback();} );
 }
 
 

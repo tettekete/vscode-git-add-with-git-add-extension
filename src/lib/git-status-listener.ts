@@ -3,6 +3,11 @@ import { createDebouncedFunction } from './create-debounced-function';
 export class GAWGADisposer
 {
 	#disposeFunction: (()=> void) | undefined = undefined;
+import {
+	kGitStatusUpdateEvent,
+	ValidGitStatusEvents,
+	ValidGitStatusEventsT
+} from '../constants';
 
 	constructor( disposer: () => void )
 	{
@@ -19,19 +24,13 @@ export class GAWGADisposer
 	}
 }
 
-const kGitStatusUpdateEvent = 'update';
-const ValidEvents = [
-	kGitStatusUpdateEvent
-] as const;
-
-export type GSLValidEventsT = (typeof kGitStatusUpdateEvent)[number];
-type EventDebouncer = {[key in GSLValidEventsT]:(...args: any)=>void}
+type EventDebouncers = {[key in ValidGitStatusEventsT]:(...args: any)=>void}
 
 type Listener =
 {
 	id: number;
-	event: GSLValidEventsT;
-	f: (eventType: GSLValidEventsT ) => void;
+	event: ValidGitStatusEventsT;
+	f: (eventType: ValidGitStatusEventsT ) => void;
 }
 
 
@@ -42,11 +41,11 @@ class GitStatusListener
 	
 	#listeners:Listener[] = [];
 	#id = 0;
-	#debouncers: EventDebouncer = {} as EventDebouncer;
+	#debouncers: EventDebouncers = {} as EventDebouncers;
 
 	private constructor()
 	{
-		for(const event of ValidEvents )
+		for(const event of ValidGitStatusEvents )
 		{
 			this.#debouncers[event] = createDebouncedFunction(()=>
 				{
@@ -68,7 +67,7 @@ class GitStatusListener
 	}
 
 
-	addListener( eventType: GSLValidEventsT ,listener: ( events:GSLValidEventsT ) => void ):GAWGADisposer
+	addListener( eventType: ValidGitStatusEventsT ,listener: ( events:ValidGitStatusEventsT ) => void ):GAWGADisposer
 	{
 		const _id = (++ this.#id) % Number.MAX_SAFE_INTEGER | 1;
 
@@ -93,7 +92,7 @@ class GitStatusListener
 		});
 	}
 
-	invokeListeners( eventType: GSLValidEventsT )
+	invokeListeners( eventType: ValidGitStatusEventsT )
 	{
 		this.#listeners.forEach(( item ) =>
 		{
@@ -104,7 +103,7 @@ class GitStatusListener
 		});
 	}
 
-	dispatchEvent( eventType: GSLValidEventsT )
+	dispatchEvent( eventType: ValidGitStatusEventsT )
 	{
 		this.#debouncers[eventType]( eventType );
 	}
@@ -118,7 +117,7 @@ class GitStatusObserver
 
 }
 
-export function onGitStatusChanged( listener: ( events:GSLValidEventsT ) => void ):GAWGADisposer
+export function onGitStatusChanged( listener: ( events:ValidGitStatusEventsT ) => void ):GAWGADisposer
 {
 	return GitStatusListener.instance().addListener( kGitStatusUpdateEvent , listener );
 }

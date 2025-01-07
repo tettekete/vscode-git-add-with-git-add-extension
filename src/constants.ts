@@ -10,6 +10,10 @@ export const kPatchPaddingSize = 3;
 
 export const kNoNewlineAtEndOfFile = 'No newline at end of file';
 
+
+// - - - - - - - - - - - - - - - - - - - -
+// Constants and type definitions related to git commands
+// - - - - - - - - - - - - - - - - - - - -
 export const kValidGitCommands =
 {	
 	kGitAdd:			'git add',
@@ -35,3 +39,14 @@ export const
 
 type ValidGitCommandsKey = keyof typeof kValidGitCommands; 
 export type ValidGitCommands = (typeof kValidGitCommands)[ValidGitCommandsKey];
+
+// - - - - - - - - - - - - - - - - - - - -
+// Constants and type definitions related to git status observing
+// - - - - - - - - - - - - - - - - - - - -
+
+export const kGitStatusUpdateEvent = 'update';
+export const ValidGitStatusEvents = [
+	kGitStatusUpdateEvent
+] as const;
+
+export type ValidGitStatusEventsT = (typeof kGitStatusUpdateEvent)[number];
