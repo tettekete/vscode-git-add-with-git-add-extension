@@ -10,7 +10,7 @@
 	"config.git-add-with-git-add.dialogOnWorkspaceSelection": "VSCode は、エクスプローラの空の領域からトリガされたコマンドを、視覚的に選択されたファイルを無視して、ワークスペース フォルダ全体をターゲットとして扱います。この設定を有効にすると、そのような操作に対して警告ダイアログが表示されます。デフォルトは ON です。",
 	"config.git-add-with-git-add.dialogOnExecRestore": "エクスプローラーから git restore を実行するときに警告ダイアログを表示する",
 	"config.git-add-with-git-add.showFileStatusInStatusBar": "アクティブエディタが切り替わる度にファイルのステータスをステータスバーに表示する",
-	"config.git-add-with-git-add.fileStatusFormat": "ファイルステータスの表示フォーマット",
+	"config.git-add-with-git-add.fileStatusFormat": "ファイルステータスの表示フォーマット\n\n**使用可能なプレースホルダ:**\n\n- `${abs_path}`: ファイルの絶対パス\n\n- `${rel_path}`: ワークスペースフォルダからの相対パス\n\n- `${file}`: ファイル名\n\n- `${git_stat}`: `Added` ,`Modified`,`Modified+Added` 等のロングスタイルのステータス表記\n\n- `${git_short_stat}`: `A`,`M`,`M+A` といったショートスタイルのステータス\n\n",
 	"config.git-add-with-git-add.fileStatusPriority": "ステータスバーアイテムとして表示するときの並び順プライオリティ",
 	"config.git-add-with-git-add.gitStatusPollingInterval": "git status の監視間隔（秒）",
 	"config.title.dialogs": "警告ダイアログ",

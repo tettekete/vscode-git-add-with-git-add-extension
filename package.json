@@ -71,7 +71,7 @@
             "git-add-with-git-add.fileStatusFormat": {
                 "type": "string",
                 "default": "${git_short_stat} : ${rel_path}",
-                "description": "%config.git-add-with-git-add.fileStatusFormat%"
+                "markdownDescription": "%config.git-add-with-git-add.fileStatusFormat%"
             },
             "git-add-with-git-add.fileStatusPriority": {
                 "type": "number",
