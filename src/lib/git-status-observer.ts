@@ -24,6 +24,7 @@ class GitStatusObserverClass
 	#conditionsByWF:Record<string,string> = {};	// Stores the results of `git status --porcelain -uno` for each workspace.
 	#pollingInterval:number	= 5;
 	#timeout: NodeJS.Timeout | undefined;
+	#isPolling: boolean = false;
 	#eventEmitter: EventEmitter | undefined;
 	#eventName: string | undefined;
 
@@ -33,6 +34,19 @@ class GitStatusObserverClass
 		const intervalSec	= config.get<number>('git-add-with-git-add.gitStatusPollingInterval', 5 );
 
 		this.pollingInterval = intervalSec;
+
+		// Perform monitoring only when the window is active.
+		vscode.window.onDidChangeWindowState((windowState) =>
+		{
+			if( windowState.focused )
+			{
+				this.resume();
+			}
+			else
+			{
+				this.pause();
+			}
+		});
 	}
 
 	static instance():GitStatusObserverClass
@@ -72,7 +86,9 @@ class GitStatusObserverClass
 	}
 
 	start()
-	{	
+	{
+		this.#isPolling = true;
+
 		if( ! Object.keys( this.#conditionsByWF ) )
 		{
 			this.checkStatus( true );
@@ -103,7 +119,21 @@ class GitStatusObserverClass
 
 	stop()
 	{
+		this.#isPolling = false;
 		clearTimeout( this.#timeout );
+	}
+
+	pause()
+	{
+		clearTimeout( this.#timeout );
+	}
+
+	resume()
+	{
+		if( this.#isPolling )
+		{
+			this.start();
+		}
 	}
 
 	
