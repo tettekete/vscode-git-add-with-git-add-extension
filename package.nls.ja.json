@@ -12,10 +12,10 @@
 	"config.git-add-with-git-add.showFileStatusInStatusBar": "アクティブエディタが切り替わる度にファイルのステータスをステータスバーに表示する",
 	"config.git-add-with-git-add.fileStatusFormat": "ファイルステータスの表示フォーマット",
 	"config.git-add-with-git-add.fileStatusPriority": "ステータスバーアイテムとして表示するときの並び順プライオリティ",
-	"config.git-add-with-git-add.gitStatusPollingInterval": "git status の監視間隔",
+	"config.git-add-with-git-add.gitStatusPollingInterval": "git status の監視間隔（秒）",
 	"config.title.dialogs": "警告ダイアログ",
 	"config.title.context-menu": "コンテキストメニュー",
-	"config.title.file-status-bar": "ステータスバーへのファイルステータス表示",
+	"config.title.file-status-bar": "ファイルステータスをステータスバーに表示する",
 	"git-add-with-git-add.showFileStatusInStatusBar.none": "表示しない",
 	"git-add-with-git-add.showFileStatusInStatusBar.status-bar-item": "ステータスバーアイテムとして常時表示する",
 	"git-add-with-git-add.showFileStatusInStatusBar.status-message": "ステータスメッセージとして表示する"

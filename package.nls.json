@@ -12,11 +12,11 @@
 	"config.git-add-with-git-add.showFileStatusInStatusBar": "Display the file status in the status bar each time the active editor changes.",
 	"config.git-add-with-git-add.fileStatusFormat": "File status display format",
 	"config.git-add-with-git-add.fileStatusPriority": "Priority of the display order when shown as a status bar item",
-	"config.git-add-with-git-add.gitStatusPollingInterval": "git status polling interval",
+	"config.git-add-with-git-add.gitStatusPollingInterval": "git status polling interval(second)",
 	"config.title.dialogs": "Warning Dialogs",
 	"config.title.context-menu": "Context Menu",
-	"config.title.file-status-bar": "File Status in status bar",
+	"config.title.file-status-bar": "Show File Status in Status Bar",
 	"git-add-with-git-add.showFileStatusInStatusBar.none": "Do not display",
-	"git-add-with-git-add.showFileStatusInStatusBar.status-bar-item": "As a persistent item in the status bar",
-	"git-add-with-git-add.showFileStatusInStatusBar.status-message": "As a status bar message"
+	"git-add-with-git-add.showFileStatusInStatusBar.status-bar-item": "Always display as a status bar item",
+	"git-add-with-git-add.showFileStatusInStatusBar.status-message": "Display as a status message"
 }
