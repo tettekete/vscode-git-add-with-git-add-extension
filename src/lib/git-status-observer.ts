@@ -27,6 +27,7 @@ class GitStatusObserverClass
 	#pollingInterval:number	= kGitStatusPollingInterval;
 	#timeout: NodeJS.Timeout | undefined;
 	#isPolling: boolean = false;
+	#isPaused: boolean = false;
 	#eventEmitter: EventEmitter | undefined;
 	#eventName: string | undefined;
 
@@ -102,21 +103,35 @@ class GitStatusObserverClass
 	private _startNextTimeout()
 	{
 		clearTimeout( this.#timeout );
+
+		if( this.#isPaused ) { return; }
+
+		if( ! vscode.window.state.focused )
+		{
+			this.pause();
+			return;
+		}
+
 		this.#timeout = setTimeout( async () =>
 			{
-				const isStatusChanged = await this.checkStatus();
-				if( isStatusChanged )
-				{
-					if( this.#eventEmitter && this.#eventName )
-					{
-						this.#eventEmitter.emit(this.#eventName , kGitStatusUpdateEvent );
-					}
-				}
-
-				this._startNextTimeout();
+				await this._invokeCheckAndTimeout();
 			}
 			,this.#pollingInterval
 		);
+	}
+
+	private async _invokeCheckAndTimeout()
+	{
+		const isStatusChanged = await this.checkStatus();
+		if( isStatusChanged )
+		{
+			if( this.#eventEmitter && this.#eventName )
+			{
+				this.#eventEmitter.emit(this.#eventName , kGitStatusUpdateEvent );
+			}
+		}
+
+		this._startNextTimeout();
 	}
 
 	stop()
@@ -127,14 +142,18 @@ class GitStatusObserverClass
 
 	pause()
 	{
+		this.#isPaused = true;
 		clearTimeout( this.#timeout );
 	}
 
 	resume()
 	{
+		this.#isPaused = false;
+		clearTimeout( this.#timeout );	// It is not guaranteed to be called after a pause in the logic.
+
 		if( this.#isPolling )
 		{
-			this.start();
+			this._invokeCheckAndTimeout();
 		}
 	}
 
