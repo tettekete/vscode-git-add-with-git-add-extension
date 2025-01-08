@@ -14,7 +14,7 @@
     "type": "git",
     "url": "git+https://github.com/tettekete/vscode-git-add-with-git-add-extension"
   },
-  "homepage": "https://github.com/tettekete/vscode-git-add-with-git-add-extension",
+  "homepage": "https://tettekete.github.io/vscode-git-add-with-git-add-extension/",
   "categories": [
     "Other"
   ],
