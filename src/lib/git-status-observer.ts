@@ -1,16 +1,18 @@
 import * as vscode from 'vscode';
 
 import { execGitCommandWithFiles } from './exec-git-commands';
-import { kGitStatusPorcelainUno } from '../constants';
+import {
+	kGitStatusPorcelainUno,
+	kGitStatusUpdateEvent,
+	kGitStatusPollingInterval
+
+} from '../constants';
 
 import { EventEmitter } from 'node:events';
 import {
 	kGitStatusUpdated,
 	gitEventBus
 } from './git-status-event-bus';
-
-import { kGitStatusUpdateEvent } from '../constants';
-import { kGitStatusPollingInterval } from '../constants';
 
 /**
  * A singleton class to periodically perform git status and monitor its update status.

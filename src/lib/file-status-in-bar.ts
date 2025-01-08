@@ -14,7 +14,6 @@ import {
 } from '../constants';
 
 import { execGitCommandWithFiles } from './exec-git-commands';
-import { RmDirOptions } from 'node:fs';
 
 type GitStats =
 {
