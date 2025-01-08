@@ -22,12 +22,13 @@ To perform `git add` in VSCode, you need to type `git stage changes` in the comm
 This is a VSCode extension that provides `git add` commands accessible from the Command Palette by typing `git add`.
 
 
-![command palette](https://tettekete.github.io/vscode-git-add-with-git-add-extension/images/command-palette.jpg)
+<img width="623" alt="command palette" src="https://tettekete.github.io/vscode-git-add-with-git-add-extension/images/command-palette.jpg">
 
 Additionally, from the context menu in the Explorer, you can perform actions such as `git add`, `git add -u`, and `git restore --staged` (unstage).  
 
 
-![context menu in explorer](https://tettekete.github.io/vscode-git-add-with-git-add-extension/images/context-menu.jpg)
+<img width="545" alt="command palette" src="https://tettekete.github.io/vscode-git-add-with-git-add-extension/images/context-menu.jpg">
+
 
 ## Operations from the command palette
 
@@ -81,6 +82,8 @@ Please note that if you open the context menu from the blank area at the bottom 
 You can display the Git tracking status and file path of the currently active file in the status bar.
 
 VSCode's Explorer only shows an `M` icon even if a file is partially staged, which can be confusing. Therefore, this feature was implemented. (Of course, this is unnecessary for those who frequently use VSCode's built-in "Source Control" view.)
+
+<img width="189" alt="git tracking status in the status bar" src="https://tettekete.github.io/vscode-git-add-with-git-add-extension/images/git-stat-in-status-bar.jpg">
 
 ### How to Configure:
 

@@ -21,11 +21,11 @@ VSCode で `git add` を行うにはコマンドパレットで `git stage chang
 
 この機能拡張はコマンドパレット上から  `git add` と入力して `git add` コマンドを実行する機能を提供します。
 
-![command palette](images/command-palette.jpg)
+<img width="623" alt="command palette" src="https://tettekete.github.io/vscode-git-add-with-git-add-extension/images/command-palette.jpg">
 
 またエクスプローラー上のコンテキストメニューから `git add` や `git add -u` の他、`git restore --staged`(アンステージ)などを行う事が出来ます。
 
-![context menu in explorer](images/context-menu.jpg)
+<img width="545" alt="command palette" src="https://tettekete.github.io/vscode-git-add-with-git-add-extension/images/context-menu.jpg">
 
 
 ## コマンドパレットからの操作
@@ -79,8 +79,9 @@ VSCode で `git add` を行うにはコマンドパレットで `git stage chang
 
 ステータスバーにアクティブエディタで表示しているファイルの git 追跡状況とファイルパスなどを表示することが出来ます。
 
-VSCode のエクスプローラーはファイルの一部がステージングされたファイルであっても `M` 表示のままで分かりにくいためこの機能を実装しました（もちろん VSCode 標準の「ソースコントロール」を毎回表示する人には不要な機能です）。
+VSCode のエクスプローラーはファイルの一部がステージングされたファイルであっても `M` 表示のままで分かりにくいためこの機能を実装しました（もちろん VSCode 標準の「ソース管理」を毎回表示する人には不要な機能です）。
 
+<img width="189" alt="git tracking status in the status bar" src="https://tettekete.github.io/vscode-git-add-with-git-add-extension/images/git-stat-in-status-bar.jpg">
 
 ### 設定方法:
 
@@ -90,7 +91,7 @@ VSCode のエクスプローラーはファイルの一部がステージング�
 1. 「ステータスメッセージとして表示する」か「ステータスバーアイテムとして常時表示する」を選択する
 
 「ステータスバーアイテムとして常時表示する」を選んだ場合、ステータスバーに常駐します。
-「ステータスメッセージとして表示する」を選んだ場合他のステータスメッセージで上書きされる場合があります。
+「ステータスメッセージとして表示する」を選んだ場合、単にステータスメッセージとして表示されるため、何かのタイミングで表示される他のステータスメッセージで上書きされる場合があります。
 
 
 ### 表示フォーマット
@@ -113,7 +114,7 @@ VSCode のエクスプローラーはファイルの一部がステージング�
 
 ### 注意点
 
-「git add with git add」が提供する git コマンドの結果は即座に反映されますが、それ以外の方法で追跡状況に変更が加えられた場合は若干遅れて更新されます。デフォルトでは最大 3 秒遅れて更新されます。反映速度を上げたい場合は「設定」から「git status の監視間隔（秒）」を短くすることも出来ます。
+「git add with git add」が提供する git コマンドの結果は即座に反映されますが、それ以外の方法で追跡状況に変更が加えられた場合は若干遅れて更新されます。デフォルトでは最大 3 秒遅れて更新されます。「設定」から「git status の監視間隔（秒）」を短くすることで反映速度を上げる事もできます。
 
 設定上は 1 秒以下の設定も可能ですが、VSCode のパフォーマンスへの影響を考慮し、内部的に 0.3 秒以下には出来ない様になっています。
 
