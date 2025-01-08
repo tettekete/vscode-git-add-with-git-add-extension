@@ -80,7 +80,7 @@
             },
             "git-add-with-git-add.gitStatusPollingInterval": {
                 "type": "number",
-                "default": 5,
+                "default": 3,
                 "description": "%config.git-add-with-git-add.gitStatusPollingInterval%"
             }
         }

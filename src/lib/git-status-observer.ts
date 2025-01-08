@@ -10,7 +10,7 @@ import {
 } from './git-status-event-bus';
 
 import { kGitStatusUpdateEvent } from '../constants';
-
+import { kGitStatusPollingInterval } from '../constants';
 
 /**
  * A singleton class to periodically perform git status and monitor its update status.
@@ -22,7 +22,7 @@ class GitStatusObserverClass
 {
 	static #instance:GitStatusObserverClass;
 	#conditionsByWF:Record<string,string> = {};	// Stores the results of `git status --porcelain -uno` for each workspace.
-	#pollingInterval:number	= 5;
+	#pollingInterval:number	= kGitStatusPollingInterval;
 	#timeout: NodeJS.Timeout | undefined;
 	#isPolling: boolean = false;
 	#eventEmitter: EventEmitter | undefined;
@@ -31,7 +31,7 @@ class GitStatusObserverClass
 	private constructor()
 	{
 		const config		= vscode.workspace.getConfiguration();
-		const intervalSec	= config.get<number>('git-add-with-git-add.gitStatusPollingInterval', 5 );
+		const intervalSec	= config.get<number>('git-add-with-git-add.gitStatusPollingInterval', kGitStatusPollingInterval );
 
 		this.pollingInterval = intervalSec;
 

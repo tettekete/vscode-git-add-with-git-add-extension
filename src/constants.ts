@@ -1,6 +1,6 @@
 
 export const kMessageTimeOut = 8000;
-
+export const kGitStatusPollingInterval = 3;	// unit: second
 
 /** kPatchPaddingSize:
  * The diff padding size when creating patches for “git apply”.

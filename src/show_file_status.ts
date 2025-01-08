@@ -12,6 +12,7 @@ import {
 	kGitStatusUpdated,
 	gitEventBus
 } from './lib/git-status-event-bus';
+import { kGitStatusPollingInterval } from './constants';
 
 const condeIconInStatusItem = '$(chevron-right)';
 
@@ -61,7 +62,7 @@ function registerConfigChangeListener()
 
 		if( event.affectsConfiguration('git-add-with-git-add.gitStatusPollingInterval') )
 		{
-			GitStatusObserver.pollingInterval = VSCConfig.gitStatusPollingInterval( 5 )!;
+			GitStatusObserver.pollingInterval = VSCConfig.gitStatusPollingInterval( kGitStatusPollingInterval )!;
 		}
 	});
 }
