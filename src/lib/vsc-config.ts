@@ -5,21 +5,33 @@ export class VSCConfig
 {
 	static #config = vscode.workspace.getConfiguration();
 
-	static showFileStatusInStatusBar( fallback?: string ):string | undefined
+
+	// - - - - - - - - - - - - - - - - - - - -
+	// dialogOnExecRestore<boolean>
+	// - - - - - - - - - - - - - - - - - - - -
+	static dialogOnExecRestore( fallback?: boolean ):boolean | undefined
 	{
-		const value = vscode.workspace
-			.getConfiguration()
-			.get<string>(
-				'git-add-with-git-add.showFileStatusInStatusBar'
-			);
-		
-		if( ! value && fallback )
-		{
-			return fallback;
-		}
-		return value;
+		return VSCConfig._booleanConfig(
+			'git-add-with-git-add.dialogOnExecRestore'
+			,fallback
+		);
 	}
 
+	// - - - - - - - - - - - - - - - - - - - -
+	// showFileStatusInStatusBar<string>
+	// - - - - - - - - - - - - - - - - - - - -
+	static showFileStatusInStatusBar( fallback?: string ):string | undefined
+	{
+		return VSCConfig._stringConfig(
+			'git-add-with-git-add.showFileStatusInStatusBar'
+			,fallback
+		);
+	}
+
+
+	// - - - - - - - - - - - - - - - - - - - -
+	// gitStatusPollingInterval<number>
+	// - - - - - - - - - - - - - - - - - - - -
 	static gitStatusPollingInterval( fallback?: number ):number | undefined
 	{
 		return VSCConfig._numberConfig(
@@ -28,6 +40,10 @@ export class VSCConfig
 		);
 	}
 
+
+	// - - - - - - - - - - - - - - - - - - - -
+	// fileStatusPriority<number>
+	// - - - - - - - - - - - - - - - - - - - -
 	static fileStatusPriority( fallback?: number ):number | undefined
 	{
 		return VSCConfig._numberConfig(

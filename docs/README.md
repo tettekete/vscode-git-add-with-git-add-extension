@@ -77,6 +77,16 @@ If you have selected multiple files, open the context menu on the selected items
 Please note that if you open the context menu from the blank area at the bottom of Explorer, the entire workspace folder will be the target.
 
 
+## Context Menu in the Text Editor
+
+The following commands can be executed from the context menu in the text editor:
+
+- `git add: File in Active Editor`  
+- `git add: Selected Lines or Cursor Line`  
+- `git restore --staged`  
+- `git restore`
+
+
 ## Displaying Git Tracking Status in the Status Bar
 
 You can display the Git tracking status and file path of the currently active file in the status bar.
