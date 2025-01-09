@@ -866,9 +866,9 @@ index 7b07b71..b015451 100644
 		test('2024-12-20: line 21 to 37',()=>
 		{
 			const makePatchFromSelection = new MakePatchFromSelection({
-			diff: _diff,
-			selectionRange: new LineRange( 21,37 )
-		});
+				diff: _diff,
+				selectionRange: new LineRange( 21,37 )
+			});
 
 		const patch = makePatchFromSelection.getPatchString();
 		const expect = `--- a/package.json
@@ -961,5 +961,28 @@ index 7b07b71..b015451 100644
 		assert.equal( typeof patch , 'string' , 'patch is string.');
 		assert.equal( patch , expect );
 		});
+	});
+
+	test('found ~~bug~~ on 2025-01-09 - lines 13 - 13',()=>
+	{
+		const makePatchFromSelection = new MakePatchFromSelection({
+			diff: diff,
+			selectionRange: new LineRange( 13,13 )
+		});
+
+		const patch = makePatchFromSelection.getPatchString();
+		const expect = `--- a/cat-and-aliens-report.md
++++ b/cat-and-aliens-report.md
+@@ -13,6 +13,7 @@
+ gods. The goddess Bastet, a feline deity, was revered as a protector of the home and a symbol of
+ especially those with unusual features like glowing eyes, were often considered emissaries of the
+ The first records of cats being associated with celestial beings date back to ancient Egypt. Cats,
++especially those with unusual features like glowing eyes, were often considered emissaries of the
+ 
+ ### Key Myths:
+ 
+`;
+		assert.equal( typeof patch , 'string' , 'patch is string.');
+		assert.equal( patch , expect );
 	});
 });
