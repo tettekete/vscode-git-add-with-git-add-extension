@@ -16,6 +16,7 @@ import {
 	kGitRestoreStaged,
 	kGitRestore,
 } from './constants';
+import { VSCConfig } from './lib/vsc-config';
 
 const dialogOnExecRestoreConfigKey = 'git-add-with-git-add.dialogOnExecRestore';
 
@@ -61,8 +62,7 @@ export async function git_unstage_from_explorer(uri: vscode.Uri, selectedFiles?:
 export async function git_restore_from_explorer(uri: vscode.Uri, selectedFiles?: vscode.Uri[])
 {
 	// git restore は破壊的なコマンドであるためダイアログを出します
-	const config        = vscode.workspace.getConfiguration();
-	const showDialog	= config.get<boolean>('myAwesomeExtension.priority', true );
+	const showDialog	= VSCConfig.dialogOnExecRestore();
 
 	if( showDialog )
 	{
