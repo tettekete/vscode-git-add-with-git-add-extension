@@ -7,6 +7,10 @@
 		- [使い方](#使い方)
 		- [コマンドと実行内容](#コマンドと実行内容)
 	- [エクスプローラー上のコンテキストメニュー](#エクスプローラー上のコンテキストメニュー)
+	- [git 追跡状況をステータスバーに表示する](#git-追跡状況をステータスバーに表示する)
+		- [設定方法:](#設定方法)
+		- [表示フォーマット](#表示フォーマット)
+		- [注意点](#注意点)
 - [動機](#動機)
 - [必要環境](#必要環境)
 
@@ -17,11 +21,11 @@ VSCode で `git add` を行うにはコマンドパレットで `git stage chang
 
 この機能拡張はコマンドパレット上から  `git add` と入力して `git add` コマンドを実行する機能を提供します。
 
-![command palette](images/command-palette.jpg)
+<img width="623" alt="command palette" src="https://tettekete.github.io/vscode-git-add-with-git-add-extension/images/command-palette.jpg">
 
 またエクスプローラー上のコンテキストメニューから `git add` や `git add -u` の他、`git restore --staged`(アンステージ)などを行う事が出来ます。
 
-![context menu in explorer](images/context-menu.jpg)
+<img width="545" alt="command palette" src="https://tettekete.github.io/vscode-git-add-with-git-add-extension/images/context-menu.jpg">
 
 
 ## コマンドパレットからの操作
@@ -70,6 +74,50 @@ VSCode で `git add` を行うにはコマンドパレットで `git stage chang
 
 複数のファイルを選択している場合、選択されたアイテムの上でコンテキストメニューを開いてください。
 エクスプローラー下部の空白部分からコンテキストメニューを開いた場合ワークスペースフォルダ全体が対象となりますのでご注意ください。
+
+## git 追跡状況をステータスバーに表示する
+
+ステータスバーにアクティブエディタで表示しているファイルの git 追跡状況とファイルパスなどを表示することが出来ます。
+
+VSCode のエクスプローラーはファイルの一部がステージングされたファイルであっても `M` 表示のままで分かりにくいためこの機能を実装しました（もちろん VSCode 標準の「ソース管理」を毎回表示する人には不要な機能です）。
+
+<img width="189" alt="git tracking status in the status bar" src="https://tettekete.github.io/vscode-git-add-with-git-add-extension/images/git-stat-in-status-bar.jpg">
+
+### 設定方法:
+
+1. 「設定」を開く
+   - 「設定」→「拡張機能」→「git add with git add」→「ファイルステータスをステータスバーに表示する」
+   - 若しくは「設定」から `git-add-with-git-add.showFileStatusInStatusBar` を検索する
+1. 「ステータスメッセージとして表示する」か「ステータスバーアイテムとして常時表示する」を選択する
+
+「ステータスバーアイテムとして常時表示する」を選んだ場合、ステータスバーに常駐します。
+「ステータスメッセージとして表示する」を選んだ場合、単にステータスメッセージとして表示されるため、何かのタイミングで表示される他のステータスメッセージで上書きされる場合があります。
+
+
+### 表示フォーマット
+
+「設定」の「ファイルステータスの表示フォーマット」で表示フォーマットを指定する事ができます。
+コンフィグを検索する場合は `git-add-with-git-add.fileStatusFormat` で検索してください。
+
+デフォルトは `${git_short_stat} : ${rel_path}` です。
+
+以下、使用可能なプレースフォルダとその説明です。
+
+| プレースフォルダ | 内容 |
+|---------------|------|
+| `${abs_path}` | ファイルの絶対パス	|
+| `${rel_path}` | ワークスペースフォルダからの相対パス	|
+| `${file}` | ファイル名	|
+| `${git_stat}` | `Added` ,`Modified`,`Modified+Added` 等のロングスタイルのステータス表記 |
+| `${git_short_stat}` |	`A`,`M`,`M+A` の様なショートスタイルのステータス |
+
+
+### 注意点
+
+「git add with git add」が提供する git コマンドの実行結果は即座に反映されます。ただし、それ以外の方法でファイルの追跡状況が変更された場合、反映には若干の遅延が生じます。デフォルトでは最大 3 秒の遅延がありますが、「設定」の「git status の監視間隔（秒）」を短縮することで、反映速度を向上させることが可能です。
+
+設定上は 1 秒以下の値も指定できますが、VSCode のパフォーマンスへの影響を考慮し、内部的には最小 0.3 秒までに制限されています。
+
 
 
 # 動機

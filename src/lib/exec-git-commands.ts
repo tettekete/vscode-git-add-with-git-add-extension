@@ -3,6 +3,7 @@ import { exec } from 'node:child_process';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { escapeArgumentForShell } from './utils';
+import { dispatchGitStatusUpdateEvent } from './git-status-listener';
 
 import type { ValidGitCommands } from '../constants';
 import {
@@ -61,7 +62,12 @@ export async function execGitCommandWithFiles(
 {
 	const filesAsArgs = files.map((file) =>
 	{
-		const relPath = path.relative( cwd , file );
+		let relPath = file;
+		if( path.isAbsolute( relPath ) )
+		{
+			relPath = path.relative( cwd , file );
+		}
+
 		return escapeArgumentForShell( relPath );
 	});
 
@@ -103,9 +109,33 @@ export async function execGitCommandWithFiles(
 		}
 	}
 
+	if( ! error )
+	{
+		if( isStatusChangingCommand( command ) )
+		{
+			dispatchGitStatusUpdateEvent();
+		}
+	}
+
 	return {
 		error: error,
 		stdout: _stdout,
 		stderr: _stderr
 	};
+}
+
+
+function isStatusChangingCommand( command: ValidGitCommands )
+{
+	switch( command )
+	{
+		case kGitAdd:
+		case kGitAddUpdate:
+		case kGitRestoreStaged:
+		case kGitRestore:
+			return true;
+		
+	}
+
+	return false;
 }

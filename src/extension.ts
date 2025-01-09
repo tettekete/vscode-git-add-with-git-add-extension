@@ -15,6 +15,10 @@ import { git_add_from_explorer } from './explorer_git';
 import { git_restore_from_explorer } from './explorer_git';
 import { git_unstage_from_explorer } from './explorer_git';
 import { git_add_u_from_explorer } from './explorer_git';
+import {
+	activateShowFileStatusInStatusBar,
+	deactivateShowInFileStatusStatusBar
+} from './show_file_status';
 
 import { kMessageTimeOut } from './constants';
 
@@ -167,7 +171,12 @@ export function activate(context: vscode.ExtensionContext)
 								run_restore_from_explorer,
 								run_unstage_from_explorer
 							);
+	
+	activateShowFileStatusInStatusBar();
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate()
+{
+	deactivateShowInFileStatusStatusBar();
+}

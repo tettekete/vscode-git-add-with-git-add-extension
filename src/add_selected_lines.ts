@@ -17,6 +17,7 @@ import { kPatchPaddingSize } from './constants';
 
 import { isUserError } from './lib/user-error';
 import type { AnyUserError } from './lib/user-error';
+import { dispatchGitStatusUpdateEvent } from './lib/git-status-listener';
 
 export async function git_add_selected_lines()
 {
@@ -113,6 +114,9 @@ export async function git_add_selected_lines()
 		else
 		{
 			console.log("Filtered diff applied successfully!");
+
+			dispatchGitStatusUpdateEvent();
+			
 			StatusBarMessageQueue.getInstance().enqueue(
 				vscode.l10n.t('The patch has been successfully applied.'),
 				kMessageTimeOut

@@ -2,7 +2,7 @@
   "name": "git-add-with-git-add",
   "displayName": "git add with git add",
   "description": "Run git add via Command Palette with 'git add'",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.95.0"
   },
@@ -14,23 +14,20 @@
     "type": "git",
     "url": "git+https://github.com/tettekete/vscode-git-add-with-git-add-extension"
   },
-  "homepage": "https://github.com/tettekete/vscode-git-add-with-git-add-extension",
+  "homepage": "https://tettekete.github.io/vscode-git-add-with-git-add-extension/",
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
-    "configuration": {
-        "type": "object",
-        "title": "git add with git add",
-        "properties": {
-            "git-add-with-git-add.showExplorerCommand": {
-                "type": "boolean",
-                "default": true,
-                "description": "%config.git-add-with-git-add.showExplorerCommand%"
-            },
-            "git-add-with-git-add.dialogOnWorkspaceSelection": {
+    "configuration": [
+      {
+        "title": "%config.title.dialogs%",
+        "properties":{
+          "git-add-with-git-add.dialogOnWorkspaceSelection": {
                 "type": "boolean",
                 "default": true,
                 "description": "%config.git-add-with-git-add.dialogOnWorkspaceSelection%"
@@ -41,7 +38,53 @@
                 "description": "%config.git-add-with-git-add.dialogOnExecRestore%"
             }
         }
-    },
+      },
+      {
+        "title": "%config.title.context-menu%",
+        "properties":{
+          "git-add-with-git-add.showExplorerCommand": {
+                "type": "boolean",
+                "default": true,
+                "description": "%config.git-add-with-git-add.showExplorerCommand%"
+           }
+        }
+
+      },
+      {
+        "title": "%config.title.file-status-bar%",
+        "properties": {
+            "git-add-with-git-add.showFileStatusInStatusBar": {
+                "type": "string",
+                "enum":[
+                  "none",
+                  "status-message",
+                  "status-bar-item"
+                ],
+                "enumItemLabels": [
+                  "%git-add-with-git-add.showFileStatusInStatusBar.none%",
+                  "%git-add-with-git-add.showFileStatusInStatusBar.status-message%",
+                  "%git-add-with-git-add.showFileStatusInStatusBar.status-bar-item%"
+                ],
+                "default": "none",
+                "description": "%config.git-add-with-git-add.showFileStatusInStatusBar%"
+            },
+            "git-add-with-git-add.fileStatusFormat": {
+                "type": "string",
+                "default": "${git_short_stat} : ${rel_path}",
+                "markdownDescription": "%config.git-add-with-git-add.fileStatusFormat%"
+            },
+            "git-add-with-git-add.fileStatusPriority": {
+                "type": "number",
+                "default": 1,
+                "description": "%config.git-add-with-git-add.fileStatusPriority%"
+            },
+            "git-add-with-git-add.gitStatusPollingInterval": {
+                "type": "number",
+                "default": 3,
+                "description": "%config.git-add-with-git-add.gitStatusPollingInterval%"
+            }
+        }
+    }],
     "commands": [
       {
         "command": "tettekete.git-add-with-git-add",
