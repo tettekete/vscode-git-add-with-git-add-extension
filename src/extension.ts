@@ -19,6 +19,10 @@ import {
 	activateShowFileStatusInStatusBar,
 	deactivateShowInFileStatusStatusBar
 } from './show_file_status';
+import {
+	git_unstage_from_editor,
+	git_restore_from_editor
+} from './context_menu_in_editor';
 
 import { kMessageTimeOut } from './constants';
 
@@ -161,6 +165,10 @@ export function activate(context: vscode.ExtensionContext)
 	const run_git_add_u_from_explorer	= vscode.commands.registerCommand('tettekete.git-add-wga-u-from-explorer', git_add_u_from_explorer );
 	const run_restore_from_explorer		= vscode.commands.registerCommand('tettekete.git-add-wga-restore-from-explorer', git_restore_from_explorer );
 	const run_unstage_from_explorer		= vscode.commands.registerCommand('tettekete.git-add-wga-unstage-from-explorer', git_unstage_from_explorer );
+	const run_git_add_from_editor_menu			= vscode.commands.registerCommand('tettekete.git-add-wga-from-editor', git_add ); 
+	const run_git_add_lines_from_editor_menu	= vscode.commands.registerCommand('tettekete.git-add-wga-selected-lines-from-editor', git_add_selected_lines );
+	const run_git_unstage_from_editor_menu		= vscode.commands.registerCommand('tettekete.git-add-wga-unstage-from-editor', git_unstage_from_editor );
+	const run_git_restore_from_editor_menu		= vscode.commands.registerCommand('tettekete.git-add-wga-restore-from-editor', git_restore_from_editor );
 
 	context.subscriptions.push(
 								run_git_add,
@@ -169,7 +177,11 @@ export function activate(context: vscode.ExtensionContext)
 								run_git_add_from_explorer,
 								run_git_add_u_from_explorer,
 								run_restore_from_explorer,
-								run_unstage_from_explorer
+								run_unstage_from_explorer,
+								run_git_add_from_editor_menu,
+								run_git_add_lines_from_editor_menu,
+								run_git_unstage_from_editor_menu,
+								run_git_restore_from_editor_menu
 							);
 	
 	activateShowFileStatusInStatusBar();

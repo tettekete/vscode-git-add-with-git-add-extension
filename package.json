@@ -46,6 +46,11 @@
                 "type": "boolean",
                 "default": true,
                 "description": "%config.git-add-with-git-add.showExplorerCommand%"
+           },
+            "git-add-with-git-add.showContextMenuInEditor": {
+                "type": "boolean",
+                "default": true,
+                "description": "%config.git-add-with-git-add.showContextMenuInEditor%"
            }
         }
 
@@ -113,6 +118,22 @@
       {
         "command": "tettekete.git-add-wga-unstage-from-explorer",
         "title": "%command.tettekete.git-add-wga-unstage-from-explorer%"
+      },
+      {
+        "command": "tettekete.git-add-wga-from-editor",
+        "title": "%command.tettekete.git-add-wga-from-editor%"
+      },
+      {
+        "command": "tettekete.git-add-wga-selected-lines-from-editor",
+        "title": "%command.tettekete.git-add-wga-selected-lines-from-editor%"
+      },
+      {
+        "command": "tettekete.git-add-wga-unstage-from-editor",
+        "title": "%command.tettekete.git-add-wga-unstage-from-editor%"
+      },
+      {
+        "command": "tettekete.git-add-wga-restore-from-editor",
+        "title": "%command.tettekete.git-add-wga-restore-from-editor%"
       }
     ],
     "menus": {
@@ -141,6 +162,31 @@
           "group": "3_destructive_commands"
         }
       ],
+      "editor/context": [
+        {
+          "submenu": "gawga.submenuInEditor",
+          "when": "editorFocus && config.git-add-with-git-add.showContextMenuInEditor",
+          "group": "z_commands"
+        }
+      ],
+      "gawga.submenuInEditor":[
+        {
+          "command": "tettekete.git-add-wga-from-editor",
+          "group": "1st-group"
+        },
+        {
+          "command": "tettekete.git-add-wga-selected-lines-from-editor",
+          "group": "1st-group"
+        },
+        {
+          "command": "tettekete.git-add-wga-unstage-from-editor",
+          "group": "2nd-group"
+        },
+        {
+          "command": "tettekete.git-add-wga-restore-from-editor",
+          "group": "2nd-group"
+        }
+      ],
       "commandPalette": [
         {
             "command": "tettekete.git-add-wga-from-explorer",
@@ -159,6 +205,10 @@
     "submenus": [
       {
         "id": "gawga.submenu",
+        "label": "git add with git add"
+      },
+      {
+        "id": "gawga.submenuInEditor",
         "label": "git add with git add"
       }
     ]
