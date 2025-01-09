@@ -7,6 +7,7 @@
 		- [Usage](#usage)
 		- [Command and to be executed](#command-and-to-be-executed)
 	- [Context menu in Explorer](#context-menu-in-explorer)
+	- [Context Menu in the Text Editor](#context-menu-in-the-text-editor)
 	- [Displaying Git Tracking Status in the Status Bar](#displaying-git-tracking-status-in-the-status-bar)
 		- [How to Configure:](#how-to-configure)
 		- [Display Format](#display-format)
