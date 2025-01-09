@@ -8,5 +8,15 @@
 	"command.tettekete.git-add-wga-unstage-from-explorer": "- git restore --staged (Unstage Changes)",
 	"config.git-add-with-git-add.showExplorerCommand": "Display command in Explorer context menu",
 	"config.git-add-with-git-add.dialogOnWorkspaceSelection": "VSCode treats commands triggered from the Explorer's empty area as targeting the entire workspace folder, ignoring the visually selected file. Enable this setting to show a warning dialog for such actions. Default is ON.",
-	"config.git-add-with-git-add.dialogOnExecRestore": "Display a warning dialog when executing git restore"
+	"config.git-add-with-git-add.dialogOnExecRestore": "Display a warning dialog when executing git restore",
+	"config.git-add-with-git-add.showFileStatusInStatusBar": "Display the file status in the status bar each time the active editor changes.",
+	"config.git-add-with-git-add.fileStatusFormat": "File status display format.\n\n**Available placeholders:**\n\n- `${abs_path}`: Absolute file path\n\n- `${rel_path}`: Relative path from the workspace folder\n\n- `${file}`: File name\n\n- `${git_stat}`: Long style status notation such as `Added`, `Modified`, `Modified+Added`\n\n- `${git_short_stat}`: Short style status notation such as `A`, `M`, `M+A`\n\n",
+	"config.git-add-with-git-add.fileStatusPriority": "Priority of the display order when shown as a status bar item",
+	"config.git-add-with-git-add.gitStatusPollingInterval": "git status polling interval(second)",
+	"config.title.dialogs": "Warning Dialogs",
+	"config.title.context-menu": "Context Menu",
+	"config.title.file-status-bar": "Show File Status in Status Bar",
+	"git-add-with-git-add.showFileStatusInStatusBar.none": "Do not display",
+	"git-add-with-git-add.showFileStatusInStatusBar.status-bar-item": "Always display as a status bar item",
+	"git-add-with-git-add.showFileStatusInStatusBar.status-message": "Display as a status message"
 }
