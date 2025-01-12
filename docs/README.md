@@ -92,7 +92,7 @@ The following commands can be executed from the context menu in the text editor:
 
 You can display the Git tracking status and file path of the currently active file in the status bar.
 
-VSCode's Explorer only shows an `M` icon even if a file is partially staged, which can be confusing. Therefore, this feature was implemented. (Of course, this is unnecessary for those who frequently use VSCode's built-in "Source Control" view.)
+VSCode's Explorer displays a file with the `M` (modified) indicator whether only part of the file is staged or all changes are staged, making it unclear what the actual state is. This feature was implemented to address that issue. (Of course, this is unnecessary for those who frequently use VSCode's built-in "Source Control" view.)
 
 <img width="189" alt="git tracking status in the status bar" src="https://tettekete.github.io/vscode-git-add-with-git-add-extension/images/git-stat-in-status-bar.jpg">
 
@@ -101,9 +101,9 @@ VSCode's Explorer only shows an `M` icon even if a file is partially staged, whi
 1. Open "Settings"
    - Go to "Settings" → "Extensions" → "git add with git add" → "Show File Status in Status Bar"
    - Alternatively, search for `git-add-with-git-add.showFileStatusInStatusBar` in the settings search bar.
-2. Choose either "Display as a status message" or "Always display as a status bar item."
+2. Choose either `Display as a status message` or `Always display as a status bar item`.
 
-If you choose "Always display as a status bar item," the status will persist in the status bar. If you choose "Display as a status message," it is displayed as a simple status bar message, so it may be overwritten by other messages.
+If you choose `Always display as a status bar item`, the status will persist in the status bar. If you choose `Display as a status message`, it is displayed as a simple status bar message, so it may be overwritten by other messages.
 
 ### Display Format
 
