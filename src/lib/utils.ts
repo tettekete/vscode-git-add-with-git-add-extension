@@ -3,6 +3,8 @@ import { execSync ,exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
 import path from 'node:path';
+import { execGitCommandSync } from './exec-git-commands';
+import { kGitDiff } from '../constants';
 
 const execAsync = promisify(exec);
 
@@ -30,17 +32,18 @@ export function getGitDiff(
 		unified_option = `--unified=${unified}`;
 	}
 
-	let relPath = file_path;
-	if( path.isAbsolute( file_path ) )
+	const {error ,stdout } = execGitCommandSync({
+		command: kGitDiff,
+		options: [unified_option],
+		files:[file_path],
+		cwd: repo_dir
+	});
+
+	if( error )
 	{
-		relPath = path.relative( repo_dir , file_path );
+		vscode.window.showErrorMessage(`Error: ${error.message}`);
 	}
-	const safePath = escapeArgumentForShell( relPath );
-	const stdout = execSync(
-								`git diff ${unified_option} ${safePath}`,
-								{cwd: repo_dir }
-							).toString();
-	if( stdout.length )
+	else if( stdout.length )
 	{
 		return stdout;
 	}
