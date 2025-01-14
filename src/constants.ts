@@ -23,7 +23,8 @@ export const kValidGitCommands =
 	kGitStatusPorcelain:'git status --porcelain',
 	kGitStatusPorcelainUno:		'git status --porcelain -uno',
 	kGitDiffCachedNameStatus:	'git diff --cached --name-status',
-	kGitDiff:					'git diff'
+	kGitDiff:					'git diff',
+	kGit:						'git'
 } as const;
 
 export const
@@ -35,7 +36,8 @@ export const
 	kGitStatusPorcelain,
 	kGitDiffCachedNameStatus,
 	kGitStatusPorcelainUno,
-	kGitDiff
+	kGitDiff,
+	kGit
 } = kValidGitCommands;
 
 
