@@ -702,7 +702,7 @@ export class ChangeSet
 	 * @param {number} afterLineNo
 	 * @returns {(number | undefined)}
 	 */
-	getBeforeLineNoFormAfterLineNo( afterLineNo: number ):number | undefined
+	getBeforeLineNoFromAfterLineNo( afterLineNo: number ):number | undefined
 	{
 		const indexInfo	= this.#lineAfterIndex.get( afterLineNo );
 
@@ -715,7 +715,7 @@ export class ChangeSet
 	/**
 	 * Returns the `beforeLine` number corresponding to the specified `afterLine`.
 	 *
-	 * The difference from `getBeforeLineNoFormAfterLineNo()` is that if no `beforeLine`
+	 * The difference from `getBeforeLineNoFromAfterLineNo()` is that if no `beforeLine`
 	 * is found, it returns the first `beforeLine` found by going backwards.
 	 * 
 	 * If no `beforeLine` is found, it returns the value of `fallback` if specified,
@@ -725,7 +725,7 @@ export class ChangeSet
 	 * @param {?number} [fallback] - fallback number if not found.
 	 * @returns {(number | undefined)}
 	 */
-	findBeforeLineNoFormAfterLineNo( afterLineNo:number ,fallback?:number ):number | undefined
+	findBeforeLineNoFromAfterLineNo( afterLineNo:number ,fallback?:number ):number | undefined
 	{
 		const indexInfo	= this.#lineAfterIndex.get( afterLineNo );
 		const return_fallback_or_undefined = () =>
