@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
-import { exec,execSync } from 'node:child_process';
+import {
+	exec,
+	execSync,
+	spawnSync
+} from 'node:child_process';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { escapeArgumentForShell } from './utils';
@@ -332,6 +336,60 @@ export function execGitCommandSync(
 		error,
 		stdout: _stdout
 	};
+}
+
+export function execGitCommandWithPipe(
+	{
+		command
+		,options = []
+		,files = []
+		,stdin
+		,cwd
+		,usePeriodWhenEmptyFiles = false
+		,isStatusChangingCommand = false
+	}:
+	{
+		command: ValidGitCommands,
+		options?: string[],
+		files?: string[] ,
+		stdin: string,
+		cwd: string,
+		usePeriodWhenEmptyFiles?: boolean
+		isStatusChangingCommand?: boolean
+	}
+):
+{
+	error: Error | undefined;
+	stdout: string;
+	stderr: string;
+	status: number | null;
+}
+{
+	const applyProcess = spawnSync(
+			command,
+			options,
+			{
+				cwd: cwd,
+				input: stdin,
+				stdio: 'pipe',
+				encoding: 'utf-8',
+				shell: process.platform === 'win32', // for Windows support
+			});
+	
+	if( applyProcess.error === undefined )
+	{
+		if( isStatusChangingCommand )
+		{
+			dispatchGitStatusUpdateEvent();
+		}
+	}
+
+	return {
+		error:	applyProcess.error,
+		stdout:	applyProcess.stdout,
+		stderr:	applyProcess.stderr,
+		status: applyProcess.status
+	}
 }
 
 function _buildCommand(
