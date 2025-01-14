@@ -3,10 +3,10 @@ import { StatusBarMessageQueue } from './lib/status-bar-message-queue';
 import
 	{
 		isGitTrackedDir, 
-		getGitDiff,
 		findWorkspaceFolder,
 		isGitTrackedFile
 	} from './lib/utils';
+import { getGitDiff } from './lib/exec-git-commands';
 import { MakePatchFromSelection } from './lib/make-patch-from-selection';
 import { LineRange } from './lib/line-range';
 import { spawnSync } from 'child_process';

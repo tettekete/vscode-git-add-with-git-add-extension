@@ -3,53 +3,19 @@ import { execSync ,exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
 import path from 'node:path';
-import { execGitCommandSync } from './exec-git-commands';
-import { kGitDiff } from '../constants';
 
 const execAsync = promisify(exec);
 
-/**
- * Get the Git diff for a specific file within a repository.
- * 
- * This function retrieves the output of the `git diff` command for a given file path,
- * executed in the specified repository directory. If there is no difference, an empty
- * string is returned.
- * 
- * @param {string} repo_dir - The path to the Git repository directory.
- * @param {string} file_path - The path to the file to check for differences.
- * @param {number | undefined} unified - Default is 'undefined'. When a number is received, it is executed with the '--unified' option.
- * @returns {string} The Git diff output as a string, or an empty string if there are no differences.
- */
-export function getGitDiff(
-							repo_dir:string ,
-							file_path: string ,
-							unified: number | undefined = undefined
-						):string
 {
-	let unified_option = '';
-	if( typeof unified === 'number' )
 	{
-		unified_option = `--unified=${unified}`;
 	}
 
-	const {error ,stdout } = execGitCommandSync({
-		command: kGitDiff,
-		options: [unified_option],
-		files:[file_path],
-		cwd: repo_dir
-	});
 
-	if( error )
 	{
-		vscode.window.showErrorMessage(`Error: ${error.message}`);
 	}
-	else if( stdout.length )
 	{
-		return stdout;
 	}
 
-	return '';
-}
 
 
 /**
