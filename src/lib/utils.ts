@@ -3,20 +3,61 @@ import { execSync ,exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
 import path from 'node:path';
+import { LineRange } from './line-range';
 
 const execAsync = promisify(exec);
 
+export async function ReadyToGitTrackedSelection()
+:
+Promise<{
+	workspace: string;
+	filePath: string;
+	lineRange: LineRange;
+}| Error>
 {
+	const editor	= vscode.window.activeTextEditor;
+	if (! editor)
 	{
+		return Error( vscode.l10n.t('No active file found') );
 	}
 
+	const filePath = editor.document.uri.fsPath;
+	const workspace = findWorkspaceFolder(filePath);
 
+	if ( ! workspace )
 	{
+		return Error( vscode.l10n.t('The active file is not part of any workspace folder.') );
 	}
+
+	if( ! await isGitTrackedDir( workspace ) )
 	{
+		return Error( vscode.l10n.t('There is no git repository in the workspace.') );
 	}
 
+	// get seletion
+	const selection = editor.selection;
+	let startLine:number;
+	let endLine:number;
 
+	if ( selection.isEmpty )
+	{
+		const cursorPosition = selection.active;
+		startLine = endLine = cursorPosition.line;
+	}
+	else
+	{
+		startLine	= selection.start.line;
+		endLine		= selection.end.line;
+	}
+
+	const lineRange = new LineRange( startLine + 1 , endLine + 1 );
+	
+	return {
+		workspace,
+		filePath,
+		lineRange
+	};
+}
 
 /**
  * Checks if a given directory is tracked by Git.
