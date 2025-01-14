@@ -29,18 +29,20 @@ export async function execGitAddFiles( files: string[] ,cwd: string ):Promise<Co
 		{
 			command: kGitAdd,
 			files,
-			cwd
+			cwd,
+			isStatusChangingCommand: true
 		});
 }
 
 
-export async function execGitRestoreStaged( files: string[] ,cwd: string ):Promise<CommandResult>
+export async function execGitRestoreStaged( files: string[] ,cwd: string ,isStatusChangingCommand = true):Promise<CommandResult>
 {
 	return await execGitCommandWithFiles(
 		{
 			command: kGitRestoreStaged,
 			files,
-			cwd
+			cwd,
+			isStatusChangingCommand
 		});
 }
 
@@ -52,13 +54,15 @@ export async function execGitCommandWithFiles(
 		,files
 		,cwd
 		,usePeriodWhenEmptyFiles = false
+		,isStatusChangingCommand = false
 	}:
 	{
 		command: ValidGitCommands,
 		options?: string[],
 		files: string[] ,
 		cwd: string,
-		usePeriodWhenEmptyFiles?: boolean
+		usePeriodWhenEmptyFiles?: boolean,
+		isStatusChangingCommand?: boolean
 	}
 ):Promise<CommandResult>
 {
@@ -69,6 +73,7 @@ export async function execGitCommandWithFiles(
 			,files
 			,cwd
 			,usePeriodWhenEmptyFiles
+			,isStatusChangingCommand
 		}
 	);
 }
@@ -81,13 +86,15 @@ export async function execGitCommand(
 		,files = []
 		,cwd
 		,usePeriodWhenEmptyFiles = false
+		,isStatusChangingCommand = false
 	}:
 	{
 		command: ValidGitCommands,
 		options?: string[],
 		files?: string[] ,
 		cwd: string,
-		usePeriodWhenEmptyFiles?: boolean
+		usePeriodWhenEmptyFiles?: boolean,
+		isStatusChangingCommand?:boolean
 	}
 ):Promise<CommandResult>
 {
@@ -133,7 +140,7 @@ export async function execGitCommand(
 
 	if( ! error )
 	{
-		if( isStatusChangingCommand( command ) )
+		if( isStatusChangingCommand )
 		{
 			dispatchGitStatusUpdateEvent();
 		}
@@ -161,12 +168,14 @@ export async function execGitCommand(
  * 		files?: string[] ,
  * 		cwd: string,
  * 		usePeriodWhenEmptyFiles?: boolean
+ *		isStatusChangingCommand?: boolean
  * 	}} param0 
  * @param {ValidGitCommands} param0.command 
  * @param {{}} [param0.options=[]] 
  * @param {{}} [param0.files=[]] 
  * @param {string} param0.cwd 
- * @param {boolean} [param0.usePeriodWhenEmptyFiles=false] 
+ * @param {boolean} [param0.usePeriodWhenEmptyFiles=false]
+ * @param {boolean} [param0.isStatusChangingCommand=false] 
  */
 export function execGitCommandSync(
 	{
@@ -175,6 +184,7 @@ export function execGitCommandSync(
 		,files = []
 		,cwd
 		,usePeriodWhenEmptyFiles = false
+		,isStatusChangingCommand = false
 	}:
 	{
 		command: ValidGitCommands,
@@ -182,6 +192,7 @@ export function execGitCommandSync(
 		files?: string[] ,
 		cwd: string,
 		usePeriodWhenEmptyFiles?: boolean
+		isStatusChangingCommand?: boolean
 	}
 ):
 {
@@ -220,6 +231,14 @@ export function execGitCommandSync(
 	catch( e )
 	{
 		error = (e as Error);
+	}
+
+	if( error === undefined )
+	{
+		if( isStatusChangingCommand )
+		{
+			dispatchGitStatusUpdateEvent();
+		}
 	}
 
 	return {
@@ -283,20 +302,4 @@ function _buildCommand(
 	const commandText = cmdList.join(' ');
 	
 	return commandText;
-}
-
-
-function isStatusChangingCommand( command: ValidGitCommands )
-{
-	switch( command )
-	{
-		case kGitAdd:
-		case kGitAddUpdate:
-		case kGitRestoreStaged:
-		case kGitRestore:
-			return true;
-		
-	}
-
-	return false;
 }
