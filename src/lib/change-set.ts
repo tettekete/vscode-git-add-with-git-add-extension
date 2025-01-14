@@ -863,9 +863,12 @@ export class ChangeSet
 	description()
 	{
 		const lines: string[] = [];
-		for(const change of this.#changes )
+		for(let i = 0;i < this.#changes.length; i ++ )
 		{
-			lines.push(`{type: "${change.type}},content: "${change.content}"`);
+			const change = this.#changes[i];
+			const beforeLine	= kLineBefore in change ? change[kLineBefore] : '-';
+			const afterLine		= kLineAfter in change ? change[kLineAfter] :'-';
+			lines.push(`[${i},${beforeLine},${afterLine}]: {type: "${change.type}",content: "${change.content}"`);
 		}
 
 		return lines.join("\n");
