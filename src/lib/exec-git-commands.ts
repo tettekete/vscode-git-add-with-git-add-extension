@@ -68,6 +68,48 @@ export function getGitDiff(
 }
 
 
+/**
+ * --cahced vesion of getGitDiff()
+ *
+ * @export
+ * @param {string} repo_dir 
+ * @param {string} file_path 
+ * @param {(number | undefined)} [unified=undefined] 
+ * @returns {string} 
+ */
+export function getGitDiffCached(
+	repo_dir:string ,
+	file_path: string ,
+	unified: number | undefined = undefined
+):string
+{
+	let unified_option = '';
+	if( typeof unified === 'number' )
+	{
+		unified_option = `--unified=${unified}`;
+	}
+
+	const {error ,stdout } = execGitCommandSync({
+		command: kGitDiff,
+		options: ['--cached' , unified_option],
+		files:[file_path],
+		cwd: repo_dir,
+		isStatusChangingCommand: false
+	});
+
+	if( error )
+	{
+		vscode.window.showErrorMessage(`Error: ${error.message}`);
+	}
+	else if( stdout.length )
+	{
+		return stdout;
+	}
+
+	return '';
+}
+
+
 export async function execGitAddFiles( files: string[] ,cwd: string ):Promise<CommandResult>
 {
 	return await execGitCommandWithFiles(
