@@ -173,6 +173,8 @@ async function git_add_u()
 
 export function activate(context: vscode.ExtensionContext)
 {
+	vscode.commands.executeCommand('setContext', 'tettekete.notShowInCommandPalette', false);
+
 	const run_git_add	= vscode.commands.registerCommand('tettekete.git-add-with-git-add', git_add );
 	const run_git_add_u	= vscode.commands.registerCommand('tettekete.git-add-with-git-add-u', git_add_u );
 	const run_git_add_l	= vscode.commands.registerCommand('tettekete.git-add-with-git-add-selected-lines', git_add_selected_lines );

@@ -1,7 +1,7 @@
 {
-	"contributes.commands0.title": "git add: File in Active Editor",
-	"contributes.commands1.title": "git add: -u (Changes in Tracked Files)",
-	"contributes.commands2.title": "git add: Selected Lines or Cursor Line",
+	"contributes.commands0.title": "File in Active Editor",
+	"contributes.commands1.title": "-u (Changes in Tracked Files)",
+	"contributes.commands2.title": "Selected Lines or Cursor Line",
 	"command.tettekete.git-add-wga-from-explorer": "+ git add",
 	"command.tettekete.git-add-wga-u-from-explorer": "+ git add -u (Changes in Tracked Files)",
 	"command.tettekete.git-add-wga-restore-from-explorer": "♻︎ git restore",

@@ -93,15 +93,18 @@
     "commands": [
       {
         "command": "tettekete.git-add-with-git-add",
-        "title": "%contributes.commands0.title%"
+        "title": "%contributes.commands0.title%",
+        "category": "git add"
       },
       {
         "command": "tettekete.git-add-with-git-add-u",
-        "title": "%contributes.commands1.title%"
+        "title": "%contributes.commands1.title%",
+        "category": "git add"
       },
       {
         "command": "tettekete.git-add-with-git-add-selected-lines",
-        "title": "%contributes.commands2.title%"
+        "title": "%contributes.commands2.title%",
+        "category": "git add"
       },
       {
         "command": "tettekete.git-add-wga-from-explorer",
@@ -137,6 +140,53 @@
       }
     ],
     "menus": {
+      "commandPalette":[
+        {
+          "command": "tettekete.git-add-with-git-add"
+        },
+        {
+          "command": "tettekete.git-add-with-git-add-u"
+        },
+        {
+          "command": "tettekete.git-add-with-git-add-selected-lines"
+        },
+        {
+            "command": "tettekete.git-add-wga-from-explorer",
+            "when": "tettekete.notShowInCommandPalette"
+        },
+        {
+          "command": "tettekete.git-add-wga-u-from-explorer",
+          "when": "tettekete.notShowInCommandPalette"
+        },
+        {
+          "command": "tettekete.git-add-wga-restore-from-explorer",
+          "when": "tettekete.notShowInCommandPalette"
+        },
+        {
+          "command": "tettekete.git-add-wga-unstage-from-explorer",
+          "when": "tettekete.notShowInCommandPalette"
+        },
+        {
+          "command": "tettekete.git-add-wga-from-editor",
+          "when": "tettekete.notShowInCommandPalette"
+        },
+        {
+          "command": "tettekete.git-add-wga-selected-lines-from-editor",
+          "when": "tettekete.notShowInCommandPalette"
+        },
+        {
+          "command": "tettekete.git-add-wga-unstage-from-editor",
+          "when": "tettekete.notShowInCommandPalette"
+        },
+        {
+          "command": "tettekete.git-add-wga-restore-from-editor",
+          "when": "tettekete.notShowInCommandPalette"
+        },
+        {
+          "command": "tettekete.git-add-wga-unstage-lines-from-editor",
+          "when": "tettekete.notShowInCommandPalette"
+        }
+      ],
       "explorer/context": [
         {
             "submenu": "gawga.submenu",
@@ -185,20 +235,6 @@
         {
           "command": "tettekete.git-add-wga-restore-from-editor",
           "group": "2nd-group"
-        }
-      ],
-      "commandPalette": [
-        {
-            "command": "tettekete.git-add-wga-from-explorer",
-            "when": "explorerViewletFocus"
-        },
-        {
-            "command": "tettekete.git-add-wga-u-from-explorer",
-            "when": "explorerViewletFocus"
-        },
-        {
-            "command": "tettekete.git-add-wga-unstage-from-explorer",
-            "when": "explorerViewletFocus"
         }
       ]
     },
