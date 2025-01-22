@@ -249,3 +249,17 @@ export function escapeRegexMeta(str: string): string
 {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
+
+export async function sleep( sec:number ):Promise<void>
+{
+	const msec = Math.floor( sec * 1000 );
+	return new Promise((resolve )=>
+	{
+		setTimeout(()=>
+			{
+				resolve();
+			}
+			,msec
+		);
+	});
+}
