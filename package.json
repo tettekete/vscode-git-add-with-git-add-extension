@@ -2,7 +2,7 @@
   "name": "git-add-with-git-add",
   "displayName": "git add with git add",
   "description": "Run git add via Command Palette with 'git add'",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "engines": {
     "vscode": "^1.95.0"
   },
