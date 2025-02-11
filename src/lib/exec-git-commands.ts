@@ -389,7 +389,7 @@ export function execGitCommandWithPipe(
 		stdout:	applyProcess.stdout,
 		stderr:	applyProcess.stderr,
 		status: applyProcess.status
-	}
+	};
 }
 
 function _buildCommand(

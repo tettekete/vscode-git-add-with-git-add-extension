@@ -43,7 +43,7 @@ export async function createStatusBarText( editor?: vscode.TextEditor )
 			return 'No file open';
 		}
 
-		filePath	= pathOrUndefined
+		filePath	= pathOrUndefined;
 	}
 
 	
