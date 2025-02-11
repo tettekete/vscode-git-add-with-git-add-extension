@@ -14,7 +14,7 @@ import {
 } from './lib/git-status-event-bus';
 import { kGitStatusPollingInterval } from './constants';
 
-const condeIconInStatusItem = '$(chevron-right)';
+const codeIconInStatusItem = '$(chevron-right)';
 
 let statusBarItem: vscode.StatusBarItem | undefined;
 let activeEditorListener: vscode.Disposable | undefined;
@@ -28,7 +28,7 @@ export function activateShowFileStatusInStatusBar()
 	setupShowFileStatusInStatusBar();
 }
 
-export function deactivateShowInFileStatusStatusBar()
+export function deactivateShowFileStatusInStatusBar()
 {
 	activeEditorListener?.dispose();
     configChangeListener?.dispose();
@@ -68,7 +68,7 @@ function registerConfigChangeListener()
 }
 
 
-function registerGitStatusLisntener(  updateDisplayCallback: ( editor?: vscode.TextEditor ) => void )
+function registerGitStatusListener(  updateDisplayCallback: ( editor?: vscode.TextEditor ) => void )
 {
 	if( gitStatusDisposer )
 	{
@@ -102,14 +102,14 @@ function setupShowFileStatusInStatusBar()
 			_createFileStatusItem();
 			updateFileStatusInStatusItem( vscode.window.activeTextEditor );
 			registerActiveEditorListener( updateFileStatusInStatusItem );
-			registerGitStatusLisntener( updateFileStatusInStatusItem );
+			registerGitStatusListener( updateFileStatusInStatusItem );
 			startGitStatusObserver();
 			break;
 
 		case 'status-message':
 			statusBarItem?.dispose();
 			registerActiveEditorListener( updateFileStatusAsMessage );
-			registerGitStatusLisntener( updateFileStatusAsMessage );
+			registerGitStatusListener( updateFileStatusAsMessage );
 			updateFileStatusAsMessage( vscode.window.activeTextEditor );
 			startGitStatusObserver();
 			break;
@@ -147,7 +147,7 @@ async function updateFileStatusInStatusItem( editor?: vscode.TextEditor ):Promis
 	statusBarItem.hide();
 	let message = await createStatusBarText( editor );
 
-	statusBarItem.text		= `${condeIconInStatusItem}${message}`;
+	statusBarItem.text		= `${codeIconInStatusItem}${message}`;
 	statusBarItem.show();
 }
 

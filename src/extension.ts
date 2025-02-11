@@ -18,7 +18,7 @@ import { git_unstage_from_explorer } from './explorer_git';
 import { git_add_u_from_explorer } from './explorer_git';
 import {
 	activateShowFileStatusInStatusBar,
-	deactivateShowInFileStatusStatusBar
+	deactivateShowFileStatusInStatusBar
 } from './show_file_status';
 import {
 	git_unstage_from_editor,
@@ -139,15 +139,15 @@ async function git_add()
 
 async function git_add_u()
 {
-	const git_trackde_dirs = await findGitTrackedDirs();
+	const git_tracked_dirs = await findGitTrackedDirs();
 
-	if( ! git_trackde_dirs )
+	if( ! git_tracked_dirs )
 	{
 		vscode.window.showErrorMessage(vscode.l10n.t('This project does not have a git repository.'),{modal:true});
 		return;
 	}
 
-	for( const dir of git_trackde_dirs )
+	for( const dir of git_tracked_dirs )
 	{
 		exec(
 			'git add -u',
@@ -205,5 +205,5 @@ export function activate(context: vscode.ExtensionContext)
 // This method is called when your extension is deactivated
 export function deactivate()
 {
-	deactivateShowInFileStatusStatusBar();
+	deactivateShowFileStatusInStatusBar();
 }

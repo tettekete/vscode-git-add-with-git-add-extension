@@ -143,7 +143,7 @@ async function getGitStat( filePath: string ,workspace: string ):Promise<GitStat
 				result['git_short_stat']	= 'M+A';
 				break;
 			
-			case 'R ':	// Renamed and stageed
+			case 'R ':	// Renamed and staged
 				result['git_stat']			= 'Renamed';
 				result['git_short_stat']	= 'R+A';
 				break;
