@@ -14,13 +14,15 @@ import {
 } from './lib/git-status-event-bus';
 import { kGitStatusPollingInterval } from './constants';
 
-const condeIconInStatusItem = '$(chevron-right)';
+const codeIconInStatusItem = '$(chevron-right)';
 
+let changeTagGroupListener: vscode.Disposable | undefined;
+let changeTabsListener: vscode.Disposable | undefined;
 let statusBarItem: vscode.StatusBarItem | undefined;
-let activeEditorListener: vscode.Disposable | undefined;
 let configChangeListener: vscode.Disposable | undefined;
 let statusMessageDisposer: vscode.Disposable | undefined;
 let gitStatusDisposer: GAWGADisposer | undefined;
+
 
 export function activateShowFileStatusInStatusBar()
 {
@@ -28,21 +30,45 @@ export function activateShowFileStatusInStatusBar()
 	setupShowFileStatusInStatusBar();
 }
 
-export function deactivateShowInFileStatusStatusBar()
+export function deactivateShowFileStatusInStatusBar()
 {
-	activeEditorListener?.dispose();
+	changeTabsListener?.dispose();
+	changeTagGroupListener?.dispose();
     configChangeListener?.dispose();
     statusBarItem?.dispose();
 }
 
 function registerActiveEditorListener( updateDisplayCallback: ( editor?: vscode.TextEditor ) => void )
 {
-	if (activeEditorListener)
+	if( changeTabsListener )
 	{
-		activeEditorListener.dispose();
+		changeTabsListener.dispose();
 	}
 
-	activeEditorListener = vscode.window.onDidChangeActiveTextEditor( updateDisplayCallback );
+	if( changeTagGroupListener )
+	{
+		changeTagGroupListener.dispose();
+	}
+
+	changeTagGroupListener = vscode.window.tabGroups.onDidChangeTabGroups(
+		(event : vscode.TabGroupChangeEvent)=>
+		{
+			if( event.changed.length )
+			{
+				updateDisplayCallback();
+			}
+		});
+
+	changeTabsListener = vscode.window.tabGroups.onDidChangeTabs(
+		(event: vscode.TabChangeEvent) =>
+		{
+			const activeTab = event.changed.find(tab => tab.isActive);
+			if( activeTab )
+			{
+				updateDisplayCallback();
+			}
+		});
+	
 }
 
 
@@ -68,7 +94,7 @@ function registerConfigChangeListener()
 }
 
 
-function registerGitStatusLisntener(  updateDisplayCallback: ( editor?: vscode.TextEditor ) => void )
+function registerGitStatusListener(  updateDisplayCallback: ( editor?: vscode.TextEditor ) => void )
 {
 	if( gitStatusDisposer )
 	{
@@ -102,14 +128,14 @@ function setupShowFileStatusInStatusBar()
 			_createFileStatusItem();
 			updateFileStatusInStatusItem( vscode.window.activeTextEditor );
 			registerActiveEditorListener( updateFileStatusInStatusItem );
-			registerGitStatusLisntener( updateFileStatusInStatusItem );
+			registerGitStatusListener( updateFileStatusInStatusItem );
 			startGitStatusObserver();
 			break;
 
 		case 'status-message':
 			statusBarItem?.dispose();
 			registerActiveEditorListener( updateFileStatusAsMessage );
-			registerGitStatusLisntener( updateFileStatusAsMessage );
+			registerGitStatusListener( updateFileStatusAsMessage );
 			updateFileStatusAsMessage( vscode.window.activeTextEditor );
 			startGitStatusObserver();
 			break;
@@ -117,7 +143,6 @@ function setupShowFileStatusInStatusBar()
 		default:
 			statusMessageDisposer?.dispose();
 			statusBarItem?.dispose();
-			activeEditorListener?.dispose();
 			gitStatusDisposer?.dispose();
 			stopGitStatusObserver();
 			break;
@@ -126,18 +151,8 @@ function setupShowFileStatusInStatusBar()
 
 async function updateFileStatusAsMessage( editor?: vscode.TextEditor ):Promise<void>
 {
-	let message = 'No file open';
-	if( ! editor )
-	{
-		editor = vscode.window.activeTextEditor;
-	}
-
-	if (editor && editor.document)
-	{
-		const filePath = editor.document.uri.fsPath;
-		message = await createStatusBarText( editor );
-	}
-
+	const message = await createStatusBarText( editor );
+	
 	if( statusMessageDisposer ){ statusMessageDisposer.dispose(); }
 	statusMessageDisposer = vscode.window.setStatusBarMessage(`${message}`);
 }
@@ -155,20 +170,9 @@ async function updateFileStatusInStatusItem( editor?: vscode.TextEditor ):Promis
 	}
 
 	statusBarItem.hide();
-	let message = 'No file open';
+	let message = await createStatusBarText( editor );
 
-	if( ! editor )
-	{
-		editor = vscode.window.activeTextEditor;
-	}
-
-	if (editor && editor.document)
-	{
-		const filePath = editor.document.uri.fsPath;
-		message = await createStatusBarText( editor );
-	}
-
-	statusBarItem.text		= `${condeIconInStatusItem}${message}`;
+	statusBarItem.text		= `${codeIconInStatusItem}${message}`;
 	statusBarItem.show();
 }
 

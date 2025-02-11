@@ -5,7 +5,8 @@ import {
 	findWorkspaceFolder,
 	isGitTrackedDir,
 	renderTemplate,
-	escapeRegexMeta
+	escapeRegexMeta,
+	getActiveTabFilePath
 } from './utils';
 
 import {
@@ -29,10 +30,22 @@ export async function createStatusBarText( editor?: vscode.TextEditor )
 	const config = vscode.workspace.getConfiguration();
 	const showFileStatusConfig	= config.get<string>('git-add-with-git-add.fileStatusFormat','');
 
-	if( ! editor )
+	let filePath:string;
+	if( editor )
 	{
-		editor = vscode.window.activeTextEditor;
+		filePath	= editor.document.uri.fsPath;
 	}
+	else
+	{
+		const pathOrUndefined = getActiveTabFilePath();
+		if( pathOrUndefined === undefined )
+		{
+			return 'No file open';
+		}
+
+		filePath	= pathOrUndefined;
+	}
+
 	
 	const kvData:Record<string,string> =
 	{
@@ -42,9 +55,10 @@ export async function createStatusBarText( editor?: vscode.TextEditor )
 		git_stat: '',
 		git_short_stat: ''
 	};
-	kvData['abs_path'] = editor ? editor.document.uri.fsPath : '';
 
-	const abs_path = editor ? editor.document.uri.fsPath : '';
+	const abs_path		= filePath;
+	kvData['abs_path']	= abs_path;
+
 	if( abs_path.length )
 	{
 		kvData['abs_path'] = abs_path;
@@ -129,7 +143,7 @@ async function getGitStat( filePath: string ,workspace: string ):Promise<GitStat
 				result['git_short_stat']	= 'M+A';
 				break;
 			
-			case 'R ':	// Renamed and stageed
+			case 'R ':	// Renamed and staged
 				result['git_stat']			= 'Renamed';
 				result['git_short_stat']	= 'R+A';
 				break;

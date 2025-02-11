@@ -5,7 +5,8 @@ import * as path from 'path';
 
 import {
 	findWorkspaceFolder,
-	isGitTrackedDir
+	isGitTrackedDir,
+	getActiveTabFilePath
 } from './lib/utils';
 
 import { StatusBarMessageQueue } from './lib/status-bar-message-queue';
@@ -17,7 +18,7 @@ import { git_unstage_from_explorer } from './explorer_git';
 import { git_add_u_from_explorer } from './explorer_git';
 import {
 	activateShowFileStatusInStatusBar,
-	deactivateShowInFileStatusStatusBar
+	deactivateShowFileStatusInStatusBar
 } from './show_file_status';
 import {
 	git_unstage_from_editor,
@@ -76,13 +77,27 @@ async function findGitTrackedDirs():Promise<string[] | undefined>
 async function git_add()
 {
 	const editor = vscode.window.activeTextEditor;
+	let filePath:string;
+
 	if (! editor)
 	{
-		vscode.window.showErrorMessage(vscode.l10n.t('No active file found'),{modal: true});
-		return;
+		const pathOrUndefined = getActiveTabFilePath();
+
+		if( pathOrUndefined === undefined)
+		{
+			vscode.window.showErrorMessage(vscode.l10n.t('No active file found'),{modal: true});
+			return;
+		}
+		else
+		{
+			filePath = pathOrUndefined;
+		}
+	}
+	else
+	{
+		filePath = editor.document.uri.fsPath;
 	}
 
-	const filePath = editor.document.uri.fsPath;
 	const workspaceFolder = findWorkspaceFolder(filePath);
 
 	if ( ! workspaceFolder )
@@ -124,15 +139,15 @@ async function git_add()
 
 async function git_add_u()
 {
-	const git_trackde_dirs = await findGitTrackedDirs();
+	const git_tracked_dirs = await findGitTrackedDirs();
 
-	if( ! git_trackde_dirs )
+	if( ! git_tracked_dirs )
 	{
 		vscode.window.showErrorMessage(vscode.l10n.t('This project does not have a git repository.'),{modal:true});
 		return;
 	}
 
-	for( const dir of git_trackde_dirs )
+	for( const dir of git_tracked_dirs )
 	{
 		exec(
 			'git add -u',
@@ -190,5 +205,5 @@ export function activate(context: vscode.ExtensionContext)
 // This method is called when your extension is deactivated
 export function deactivate()
 {
-	deactivateShowInFileStatusStatusBar();
+	deactivateShowFileStatusInStatusBar();
 }

@@ -3,51 +3,94 @@ import { execSync ,exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
 import path from 'node:path';
+import { LineRange } from './line-range';
 
 const execAsync = promisify(exec);
 
+
 /**
- * Get the Git diff for a specific file within a repository.
- * 
- * This function retrieves the output of the `git diff` command for a given file path,
- * executed in the specified repository directory. If there is no difference, an empty
- * string is returned.
- * 
- * @param {string} repo_dir - The path to the Git repository directory.
- * @param {string} file_path - The path to the file to check for differences.
- * @param {number | undefined} unified - Default is 'undefined'. When a number is received, it is executed with the '--unified' option.
- * @returns {string} The Git diff output as a string, or an empty string if there are no differences.
+ * A utility function that returns the file path of the active tab.
+ *
+ * If vscode.window.activeTextEditor returns undefined, it may indicate that
+ * an image file or other non-text content is being displayed. In this case,
+ * the file path should be retrieved from vscode.window.tabGroups.activeTabGroup.activeTab
+ * instead.
+ *
+ * @export
+ * @returns {(string | undefined)} 
  */
-export function getGitDiff(
-							repo_dir:string ,
-							file_path: string ,
-							unified: number | undefined = undefined
-						):string
+export function getActiveTabFilePath(): string | undefined
 {
-	let unified_option = '';
-	if( typeof unified === 'number' )
+    const activeTab = vscode.window.tabGroups.activeTabGroup.activeTab;
+    if( activeTab === undefined )
 	{
-		unified_option = `--unified=${unified}`;
+		return undefined;
 	}
 
-	let relPath = file_path;
-	if( path.isAbsolute( file_path ) )
+	if( activeTab.input instanceof vscode.TabInputText
+		|| activeTab.input instanceof vscode.TabInputCustom
+	)
 	{
-		relPath = path.relative( repo_dir , file_path );
-	}
-	const safePath = escapeArgumentForShell( relPath );
-	const stdout = execSync(
-								`git diff ${unified_option} ${safePath}`,
-								{cwd: repo_dir }
-							).toString();
-	if( stdout.length )
-	{
-		return stdout;
-	}
+        const fileUri = activeTab.input.uri;
+        return fileUri.fsPath;
+    }
 
-	return '';
+    return undefined;
 }
 
+
+
+export async function ReadyToGitTrackedSelection()
+:
+Promise<{
+	workspace: string;
+	filePath: string;
+	lineRange: LineRange;
+}| Error>
+{
+	const editor	= vscode.window.activeTextEditor;
+	if (! editor)
+	{
+		return Error( vscode.l10n.t('No active file found') );
+	}
+
+	const filePath = editor.document.uri.fsPath;
+	const workspace = findWorkspaceFolder(filePath);
+
+	if ( ! workspace )
+	{
+		return Error( vscode.l10n.t('The active file is not part of any workspace folder.') );
+	}
+
+	if( ! await isGitTrackedDir( workspace ) )
+	{
+		return Error( vscode.l10n.t('There is no git repository in the workspace.') );
+	}
+
+	// get seletion
+	const selection = editor.selection;
+	let startLine:number;
+	let endLine:number;
+
+	if ( selection.isEmpty )
+	{
+		const cursorPosition = selection.active;
+		startLine = endLine = cursorPosition.line;
+	}
+	else
+	{
+		startLine	= selection.start.line;
+		endLine		= selection.end.line;
+	}
+
+	const lineRange = new LineRange( startLine + 1 , endLine + 1 );
+	
+	return {
+		workspace,
+		filePath,
+		lineRange
+	};
+}
 
 /**
  * Checks if a given directory is tracked by Git.
