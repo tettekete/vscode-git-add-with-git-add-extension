@@ -5,7 +5,8 @@ import * as path from 'path';
 
 import {
 	findWorkspaceFolder,
-	isGitTrackedDir
+	isGitTrackedDir,
+	getActiveTabFilePath
 } from './lib/utils';
 
 import { StatusBarMessageQueue } from './lib/status-bar-message-queue';
@@ -76,13 +77,27 @@ async function findGitTrackedDirs():Promise<string[] | undefined>
 async function git_add()
 {
 	const editor = vscode.window.activeTextEditor;
+	let filePath:string;
+
 	if (! editor)
 	{
-		vscode.window.showErrorMessage(vscode.l10n.t('No active file found'),{modal: true});
-		return;
+		const pathOrUndefined = getActiveTabFilePath();
+
+		if( pathOrUndefined === undefined)
+		{
+			vscode.window.showErrorMessage(vscode.l10n.t('No active file found'),{modal: true});
+			return;
+		}
+		else
+		{
+			filePath = pathOrUndefined;
+		}
+	}
+	else
+	{
+		filePath = editor.document.uri.fsPath;
 	}
 
-	const filePath = editor.document.uri.fsPath;
 	const workspaceFolder = findWorkspaceFolder(filePath);
 
 	if ( ! workspaceFolder )
