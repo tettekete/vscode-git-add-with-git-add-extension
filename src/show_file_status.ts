@@ -16,11 +16,13 @@ import { kGitStatusPollingInterval } from './constants';
 
 const codeIconInStatusItem = '$(chevron-right)';
 
+let changeTagGroupListener: vscode.Disposable | undefined;
+let changeTabsListener: vscode.Disposable | undefined;
 let statusBarItem: vscode.StatusBarItem | undefined;
-let activeEditorListener: vscode.Disposable | undefined;
 let configChangeListener: vscode.Disposable | undefined;
 let statusMessageDisposer: vscode.Disposable | undefined;
 let gitStatusDisposer: GAWGADisposer | undefined;
+
 
 export function activateShowFileStatusInStatusBar()
 {
@@ -30,19 +32,43 @@ export function activateShowFileStatusInStatusBar()
 
 export function deactivateShowFileStatusInStatusBar()
 {
-	activeEditorListener?.dispose();
+	changeTabsListener?.dispose();
+	changeTagGroupListener?.dispose();
     configChangeListener?.dispose();
     statusBarItem?.dispose();
 }
 
 function registerActiveEditorListener( updateDisplayCallback: ( editor?: vscode.TextEditor ) => void )
 {
-	if (activeEditorListener)
+	if( changeTabsListener )
 	{
-		activeEditorListener.dispose();
+		changeTabsListener.dispose();
 	}
 
-	activeEditorListener = vscode.window.onDidChangeActiveTextEditor( updateDisplayCallback );
+	if( changeTagGroupListener )
+	{
+		changeTagGroupListener.dispose();
+	}
+
+	changeTagGroupListener = vscode.window.tabGroups.onDidChangeTabGroups(
+		(event : vscode.TabGroupChangeEvent)=>
+		{
+			if( event.changed.length )
+			{
+				updateDisplayCallback();
+			}
+		});
+
+	changeTabsListener = vscode.window.tabGroups.onDidChangeTabs(
+		(event: vscode.TabChangeEvent) =>
+		{
+			const activeTab = event.changed.find(tab => tab.isActive);
+			if( activeTab )
+			{
+				updateDisplayCallback();
+			}
+		});
+	
 }
 
 
@@ -117,7 +143,6 @@ function setupShowFileStatusInStatusBar()
 		default:
 			statusMessageDisposer?.dispose();
 			statusBarItem?.dispose();
-			activeEditorListener?.dispose();
 			gitStatusDisposer?.dispose();
 			stopGitStatusObserver();
 			break;
