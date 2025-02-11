@@ -126,18 +126,8 @@ function setupShowFileStatusInStatusBar()
 
 async function updateFileStatusAsMessage( editor?: vscode.TextEditor ):Promise<void>
 {
-	let message = 'No file open';
-	if( ! editor )
-	{
-		editor = vscode.window.activeTextEditor;
-	}
-
-	if (editor && editor.document)
-	{
-		const filePath = editor.document.uri.fsPath;
-		message = await createStatusBarText( editor );
-	}
-
+	const message = await createStatusBarText( editor );
+	
 	if( statusMessageDisposer ){ statusMessageDisposer.dispose(); }
 	statusMessageDisposer = vscode.window.setStatusBarMessage(`${message}`);
 }
@@ -155,18 +145,7 @@ async function updateFileStatusInStatusItem( editor?: vscode.TextEditor ):Promis
 	}
 
 	statusBarItem.hide();
-	let message = 'No file open';
-
-	if( ! editor )
-	{
-		editor = vscode.window.activeTextEditor;
-	}
-
-	if (editor && editor.document)
-	{
-		const filePath = editor.document.uri.fsPath;
-		message = await createStatusBarText( editor );
-	}
+	let message = await createStatusBarText( editor );
 
 	statusBarItem.text		= `${condeIconInStatusItem}${message}`;
 	statusBarItem.show();
