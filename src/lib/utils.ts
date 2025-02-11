@@ -7,6 +7,39 @@ import { LineRange } from './line-range';
 
 const execAsync = promisify(exec);
 
+
+/**
+ * A utility function that returns the file path of the active tab.
+ *
+ * If vscode.window.activeTextEditor returns undefined, it may indicate that
+ * an image file or other non-text content is being displayed. In this case,
+ * the file path should be retrieved from vscode.window.tabGroups.activeTabGroup.activeTab
+ * instead.
+ *
+ * @export
+ * @returns {(string | undefined)} 
+ */
+export function getActiveTabFilePath(): string | undefined
+{
+    const activeTab = vscode.window.tabGroups.activeTabGroup.activeTab;
+    if( activeTab === undefined )
+	{
+		return undefined;
+	}
+
+	if( activeTab.input instanceof vscode.TabInputText
+		|| activeTab.input instanceof vscode.TabInputCustom
+	)
+	{
+        const fileUri = activeTab.input.uri;
+        return fileUri.fsPath;
+    }
+
+    return undefined;
+}
+
+
+
 export async function ReadyToGitTrackedSelection()
 :
 Promise<{
