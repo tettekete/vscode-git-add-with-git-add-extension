@@ -181,10 +181,6 @@
         {
           "command": "tettekete.git-add-wga-restore-from-editor",
           "when": "tettekete.notShowInCommandPalette"
-        },
-        {
-          "command": "tettekete.git-add-wga-unstage-lines-from-editor",
-          "when": "tettekete.notShowInCommandPalette"
         }
       ],
       "explorer/context": [
