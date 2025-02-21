@@ -6,7 +6,10 @@ import {
 } from 'node:child_process';
 import path from 'node:path';
 import { promisify } from 'node:util';
-import { escapeArgumentForShell } from './utils';
+import {
+	escapeArgumentForShell,
+	sleep
+} from './utils';
 import { dispatchGitStatusUpdateEvent } from './git-status-listener';
 
 import type { ValidGitCommands } from '../constants';
@@ -26,6 +29,8 @@ type CommandResult = {
 	stdout: string,
 	stderr: string
 };
+
+const kGitIndexLockedRegex = /^fatal: Unable to create(?:.+)\.git\/index\.lock': File exists/;
 
 /**
  * Get the Git diff for a specific file within a repository.
@@ -207,26 +212,61 @@ export async function execGitCommand(
 	let _stdout:string = '';
 	let _stderr:string = '';
 	let error:Error|undefined = undefined;
-	try
+	let gitIndexLocked = false;
+	
+	const tryExecGitCommand = async () =>
 	{
-		const { stdout , stderr } = await execAsync(
-			commandText,
-			execOption,
-		);
+		try
+		{
+			const { stdout , stderr } = await execAsync(
+				commandText,
+				execOption,
+			);
 
-		_stdout = stdout;
-		_stderr = stderr;
-	}
-	catch( e )
+			_stdout = stdout;
+			_stderr = stderr;
+		}
+		catch( e )
+		{
+			if( e instanceof Error )
+			{
+				if( 'stderr' in e )
+				{
+					const stderr:string = e['stderr'] as string;
+					if( kGitIndexLockedRegex.test( stderr ) )
+					{
+						gitIndexLocked = true;
+					}
+
+				}
+				error = e;
+				
+			}
+			else
+			{
+				error = Error(`${e}`);
+			}
+		}
+	};
+
+	let maxRetry = 8;
+	const retryWaitSec = 0.4;
+	while( maxRetry -- > 0 )
 	{
-		if( e instanceof Error )
+		gitIndexLocked	= false;
+		_stdout			= '';
+		_stderr			= '';
+		error			= undefined;
+
+		await tryExecGitCommand();
+		if( error && gitIndexLocked )
 		{
-			error = e;
+			console.debug('.git/index.lock exists.');
+			await sleep( retryWaitSec );
+			continue;
 		}
-		else
-		{
-			error = Error(`${e}`);
-		}
+		
+		break;
 	}
 
 	if( ! error )
