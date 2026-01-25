@@ -26,6 +26,8 @@ import {
 } from './context_menu_in_editor';
 
 import { kMessageTimeOut } from './constants';
+import { onGitStatusChanged } from './lib/git-status-listener';
+import { refreshGitModel } from './lib/refresh-git-model';
 
 const execAsync = promisify(exec);
 
@@ -202,6 +204,8 @@ export function activate(context: vscode.ExtensionContext)
 							);
 	
 	activateShowFileStatusInStatusBar();
+
+	onGitStatusChanged( refreshGitModel);
 }
 
 // This method is called when your extension is deactivated
